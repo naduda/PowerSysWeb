@@ -1,0 +1,63 @@
+.tablesorter-default{
+	width:100%;
+	text-align: left;
+	border: solid;
+	border-width: 1px;
+	border-color: #888;
+	background-color: #eee;
+}
+.tablesorter-default thead tr{background-color: #8dbdd8;}
+.tablesorter-default th,.tablesorter-default thead td{
+	text-align: center;
+	font-weight: bold;
+	padding: 0 15px;
+	margin: 0;
+	cursor:pointer;
+	border-top: #555 2px solid;
+	border-bottom: #555 2px solid;
+	color: black;
+	font-size: 1.1em;
+}
+.tablesorter-header:after{
+	content: "\f0dc";
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	color: green;
+	margin-left: -17px;
+}
+.tablesorter-headerAsc, .tablesorter-headerDesc{
+	background-color: #BEEBFF;
+}
+.tablesorter-headerAsc:after{
+	content: "\f0de";
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	color: green;
+	margin-left: -17px;
+}
+.tablesorter-header-inner{
+	display: inline-block;
+	width: 100%;
+}
+.tablesorter-headerDesc:after{
+	content: "\f0dd";
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	color: green;
+	margin-left: -17px;
+}
+.tablesorter tbody tr:hover{
+	background-color: #555 !important;
+	color: white;
+	cursor: pointer;
+}
+.selectedAlarm{
+	background-color: blue !important;
+	color: white;
+}
+.filtered{
+	display: none;
+}

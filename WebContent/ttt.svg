@@ -1,0 +1,510 @@
+<svg width="98%" height="98%" viewBox="0 0 1048.82 708.661" xml:space="preserve" color-interpolation-filters="sRGB" class="st48" xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svgScheme" style="position: relative; transform: scale(1) translate(0px, 0px); left: 565px; top: -85px;">
+<style type="text/css">
+		
+		.st1 {fill:#000000;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.71997}
+		.st2 {fill:url(#grad33-6);stroke:#595959;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st3 {fill:#006600;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.71997}
+		.st4 {fill:#2f4f4f;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.71997}
+		.st5 {fill:url(#grad29-16);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.71997}
+		.st6 {fill:none;stroke:#00b0f0;stroke-width:0.999958}
+		.st7 {fill:none;stroke:#00b0f0;stroke-width:0.999961}
+		.st8 {fill:none;stroke:none;stroke-width:0.999964}
+		.st9 {fill:none;stroke:none;stroke-width:0.999967}
+		.st10 {fill:none;stroke:none;stroke-width:0.99997}
+		.st11 {fill:none;stroke:none;stroke-width:0.999973}
+		.st12 {fill:none;stroke:none;stroke-width:0.999976}
+		.st13 {fill:none;stroke:none;stroke-width:0.999979}
+		.st14 {fill:none;stroke:none;stroke-width:0.999982}
+		.st15 {fill:none;stroke:none;stroke-width:0.999985}
+		.st16 {fill:none;stroke:none;stroke-width:0.999988}
+		.st17 {fill:none;stroke:none;stroke-width:0.999991}
+		.st18 {fill:none;stroke:none;stroke-width:0.999994}
+		.st19 {fill:none;stroke:none;stroke-width:0.999997}
+		.st20 {fill:none}
+		.st21 {stroke:#00b0f0;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st22 {fill:#a5a5a5;stroke:#595959;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st23 {fill:#f59d56;stroke:#ffa855;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st24 {fill:none;stroke:none;stroke-width:0.999958}
+		.st25 {fill:none;stroke:none;stroke-width:0.999961}
+		.st26 {stroke:#00bfff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st27 {fill:#7f7f7f;stroke:#7f7f7f;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st28 {fill:#696969;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st29 {fill:#ffd700;font-family:Arial;font-size:1.5em}
+		.st30 {fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st31 {fill:#ffffff;font-family:Arial;font-size:1.5em}
+		.st32 {font-size:1em}
+		.st33 {fill:#4169ff;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.71997}
+		.st34 {font-size:1em;font-weight:bold}
+		.st35 {fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.71997}
+		.st36 {fill:#ffd700;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.71997}
+		.st37 {stroke:#ffffff;stroke-linecap:round;stroke-linejoin:round;stroke-width:4.49985}
+		.st38 {fill:#ffffff;font-family:Arial;font-size:3em}
+		.st39 {fill:#696969;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.71997}
+		.st40 {fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.249989}
+		.st41 {fill:#a5a5a5;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.71997}
+		.st42 {fill:#000000;font-family:Arial;font-size:1.5em}
+		.st43 {fill:#696969;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st44 {stroke:#ff0000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9841}
+		.st45 {fill:#696969;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.249989}
+		.st46 {fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.98408}
+		.st47 {fill:#696969;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.98408}
+		.st48 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+		
+	</style>
+<defs id="Patterns_And_Gradients">
+<linearGradient id="grad30-7" v:fillpattern="33" v:foreground="#777777" v:background="#595959" x1="0.0" y1="1.0" x2="0.0" y2="0.0">
+<stop offset="0.0" style="stop-color:#777777;stop-opacity:1"></stop>
+<stop offset="1.0" style="stop-color:#595959;stop-opacity:1"></stop>
+</linearGradient>
+<linearGradient id="grad25-8" v:fillpattern="33" v:foreground="#777777" v:background="#595959" x1="0.0" y1="0.0" x2="1.0" y2="0.0">
+<stop offset="0.0" style="stop-color:#777777;stop-opacity:1"></stop>
+<stop offset="1.0" style="stop-color:#595959;stop-opacity:1"></stop>
+</linearGradient>
+<linearGradient id="grad29-16" v:fillpattern="29" v:foreground="#ffffff" v:background="#000000" x1="0.0" y1="0.0" x2="0.0" y2="1.0">
+<stop offset="0.0" style="stop-color:#000000;stop-opacity:1"></stop>
+<stop offset="0.5" style="stop-color:#ffffff;stop-opacity:1"></stop>
+<stop offset="1.0" style="stop-color:#000000;stop-opacity:1"></stop>
+</linearGradient>
+<pattern id="grad33-6" v:fillpattern="33" v:foreground="#777777" v:background="#595959" x="0.0" y="0.0" width="1.0" height="1.0" patternContentUnits="objectBoundingBox">
+<path d="M 0 1 L 0 0 L 1 0 z" style="fill:url(#grad30-7)"></path>
+<path d="M 0 1 L 1 1 L 1 0 z" style="fill:url(#grad25-8)"></path>
+</pattern>
+</defs>
+<g>
+<g id="shape1-1" transform="matrix(1, 0, 0, 1, 0,-0.0110863)">
+<rect x="0.0" y="0.0306021" width="1048.82" height="708.631" class="st1"></rect>
+</g>
+</g>
+<g>
+<g id="shape1-3" transform="matrix(1, 0, 0, 1, 724.524,-311.797)">
+<rect x="0.0" y="596.977" width="28.345" height="111.685" class="st2"></rect>
+</g>
+<g id="shape2-9" transform="matrix(1, 0, 0, 1, 352.898,-268.812)">
+<rect x="0.0" y="694.488" width="541.387" height="14.1732" class="st3"></rect>
+</g>
+<g id="shape3-11" transform="matrix(1, 0, 0, 1, 352.898,-22.6952)">
+<rect x="0.0" y="462.542" width="541.387" height="246.119" class="st4"></rect>
+</g>
+<g id="shape4-13" transform="matrix(1, 0, 0, 1, 352.898,-185.672)">
+<rect x="0.0" y="668.978" width="541.387" height="39.6835" class="st5"></rect>
+</g>
+<g id="group5-17" transform="matrix(0.0,-1.0,1.0,0.0,22.9238,453.543)" class="st6 st7 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape6-18">
+<path d="M0 708.66 L56.69 708.66 L0 708.66 Z" class="st6"></path>
+</g>
+</g>
+<g id="group34-62" transform="matrix(0.0,-1.0,1.0,0.0,37.0971,453.543)" class="st6 st7 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape35-63">
+<path d="M0 708.66 L56.69 708.66 L0 708.66 Z" class="st6"></path>
+</g>
+</g>
+<g id="shape63-107" transform="matrix(1, 0, 0, 1, 724.43,-233.151)">
+<rect x="0.0" y="687.403" width="28.345" height="21.2583" class="st22"></rect>
+</g>
+<g id="group64-109" transform="matrix(-1.0,0.0,0.0,-1.0,724.505,1065.83)" class="st6 st7 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape65-110">
+<path d="M0 708.66 L82.49 708.66 L0 708.66 Z" class="st6"></path>
+</g>
+</g>
+<g id="shape93-154" transform="matrix(1, 0, 0, 1, 394.001,-72.5774)">
+<rect x="0.0" y="639.499" width="14.1732" height="69.1624" class="st23"></rect>
+</g>
+<g id="shape94-156" transform="matrix(1, 0, 0, 1, 415.261,-72.5774)">
+<rect x="0.0" y="639.499" width="14.1732" height="69.1624" class="st23"></rect>
+</g>
+<g id="shape95-158" transform="matrix(1, 0, 0, 1, 436.52,-72.5774)">
+<rect x="0.0" y="639.499" width="14.1732" height="69.1624" class="st23"></rect>
+</g>
+<g id="shape96-160" transform="matrix(1, 0, 0, 1, 457.78,-72.5774)">
+<rect x="0.0" y="639.499" width="14.1732" height="69.1624" class="st23"></rect>
+</g>
+<g id="shape97-162" transform="matrix(1, 0, 0, 1, 479.04,-72.5774)">
+<rect x="0.0" y="639.499" width="14.1732" height="69.1624" class="st23"></rect>
+</g>
+<g id="group98-164" transform="matrix(0.0,-1.0,1.0,0.0,-180.044,566.929)">
+<g id="shape99-165">
+<path d="M0 623.62 L209.76 623.62 L209.76 708.66" class="st26"></path>
+</g>
+</g>
+<g id="group127-209" transform="matrix(-1.0,0.0,0.0,-1.0,697.299,1091.34)" class="st6 st7 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape128-210">
+<path d="M0 708.66 L204.09 708.66 L0 708.66 Z" class="st6"></path>
+</g>
+</g>
+<g id="shape156-254" transform="matrix(1, 0, 0, 1, 510.206,-311.81)">
+<rect x="0.0" y="450.723" width="170.064" height="257.938" class="st27"></rect>
+</g>
+<g id="group157-256" transform="matrix(0.0,-1.0,1.0,0.0,-222.561,566.929)">
+<g id="shape158-257">
+<path d="M0 623.9 L14.17 623.9 L14.17 708.66 L0 708.66" class="st26"></path>
+</g>
+</g>
+<g id="group186-301" transform="matrix(0.0,1.0,-1.0,0.0,1131.02,552.756)" class="st24 st25 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape187-302">
+<path d="M0 708.66 L14.17 708.66 L0 708.66 Z" class="st24"></path>
+</g>
+</g>
+<g id="group215-346" transform="matrix(0.0,1.0,-1.0,0.0,1173.54,552.756)" class="st24 st25 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape216-347">
+<path d="M0 708.66 L14.17 708.66 L0 708.66 Z" class="st24"></path>
+</g>
+</g>
+<g id="shape244-391" transform="matrix(1, 0, 0, 1, 425.181,-391.986)">
+<rect x="0.0" y="683.151" width="76.533" height="25.5106" class="st28"></rect>
+<text x="7.24" y="701.28" class="st29">888.0 В</text>
+</g>
+<g id="shape245-394" transform="matrix(1, 0, 0, 1, 386.914,-22.6882)">
+<rect x="0.0" y="666.143" width="113.386" height="42.5182" class="st30"></rect>
+<text x="20.48" y="681.98" class="st31">Анодное 
+<tspan class="st32" dy="1.2em" x="6.98">заземление</tspan>
+</text>
+</g>
+<g id="shape246-398" transform="matrix(1, 0, 0, 1, 753.249,-226.774)">
+<rect x="0.0" y="666.143" width="113.386" height="42.5182" class="st30"></rect>
+<text x="16.64" y="681.98" class="st31">Электрод 
+<tspan class="st32" dy="1.2em" x="12.55">сравнения</tspan>
+</text>
+</g>
+<g id="shape247-402" transform="matrix(1, 0, 0, 1, 368.489,-394.111)">
+<rect x="0.0" y="687.403" width="56.6899" height="21.2583" class="st30"></rect>
+<text x="24.18" y="703.41" class="st31">U =</text>
+</g>
+<g id="shape248-405" transform="matrix(1, 0, 0, 1, 51.0212,-542.825)">
+<rect x="0.0" y="660.474" width="255.106" height="48.1878" class="st33"></rect>
+<text x="80.92" y="679.15" class="st31">Включение
+<tspan class="st34" dy="1.2em" x="38.43">(</tspan>перезапуск
+<tspan class="st34">) </tspan>станции</text>
+</g>
+<g id="shape249-410" transform="matrix(1, 0, 0, 1, 51.0212,-474.796)">
+<rect x="0.0" y="660.474" width="255.106" height="48.1878" class="st33"></rect>
+<text x="39.49" y="689.95" class="st31">Отключение
+<tspan class="st34"> </tspan>станции</text>
+</g>
+<g id="shape250-414" transform="matrix(1, 0, 0, 1, 37.9112,-416.687)">
+<rect x="0.0" y="674.647" width="273.883" height="34.0142" class="st35"></rect>
+<text x="4.0" y="697.03" class="st31">Датчик вскрытия двери</text>
+</g>
+<g id="shape251-417" transform="matrix(1, 0, 0, 1, 2.83394,-419.524)">
+<rect x="0.0" y="680.316" width="28.345" height="28.345" class="st36"></rect>
+</g>
+<g id="shape252-419" transform="matrix(1, 0, 0, 1, 37.9112,-371.901)">
+<rect x="0.0" y="674.647" width="273.883" height="34.0142" class="st35"></rect>
+<text x="4.0" y="697.03" class="st31">Сигнал синхронизации сети</text>
+</g>
+<g id="shape253-422" transform="matrix(1, 0, 0, 1, 2.83394,-374.738)">
+<rect x="0.0" y="680.316" width="28.345" height="28.345" class="st36"></rect>
+</g>
+<g id="shape254-424" transform="matrix(1, 0, 0, 1, 37.9112,-327.116)">
+<rect x="0.0" y="674.647" width="273.883" height="34.0142" class="st35"></rect>
+<text x="4.0" y="697.03" class="st31">Режим ограничения по току</text>
+</g>
+<g id="shape255-427" transform="matrix(1, 0, 0, 1, 2.83394,-329.952)">
+<rect x="0.0" y="680.316" width="28.345" height="28.345" class="st36"></rect>
+</g>
+<g id="shape256-429" transform="matrix(1, 0, 0, 1, 37.9112,-282.33)">
+<rect x="0.0" y="674.647" width="316.411" height="34.0142" class="st35"></rect>
+<text x="4.0" y="697.03" class="st31">Защита по сопративлению нагрузки</text>
+</g>
+<g id="shape257-432" transform="matrix(1, 0, 0, 1, 2.83394,-285.165)">
+<rect x="0.0" y="680.316" width="28.345" height="28.345" class="st36"></rect>
+</g>
+<g id="shape258-434" transform="matrix(1, 0, 0, 1, 37.9112,-237.545)">
+<rect x="0.0" y="674.647" width="273.883" height="34.0142" class="st35"></rect>
+<text x="4.0" y="697.03" class="st31">Короткое замыкание по выходу</text>
+</g>
+<g id="shape259-437" transform="matrix(1, 0, 0, 1, 2.83394,-240.378)">
+<rect x="0.0" y="680.316" width="28.345" height="28.345" class="st36"></rect>
+</g>
+<g id="group260-439" transform="matrix(0.0,1.0,-1.0,0.0,1056.11,88.8339)">
+<g id="shape261-440">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st24"></path>
+</g>
+<g id="group262-442">
+<g id="shape263-443">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st25"></path>
+</g>
+<g id="group264-445">
+<g id="shape265-446">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st8"></path>
+</g>
+<g id="group266-448">
+<g id="shape267-449">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st9"></path>
+</g>
+<g id="group268-451">
+<g id="shape269-452">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st10"></path>
+</g>
+<g id="group270-454">
+<g id="shape271-455">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st11"></path>
+</g>
+<g id="group272-457">
+<g id="shape273-458">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st12"></path>
+</g>
+<g id="group274-460">
+<g id="shape275-461">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st13"></path>
+</g>
+<g id="group276-463">
+<g id="shape277-464">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st14"></path>
+</g>
+<g id="group278-466">
+<g id="shape279-467">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st15"></path>
+</g>
+<g id="group280-469">
+<g id="shape281-470">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st16"></path>
+</g>
+<g id="group282-472">
+<g id="shape283-473">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st17"></path>
+</g>
+<g id="group284-475">
+<g id="shape285-476">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st18"></path>
+</g>
+<g id="group286-478">
+<g id="shape287-479">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st19"></path>
+</g>
+<g id="shape288-481">
+<path d="M0 708.66 L619.84 708.66 L0 708.66 Z" class="st20"></path>
+<path d="M0 708.66 L619.84 708.66" class="st37"></path>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="shape289-484" transform="matrix(1, 0, 0, 1, 7.08791,-90.7167)">
+<rect x="0.0" y="674.647" width="212.583" height="34.0142" class="st35"></rect>
+<text x="4.0" y="697.03" class="st31">Текущие показания А+</text>
+</g>
+<g id="shape290-487" transform="matrix(1, 0, 0, 1, 7.08791,-45.3653)">
+<rect x="0.0" y="674.647" width="212.583" height="34.0142" class="st35"></rect>
+<text x="4.0" y="697.03" class="st31">Текущие показания R+</text>
+</g>
+<g id="shape291-490" transform="matrix(1, 0, 0, 1, 204.082,-94.9683)">
+<rect x="0.0" y="683.151" width="136.063" height="25.5106" class="st28"></rect>
+<text x="9.63" y="701.28" class="st29">888888.0 кВт·г</text>
+</g>
+<g id="shape292-493" transform="matrix(1, 0, 0, 1, 204.082,-49.6155)">
+<rect x="0.0" y="683.151" width="136.063" height="25.5106" class="st28"></rect>
+<text x="9.63" y="701.28" class="st29">888888.0 кВт·г</text>
+</g>
+<g id="group293-496" transform="matrix(-1.0,0.0,0.0,-1.0,1046.93,796.565)">
+<g id="shape294-497">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st24"></path>
+</g>
+<g id="group295-499">
+<g id="shape296-500">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st25"></path>
+</g>
+<g id="group297-502">
+<g id="shape298-503">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st8"></path>
+</g>
+<g id="group299-505">
+<g id="shape300-506">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st9"></path>
+</g>
+<g id="group301-508">
+<g id="shape302-509">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st10"></path>
+</g>
+<g id="group303-511">
+<g id="shape304-512">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st11"></path>
+</g>
+<g id="group305-514">
+<g id="shape306-515">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st12"></path>
+</g>
+<g id="group307-517">
+<g id="shape308-518">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st13"></path>
+</g>
+<g id="group309-520">
+<g id="shape310-521">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st14"></path>
+</g>
+<g id="group311-523">
+<g id="shape312-524">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st15"></path>
+</g>
+<g id="group313-526">
+<g id="shape314-527">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st16"></path>
+</g>
+<g id="group315-529">
+<g id="shape316-530">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st17"></path>
+</g>
+<g id="group317-532">
+<g id="shape318-533">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st18"></path>
+</g>
+<g id="group319-535">
+<g id="shape320-536">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st19"></path>
+</g>
+<g id="shape321-538">
+<path d="M0 708.66 L1046.93 708.66 L0 708.66 Z" class="st20"></path>
+<path d="M0 708.66 L1046.93 708.66" class="st37"></path>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="shape322-541" transform="matrix(1, 0, 0, 1, 0,-623.61)">
+<rect x="0.0" y="623.629" width="1048.82" height="85.0325" class="st35"></rect>
+<text x="256.27" y="676.92" class="st38">СКЗ №21 838 км МГ «БГР-ТБА»</text>
+</g>
+<g id="shape323-544" transform="matrix(1, 0, 0, 1, 708.631,-423.492)">
+<path d="M30.07 678.6 L0 708.66 L60.13 708.66 L30.07 678.6 Z" class="st2"></path>
+</g>
+<g id="shape324-547" transform="matrix(1, 0, 0, 1, 349.709,-575.419)">
+<rect x="0.0" y="674.647" width="194.513" height="34.0142" class="st35"></rect>
+<text x="3.99" y="697.03" class="st31">Режим стабилизации</text>
+</g>
+<g id="shape325-550" transform="matrix(1, 0, 0, 1, 538.553,-579.671)">
+<rect x="0.0" y="683.151" width="153.071" height="25.5106" class="st39"></rect>
+<text x="24.25" y="701.29" class="st29">Напряжение</text>
+</g>
+<g id="shape326-553" transform="matrix(1, 0, 0, 1, 708.631,-575.419)">
+<rect x="0.0" y="674.647" width="212.583" height="34.0142" class="st35"></rect>
+<text x="4.0" y="697.03" class="st31">Значение стабилизации</text>
+</g>
+<g id="shape327-556" transform="matrix(1, 0, 0, 1, 975.076,-579.67)">
+<rect x="0.0" y="683.151" width="34.0142" height="25.5107" class="st40"></rect>
+<text x="10.01" y="701.29" class="st31">Q</text>
+</g>
+<g id="shape328-559" transform="matrix(1, 0, 0, 1, 751.157,-504.555)">
+<rect x="0.0" y="674.647" width="212.583" height="34.0142" class="st35"></rect>
+<text x="93.0" y="697.03" class="st31">Выходной ток</text>
+</g>
+<g id="shape329-562" transform="matrix(1, 0, 0, 1, 751.157,-462.037)">
+<rect x="0.0" y="674.647" width="212.583" height="34.0142" class="st35"></rect>
+<text x="17.67" y="697.03" class="st31">Выходное напряжение</text>
+</g>
+<g id="shape330-565" transform="matrix(1, 0, 0, 1, 751.157,-419.522)">
+<rect x="0.0" y="674.647" width="212.583" height="34.0142" class="st35"></rect>
+<text x="47.0" y="697.03" class="st31">Датчик потенциала</text>
+</g>
+<g id="shape331-568" transform="matrix(1, 0, 0, 1, 967.986,-508.808)">
+<rect x="0.0" y="683.151" width="76.533" height="25.5106" class="st28"></rect>
+<text x="7.24" y="701.28" class="st29">888.0 А</text>
+</g>
+<g id="shape332-571" transform="matrix(1, 0, 0, 1, 967.986,-466.289)">
+<rect x="0.0" y="683.151" width="76.533" height="25.5106" class="st28"></rect>
+<text x="7.24" y="701.28" class="st29">888.0 В</text>
+</g>
+<g id="shape333-574" transform="matrix(1, 0, 0, 1, 967.986,-423.772)">
+<rect x="0.0" y="683.151" width="76.533" height="25.5106" class="st28"></rect>
+<text x="7.24" y="701.28" class="st29">888.0 В</text>
+</g>
+<g id="shape334-577" transform="matrix(1, 0, 0, 1, 511.387,-511.642)">
+<rect x="0.0" y="651.972" width="167.229" height="56.6899" class="st41"></rect>
+<text x="33.75" y="674.9" class="st42">Контроллер</text>
+</g>
+<g id="shape335-580" transform="matrix(1, 0, 0, 1, 599.497,-515.087)">
+<rect x="0.0" y="683.151" width="76.533" height="25.5106" class="st43"></rect>
+<text x="7.24" y="701.28" class="st29">888.0 А</text>
+</g>
+<g id="shape336-583" transform="matrix(1, 0, 0, 1, 599.497,-482.689)">
+<rect x="0.0" y="683.151" width="76.533" height="25.5106" class="st43"></rect>
+<text x="7.24" y="701.28" class="st29">888.0 А</text>
+</g>
+<g id="shape337-586" transform="matrix(1, 0, 0, 1, 511.387,-313.296)">
+<rect x="0.0" y="651.972" width="167.229" height="56.6899" class="st41"></rect>
+<text x="30.29" y="674.9" class="st42">Аккумулятор</text>
+</g>
+<g id="shape338-589" transform="matrix(1, 0, 0, 1, 599.497,-316.062)">
+<rect x="0.0" y="683.151" width="76.533" height="25.5106" class="st43"></rect>
+<text x="7.24" y="701.28" class="st29">888.0 В</text>
+</g>
+<g id="shape339-592" transform="matrix(1, 0, 0, 1, 542.805,-317.478)">
+<rect x="0.0" y="687.403" width="56.6899" height="21.2583" class="st30"></rect>
+<text x="24.18" y="703.41" class="st42">U =</text>
+</g>
+<g id="shape340-595" transform="matrix(1, 0, 0, 1, 515.876,-375.585)">
+<rect x="0.0" y="677.482" width="43.9355" height="31.1796" class="st41"></rect>
+<text x="10.81" y="698.45" class="st42">ЗУ</text>
+</g>
+<g id="group341-598" transform="matrix(-1.0,0.0,0.0,-1.0,514.458,1027.56)" class="st24 st25 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape342-599">
+<path d="M0 708.66 L141.26 708.66 L0 708.66 Z" class="st24"></path>
+</g>
+</g>
+<g id="group370-643" transform="matrix(-1.0,0.0,0.0,-1.0,602.332,1027.56)" class="st24 st25 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape371-644">
+<path d="M0 708.66 L42.11 708.66 L0 708.66 Z" class="st24"></path>
+</g>
+</g>
+<g id="group399-688" transform="matrix(0.0,-1.0,1.0,0.0,-106.344,338.386)" class="st24 st25 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape400-689">
+<path d="M0 708.66 L19.49 708.66 L0 708.66 Z" class="st24"></path>
+</g>
+</g>
+<g id="shape428-733" transform="matrix(1, 0, 0, 1, 599.497,-391.986)">
+<rect x="0.0" y="683.151" width="76.533" height="25.5106" class="st43"></rect>
+<text x="7.24" y="701.28" class="st29">888.0 В</text>
+</g>
+<g id="shape429-736" transform="matrix(1, 0, 0, 1, 542.805,-394.111)">
+<rect x="0.0" y="687.403" width="56.6899" height="21.2583" class="st30"></rect>
+<text x="24.18" y="703.41" class="st42">U =</text>
+</g>
+<g id="shape430-739" transform="matrix(1, 0, 0, 1, 924.058,-579.671)">
+<rect x="0.0" y="683.151" width="52.4325" height="25.5106" class="st45"></rect>
+<text x="7.7" y="701.28" class="st29">88 А</text>
+</g>
+<g id="group431-742" transform="matrix(0.0,-1.0,1.0,0.0,-11.3818,481.89)" class="st6 st7 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape432-743">
+<path d="M0 708.66 L99.21 708.66 L0 708.66 Z" class="st6"></path>
+</g>
+</g>
+<g id="group460-787" transform="matrix(0.0,-1.0,1.0,0.0,-215.469,481.89)" class="st6 st7 st8 st9 st10 st11 st12 st13 st14 st15 st16 st17 st18 st19">
+<g id="shape461-788">
+<path d="M0 708.66 L99.21 708.66 L0 708.66 Z" class="st6"></path>
+</g>
+</g>
+<g id="shape489-832" transform="matrix(1, 0, 0, 1, 518.718,-153.075)">
+<rect x="0.0" y="683.151" width="286.288" height="25.5107" class="st46"></rect>
+<text x="17.18" y="701.29" class="st31">Омическая составляющая Ra =</text>
+</g>
+<g id="shape490-835" transform="matrix(1, 0, 0, 1, 805.023,-153.075)">
+<rect x="0.0" y="683.151" width="85.037" height="25.5104" class="st47"></rect>
+<text x="14.32" y="701.28" class="st29">0.0 Ом</text>
+</g>
+<g id="shape491-838" transform="matrix(1, 0, 0, 1, 37.9112,-192.758)">
+<rect x="0.0" y="674.647" width="273.883" height="34.0142" class="st35"></rect>
+<text x="4.0" y="697.03" class="st31">Силовой блок выключен</text>
+</g>
+<g id="shape492-841" transform="matrix(1, 0, 0, 1, 2.83394,-195.593)">
+<rect x="0.0" y="680.316" width="28.345" height="28.345" class="st36"></rect>
+</g>
+</g>
+</svg>
