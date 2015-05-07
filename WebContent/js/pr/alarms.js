@@ -12,6 +12,10 @@ $.tablesorter.addParser({
 	type: "numeric"
 });
 $("#alarmTable").tablesorter({
+	widgets: ['stickyHeaders'],
+	widgetOptions: {
+		stickyHeaders_attachTo: '#divTableAlarm'
+	},
 	headers: {
 		3: { sorter:'customDate' },
 		4: { sorter:'customDate' },
@@ -35,26 +39,110 @@ $("#alarmTable").colResizable({
 	fixed:false
 });
 
-$('#alarmTable thead tr:first').find('th').each(function(){
-	if ($(this).index() === 7 || $(this).index() === 12) {
-		$(this).css({
-			display: "none"
-		})
-	}
-});
-
 $('#alarmTable tbody').on('click', 'tr', function(){
 	$(this).hasClass('selectedAlarm') ? 
 		$(this).removeClass('selectedAlarm') : $(this).addClass('selectedAlarm');
 });
 
 function showHideColumn(col, isShow) {
+	var header2 = $('.tablesorter-sticky-wrapper');
 	$('#alarmTable').find('tr').each(function(){
 		$(this).find('th').eq(col).css({
+			'display': isShow ? '' : 'none'
+		})
+		header2.find('th').eq(col).css({
 			'display': isShow ? '' : 'none'
 		})
 		$(this).find('td').eq(col).css({
 			'display': isShow ? '' : 'none'
 		})
+	});
+}
+
+function confirmOne() {
+	var isConfirm = true;
+	var cm = {};
+	var par = {};
+	cm.type = 'CommandMessage';
+	cm.command = 'confimAlarmOne';
+	cm.parameters = [];
+
+	$('.selectedAlarm').each(function() {
+		var recordDT = $(this).find('td')[17].innerHTML;
+		var eventDT = $(this).find('td')[16].innerHTML;
+		var objectRef = $(this).find('td')[15].innerHTML;
+		var status = $(this).find('td')[7].innerHTML;
+
+		if (Number(status) == 1) {
+			par[eventDT + '_' + objectRef] = recordDT;
+			isConfirm = false;
+		}
+	});
+
+	if(isConfirm) {
+		$('.selectedAlarm').each(function() {
+			alert('This alarm already confirmed!')
+			$(this).removeClass('selectedAlarm');
+		});
+		return true;
+	}
+	BootstrapDialog.show({
+		size: BootstrapDialog.SIZE_SMALL,
+		title: translateValueByKey('keyTooltip_kvitOne'),
+		message: $('<textarea class="form-control" placeholder="Text..."></textarea>'),
+		onshown: function(dialog) {
+			dialog.getModalBody().find('textarea').focus();
+		},
+		buttons: [{
+			icon: 'glyphicon glyphicon-send',
+			label: '  ' + translateValueByKey('keySend'),
+			cssClass: 'menubutton',
+			autospin: true,
+			action: function(dialog){
+				par.text = dialog.getModalBody().find('textarea').val();
+				cm.parameters.push(par);
+
+				dialog.enableButtons(false);
+				webSocket.send(JSON.stringify(cm));
+				$('.selectedAlarm').each(function() {
+					$(this).removeClass('selectedAlarm');
+				});
+				dialog.close();
+			}
+		}],
+		draggable: true,
+		closable: true
+	});
+}
+
+function confirmAll(){
+	var cm = {};
+	var par = {};
+	cm.type = 'CommandMessage';
+	cm.command = 'confimAlarmAll';
+	cm.parameters = [];
+
+	BootstrapDialog.show({
+		size: BootstrapDialog.SIZE_SMALL,
+		title: translateValueByKey('keyTooltip_kvitOne'),
+		message: $('<textarea class="form-control" placeholder="Text..."></textarea>'),
+		onshown: function(dialog) {
+			dialog.getModalBody().find('textarea').focus();
+		},
+		buttons: [{
+			icon: 'glyphicon glyphicon-send',
+			label: '  ' + translateValueByKey('keySend'),
+			cssClass: 'menubutton',
+			autospin: true,
+			action: function(dialog){
+				par.text = dialog.getModalBody().find('textarea').val();
+
+				dialog.enableButtons(false);
+				webSocket.send(JSON.stringify(cm));
+				dialog.close();
+			}
+		}],
+		draggable: true,
+		closable: true
 	});
 }

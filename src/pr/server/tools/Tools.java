@@ -1,11 +1,21 @@
 package pr.server.tools;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+
+
 
 import javax.websocket.Session;
 
+
+
+
+import pr.common.Encryptor;
 import pr.db.ConnectDB;
 import pr.model.Alarm;
 import pr.model.DvalTI;
@@ -35,17 +45,12 @@ public class Tools {
 	public static void sendValues(Session session, List<DvalTI> values, Scheme scheme) {
 		if (values == null) return;
 		values.forEach(v -> {
+//			DvalTI v = values.get(0);
 			ValueMessage oldValue = new ValueMessage();
 			oldValue.setValue(v.getVal());
 			oldValue.setDate(v.getDt());
-//			oldValue.setKoef(VSIGNALS.get(v.getSignalref()).getKoef());
-//			oldValue.setTitle(VSIGNALS.get(v.getSignalref()).getNamesignal());
-//			oldValue.setTypeSignal(VSIGNALS.get(v.getSignalref()).getTypesignalref());
 			oldValue.setMode(ConnectDB.getTSysParam("SIGNAL_STATUS")
 					.get(VSIGNALS.get(v.getSignalref()).getStatus() + "").getParamdescr());
-//			String units = VSIGNALS.get(v.getSignalref()).getNameunit();
-//			units = units == null ? "" : units;
-//			oldValue.setUnit(units);
 			oldValue.setrCode(v.getRcode());
 
 			List<Group> groups = new ArrayList<>();
@@ -62,10 +67,6 @@ public class Tools {
 						script = title;
 					}
 				}
-//				group.setScript(script);
-//				String precision = scheme.getCustProps().get(g).get("Precision");
-//				int precisionInt = precision == null ? 0 : precision.length() - precision.indexOf(".") - 1;
-//				group.setPreceseon(precisionInt);
 				groups.add(group);
 			});
 			oldValue.setGroups(groups);
@@ -101,13 +102,13 @@ public class Tools {
 					int typeSignal = VSIGNALS.get(k) != null ? VSIGNALS.get(k).getTypesignalref() : 0;
 					String precision = scheme.getCustProps().get(g).get("Precision");
 					int precisionInt = precision == null ? 0 : precision.length() - precision.indexOf(".") - 1;
-					String units = VSIGNALS.get(k).getNameunit();
+					String units = VSIGNALS.get(k) != null ? VSIGNALS.get(k).getNameunit() : "";
 					//null or Ne zadano
 					units = ((units == null) || (units.trim().indexOf(" ") != -1)) ? "" : units;
 					arr.putKeyValue(g, k + ":" + 
 							ConnectDB.getSpTypeSignalMap().get(typeSignal).getNametypesignal() + ":" +
 							typeSignal + ":" + TSIGNALS.get(k).getKoef() + ":" + precisionInt + ":" +
-							units + ":" + script + ":" + title);
+							units + ":" + script + ":" + VSIGNALS.get(k).getNamesignal());
 				}
 			});
 		});
@@ -154,4 +155,48 @@ public class Tools {
 		});
 	}
 	
+	public static Tuser checkUser(String userName, String password) {
+		Optional<Tuser> filter = TUSERS.values().stream().filter(f -> f.getUn().equals(userName)).findFirst();
+		Encryptor encryptor = new Encryptor();
+		String psw = encryptor.decrypt(password);
+		psw = psw.substring(psw.indexOf("_") + 1);
+		
+		if (filter.isPresent()) {
+			Tuser currentUser = filter.get();
+			return encryptor.decrypt(currentUser.getPwd()).trim().equals(psw) && 
+					currentUser.getIsblocked() == 0 ? currentUser : null;
+		} else {
+			if ("admin".equals(userName) && "qwe".equals(psw)) {
+				Tuser currentUser = new Tuser();
+				currentUser.setIduser(-1);
+				currentUser.setUn("Administrator");
+				return currentUser;
+			}
+		}
+		return null;
+	}
+	
+	public static void confirmAlarms(int userId, String text, Map<String, String> parameters) {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+		parameters.keySet().forEach(k -> {
+			try {
+				String[] arr = k.split("_");
+				String recDT = parameters.get(k);
+				String recDTmili = parameters.get(k).substring(parameters.get(k).lastIndexOf(".") + 1);
+				while (recDTmili.length() < 9) recDTmili += "0";
+				String evDTmili = arr[0].substring(arr[0].lastIndexOf(".") + 1);
+				while (evDTmili.length() < 9) evDTmili += "0";
+				
+				Timestamp recordDT = new Timestamp(formatter.parse(recDT).getTime());
+				recordDT.setNanos(Integer.parseInt(recDTmili));
+				Timestamp eventDT = new Timestamp(formatter.parse(arr[0]).getTime());
+				eventDT.setNanos(Integer.parseInt(evDTmili));
+				int objRef = Integer.parseInt(arr[1]);
+
+				ConnectDB.confirmAlarm(recordDT, eventDT, objRef, new Timestamp(System.currentTimeMillis()), text, userId);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
 }

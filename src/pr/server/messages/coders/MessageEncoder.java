@@ -66,7 +66,6 @@ public class MessageEncoder implements Encoder.Text<Message> {
 					.add("value", vm.getValue())
 					.add("mode", vm.getMode())
 					.add("rcode", vm.getrCode())
-					.add("dateFormated", vm.getDateFormated())
 					.add("timestamp", vm.getDate().getTime())
 					.add("groups", groups).build().toString();
 		}
@@ -89,7 +88,8 @@ public class MessageEncoder implements Encoder.Text<Message> {
 					.add("alarmPriorityInt", vm.getAlarmItem().getAlarmPriorityInt())
 					.add("eventType", vm.getAlarmItem().getEventType())
 					.add("schemeObject", vm.getAlarmItem().getSchemeObject())
-					.add("color", vm.getAlarmItem().getColor()).build().toString();
+					.add("color", vm.getAlarmItem().getColor())
+					.add("objectRef", vm.getAlarmItem().getObjectRef()).build().toString();
 		}
 		if (message instanceof KeyValueArrayMessage) {
 			KeyValueArrayMessage vm = (KeyValueArrayMessage) message;

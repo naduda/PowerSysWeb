@@ -17,6 +17,9 @@ public class BatisJDBC {
 		while (count < MAX_REPET) {
 			SqlSession session = null;
 			try {
+				while(ConnectDB.getPostgressDB() == null) {
+					Thread.sleep(1000);
+				}
 				session = ConnectDB.getPostgressDB().getSqlSessionFactory().openSession(true);
 				return iBatis.getResult(session);
 			} catch (Exception e) {

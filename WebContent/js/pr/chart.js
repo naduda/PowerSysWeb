@@ -7,20 +7,14 @@ $('#chartsPowerSys').resizable({
 
 			chart.setSize(newWidth, newHeight);
 			$('#dataWrapper').css({
+					'height' : newHeight + 'px',
 					'max-height' : newHeight + 'px',
 					'max-width'  : newWidth + 'px'
 			});
 	}
 });
 $("#sInstantaneous").change(function() {
-	var selRect = $('#selectableRectangle')[0];
-	var curItem = $('#' + selRect.getAttribute('selectedId'))[0];
-	var urlData = 'http:' + docURL + '/dataServer/db/getDataById?params=' + 
-							curItem.getAttribute('idSignal') + '_' + 
-							$("#dpBeg")[0].value +'_' + $("#dpEnd")[0].value + '_' + 
-							this.value;
-
-	setDataTable(urlData, curItem);
+	setDataTable();
 });
 $(".datePicker").datepicker({
 	showOn: "button",
@@ -52,12 +46,6 @@ function onDateChange(dateText) {
 	var dd = parseInt(arr[0]);
 	var mm = parseInt(arr[1]) - 1;
 	var yy = parseInt(arr[2]);
-	var selRect = $('#selectableRectangle')[0];
-	var curItem = $('#' + selRect.getAttribute('selectedId'))[0];
-	var urlData = 'http:' + docURL + '/dataServer/db/getDataById?params=' + 
-							curItem.getAttribute('idSignal') + '_' + 
-							$("#dpBeg")[0].value +'_' + $("#dpEnd")[0].value + '_' + 
-							$("#sInstantaneous")[0].value;
 
 	if(this.id === 'dpBeg') {
 		$("#dpEnd").datepicker("option", "minDate", new Date(yy, mm, dd));
@@ -65,84 +53,115 @@ function onDateChange(dateText) {
 		$("#dpBeg").datepicker("option", "maxDate", new Date(yy, mm, dd));
 	}
 
-	setDataTable(urlData, curItem);
+	setDataTable();
 }
 
 function showChartPowerSys() {
 	var md = document.getElementById('chartsPowerSys');
-	var selRect = $('#selectableRectangle')[0];
-	var curItem = $('#' + selRect.getAttribute('selectedId'))[0];
-	if (curItem === undefined) {
-		if (md.style.display === 'block') 
-			md.style.display = 'none';
-		return false;
-	}
-	var urlData = 'http:' + docURL + '/dataServer/db/getDataById?params=' + 
-							curItem.getAttribute('idSignal') + '_' + 
-							$("#dpBeg")[0].value +'_' + $("#dpEnd")[0].value + '_' + 
-							$("#sInstantaneous")[0].value;
 	var sp = $('#sInstantaneous option:first span:first');
 	if(!sp.html()) sp.html(translateValueByKey('keyInstantaneous'));
 
 	if (!(md.style.display === 'block')) {
-		setDataTable(urlData, curItem);
+		setDataTable();
 	}
 
 	setPopupWindow('chartsPowerSys', 'main');
 }
 
-function setDataTable(url, curItem) {
+function setDataTable() {
 	var chart = $('#tabChart').highcharts();
-	while(chart.series.length > 0) {
-		chart.series[0].remove(true);
-	}
-	$.tablesorter.clearTableBody($('#dataTable')[0]);
-
-	$.getJSON(url, function(data){
-		var chart = $('#tabChart').highcharts();
-		var charDada = '[';
-		$.each(data.data, function(key, val) {
-			var dt = timestamp2date(val.timestamp);
-			var newColumn = '<td style="text-align: left;">' + dt + '</td>';
-
-			newColumn += '<td style="text-align: center;">' + val.value + '</td>';
-			$('#dataTable tbody').append('<tr>' + newColumn + '</tr>')
-				.trigger("update").trigger("sorton", [[[0,1]]]);
-			charDada += '[' + val.timestamp + ',' + val.value + '],';
-		});
-		if (charDada.length > 1) charDada = charDada.substring(0, charDada.length - 1);
-		charDada += ']';
-
-		chart.yAxis[0].setTitle({
-			text: translateValueByKey('key_pValue') + ', ' + curItem.getAttribute('unit')
-		});
-		chart.addSeries({
-			name: data.signalName, 
-			data: JSON.parse(charDada),
-			step: 'right'});
-	}).fail(function( jqxhr, textStatus, error ) {
-		var err = textStatus + ', ' + error;
-		console.log( "Request Failed: " + err);
+	var closeId;
+	var modalInfo = new BootstrapDialog({
+		size: BootstrapDialog.SIZE_SMALL,
+			type: BootstrapDialog.TYPE_SUCCESS,
+			title: 'Information: ',
+			message: '<i class="fa fa-spinner fa-spin"></i> Creating chart ...',
+			closable: false
 	});
-}
+	modalInfo.open();
 
-function timestamp2date(ts){
-	var d = new Date(ts);
-	var dd = d.getDate();
-	var mm = d.getMonth() + 1;
-	var yy = d.getFullYear();
-	var hh = d.getHours();
-	var mi = d.getMinutes();
-	var ss = d.getSeconds();
-	var SSS = d.getMilliseconds();
-	dd = dd < 10 ? '0' + dd : dd;
-	mm = mm < 10 ? '0' + mm : mm;
-	hh = hh < 10 ? '0' + hh : hh;
-	mi = mi < 10 ? '0' + mi : mi;
-	ss = ss < 10 ? '0' + ss : ss;
-	SSS = SSS > 10 ? (SSS > 100 ? SSS : '0' + SSS) : '00' + SSS;
-	return dd + '.' + mm + '.' + yy + ' ' +
-				 hh + ':' + mi + ':' + ss + '.' + SSS;
+	setTimeout(function() {
+		while(chart.series.length > 0) {
+			chart.series[0].remove(true);
+		}
+		$.tablesorter.clearTableBody($('#dataTable')[0]);
+		var items = document.querySelectorAll('#dataTable thead tr th');
+		if (items.length > 1) {
+			for (var i = items.length - 1; i > 0; i--) {
+				items[i].remove();
+			}
+		}
+
+		var paras = document.querySelectorAll(".selectableRectangle, #selectableRectangle");
+		Array.prototype.forEach.call(paras, function(selRect) {
+			var curItem = document.getElementById(selRect.getAttribute('selectedId'));
+			closeId = curItem.getAttribute('idSignal');
+
+			chart.yAxis[0].setTitle({
+				text: translateValueByKey('key_pValue') + ', ' + curItem.getAttribute('unit')
+			});
+			addDataById(curItem.getAttribute('idSignal'));
+		});
+	}, 250);
+
+	function addDataById(id) {
+		var integr = $("#sInstantaneous")[0].value;
+		var url = 'http:' + docURL + '/dataServer/db/getDataById?params=' + 
+							id + '_' + 
+							$("#dpBeg")[0].value +'_' + $("#dpEnd")[0].value + '_' + 
+							integr;
+		$.getJSON(url, function(data){
+			var chart = $('#tabChart').highcharts();
+			var dataTable = document.getElementById('dataTable');
+			var htr = document.querySelector('#dataTable thead tr');
+			var seriesCount = chart.series.length;
+			if(seriesCount > htr.getElementsByTagName('th').length - 2) {
+				var nth = document.createElement('th');
+				nth.innerHTML = data.signalName;
+				nth.style.width = '200px';
+				htr.appendChild(nth);
+			}
+
+			var charDada = '[';
+			$.each(data.data, function(key, val) {
+				var dt = timestamp2date(val.timestamp);
+				if(seriesCount == 0) {
+					var newColumn = '<td style="text-align: left;">' + dt + '</td>';
+
+					newColumn += '<td style="text-align: center;">' + val.value + '</td>';
+					$('#dataTable tbody').append('<tr>' + newColumn + '</tr>')
+						.trigger("updateAll").trigger("sorton", [[[0,1]]]);
+				} else {
+					var btr = $('#dataTable tbody')
+						.find('tr td:contains("' + dt + '")')[0];
+					if ((integr != 0) && (btr !== undefined)) {
+						var ntd = document.createElement('td');
+						btr = btr.parentNode;
+						ntd.setAttribute('style', 'text-align: center;');
+						ntd.innerHTML = val.value;
+						btr.appendChild(ntd);
+						$('#dataTable tbody').trigger("updateAll").trigger("sorton", [[[0,1]]]);
+					}
+				}
+				charDada += '[' + val.timestamp + ',' + val.value + '],';
+			});
+			if (charDada.length > 1) charDada = charDada.substring(0, charDada.length - 1);
+			charDada += ']';
+
+			chart.addSeries({
+				name: data.signalName, 
+				data: JSON.parse(charDada),
+				step: 'right'
+			});
+			if (id === closeId) {
+				modalInfo.close();
+			}
+		}).fail(function( jqxhr, textStatus, error ) {
+			var err = textStatus + ', ' + error;
+			console.log( "Request Failed: " + err);
+			modalInfo.close();
+		});
+	}
 }
 
 Highcharts.setOptions({global: {useUTC: false}});

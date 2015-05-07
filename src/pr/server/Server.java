@@ -3,6 +3,7 @@ package pr.server;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import pr.db.ConnectDB;
+import pr.model.Tuser;
 import pr.server.messages.CommandMessage;
 import pr.server.messages.Message;
 import pr.server.messages.coders.MessageDecoder;
@@ -27,40 +29,13 @@ public class Server {
 	
 	public Server() throws UnsupportedEncodingException, IOException {
 		
-//		new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-//				while (true) {
-//					if (users.size() > 0) {
-//						try {
-//							Set<Session> sessions = users.keySet();
-//							Iterator<Session> iterator = sessions.iterator();
-//							while (iterator.hasNext()) {
-//								Session session = (Session) iterator.next();
-//								session.getBasicRemote().sendObject(treeContent);
-//								System.out.println(treeContent.getResult());
-//							}
-//						} catch (IOException | EncodeException e) {
-//							e.printStackTrace();
-//						}
-//					}
-//					
-//					try {
-//						Thread.sleep(15000);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//					
-//				}
-//			}
-//		}).start();
 	}
 	
 	@OnOpen
 	public void handlerOpen(Session session) throws UnsupportedEncodingException, IOException, EncodeException {
-		users.put(session, new SessionParams(0, 0));
-		Tools.sendAlarms(session, ConnectDB.getCurDayAlarms());
-		Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
+		long id = System.currentTimeMillis();
+		users.put(session, new SessionParams(id, 0));
+		System.out.println("User connect at " + id + ". Now " + users.size() + " users.");
 	}
 	
 	@OnMessage
@@ -70,41 +45,119 @@ public class Server {
 			switch (cm.getCommand().toLowerCase()) {
 			case "getscheme":
 				int idScheme = Integer.parseInt(cm.getParameters().get("idNode"));
-				
-				Scheme scheme = null; 
-				if (schemes.containsKey(idScheme)) {
-					scheme = schemes.get(idScheme);
-				} else {
-					scheme = SVGtrans.convert2matrix("d:/GIT/PowerSysWeb/PowerSysWeb/WebContent/schemes/" + idScheme + ".svg");
-					schemes.put(idScheme, scheme);
-				}
-
-				CommandMessage rm = new CommandMessage();
-				rm.setCommand("scheme");
-				Map<String, String> parameters = new HashMap<>();
-				parameters.put("content", scheme.getContent());
-				parameters.put("fill", scheme.getBackground());
-				rm.setParameters(parameters);
-				
-				session.getBasicRemote().sendObject(rm);
 				users.get(session).setIdScheme(idScheme);
+				if (users.get(session).getUserId() > Integer.MAX_VALUE) return;
+				putScheme(session, idScheme);
 				break;
 			case "getoldvalues" :
-				scheme = schemes.get(users.get(session).getIdScheme());
+				Scheme scheme = schemes.get(users.get(session).getIdScheme());
 				Tools.sendValues(session, ConnectDB.getOldValues(scheme.getSignalMap().keySet()), scheme);
 				break;
 			case "getscripts" :
 				scheme = schemes.get(users.get(session).getIdScheme());
 				Tools.sendScripts(session, scheme);
 				break;
+			case "settu" :
+				scheme = schemes.get(users.get(session).getIdScheme());
+				int idSignal = Integer.parseInt(cm.getParameters().get("id"));
+				double value = Double.parseDouble(cm.getParameters().get("value"));
+				ConnectDB.setTU(idSignal, value, 0, (int)users.get(session).getUserId(), scheme.getIdScheme());
+				try {
+					Thread.sleep(3000);
+					cm = new CommandMessage();
+					cm.setCommand("updateTU");
+					Map<String, String> parameters = new HashMap<>();
+					parameters.put("status", "1");
+					cm.setParameters(parameters);
+					
+					session.getBasicRemote().sendObject(cm);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				break;
+			case "checkuser":
+				String userName = cm.getParameters().get("name");
+				String password = cm.getParameters().get("password");
+				CommandMessage rm = new CommandMessage();
+				rm.setCommand("runAll");
+				Map<String, String> parameters = new HashMap<>();
+				
+				Tuser user = Tools.checkUser(userName, password);
+				if (user != null) {
+					users.get(session).setUserId(user.getIduser());
+					putScheme(session, users.get(session).getIdScheme());
+					Tools.sendAlarms(session, ConnectDB.getCurDayAlarms());
+					Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
+
+					parameters.put("status", "1");
+					String connString = ConnectDB.getPostgressDB().getConnStr();
+					System.out.println(connString);
+					parameters.put("user", userName);
+					parameters.put("server", connString.substring(0, connString.indexOf("_")));
+					parameters.put("db", connString.substring(connString.indexOf("_") + 1));
+					System.out.println(parameters);
+					rm.setParameters(parameters);
+					session.getBasicRemote().sendObject(rm);
+					System.out.println("Login user - " + cm.getParameters().get("IP") + " at " + new Date(System.currentTimeMillis()));
+				} else {
+					parameters.put("status", "0");
+					rm.setParameters(parameters);					
+					session.getBasicRemote().sendObject(rm);
+					System.out.println("Faul connection - " + cm.getParameters().get("IP"));
+				}
+				break;
+			case "confimalarmone":
+				String messConfirm = cm.getParameters().get("text").trim();
+				cm.getParameters().remove("text");
+				Tools.confirmAlarms((int)users.get(session).getUserId(), messConfirm, cm.getParameters());
+				break;
+			case "confimalarmall":
+				messConfirm = cm.getParameters().get("text").trim();
+				ConnectDB.confirmAlarmAll(messConfirm, (int)users.get(session).getUserId());
+				break;
 			default:
+				System.err.println(cm.getCommand().toLowerCase());
 				break;
 			}
+		}
+	}
+	
+	private void putScheme(Session session, int idScheme) {
+		if(idScheme == 0) return;
+		Scheme scheme = null; 
+		if (schemes.containsKey(idScheme)) {
+			scheme = schemes.get(idScheme);
+		} else {
+			scheme = SVGtrans.convert2matrix("d:/GIT/PowerSysWeb/PowerSysWeb/WebContent/schemes/" + idScheme + ".svg");
+			schemes.put(idScheme, scheme);
+		}
+
+		CommandMessage rm = new CommandMessage();
+		rm.setCommand("scheme");
+		Map<String, String> parameters = new HashMap<>();
+		parameters.put("content", scheme.getContent());
+		parameters.put("fill", scheme.getBackground());
+		rm.setParameters(parameters);
+		
+		try {
+			session.getBasicRemote().sendObject(rm);
+		} catch (IOException | EncodeException e) {
+			e.printStackTrace();
 		}
 	}
 	
 	@OnClose
 	public void handlerClose(Session session) {
 		users.remove(session);
+		long id = System.currentTimeMillis();
+		System.out.println("User disconnect at " + id + ". Now " + users.size() + " users.");
+	}
+
+	public static Map<Session, SessionParams> getUsers() {
+		return users;
+	}
+
+	public static Map<Integer, Scheme> getSchemes() {
+		return schemes;
 	}
 }

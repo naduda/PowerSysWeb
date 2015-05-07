@@ -1,5 +1,7 @@
 package pr.db.jdbc;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.util.Map;
 
 import javax.naming.InitialContext;
@@ -23,6 +25,7 @@ import pr.db.jdbc.mappers.IMapperV;
 public class PostgresDB {
 	private DataSource dataSource;
 	private SqlSessionFactory sqlSessionFactory;
+	private String connStr;
 	
 	public PostgresDB() {
 		System.out.println("PostgresDB created");
@@ -32,6 +35,15 @@ public class PostgresDB {
 		try {	
 			InitialContext ctx = new InitialContext();
 			dataSource = (DataSource) ctx.lookup(dataSourceName);
+			
+			Connection conn = dataSource.getConnection();
+			DatabaseMetaData dbmd = conn.getMetaData();
+			connStr = dbmd.getURL();
+			connStr = connStr.substring(connStr.indexOf("://") + 3);
+			String ip = connStr.substring(0, connStr.indexOf("/"));
+			connStr = connStr.substring(connStr.indexOf("/") + 1);
+			connStr = ip + "_" + connStr.substring(0, connStr.indexOf("?"));
+			
 			setMappers(dataSource);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -55,7 +67,16 @@ public class PostgresDB {
 	public SqlSessionFactory getSqlSessionFactory() {
 		return sqlSessionFactory;
 	}
-//	=============================================================================================
+	
+	public String getConnStr() {
+		return connStr;
+	}
+
+	public void setConnStr(String connStr) {
+		this.connStr = connStr;
+	}
+
+	//	=============================================================================================
 	public static String getQuery(Map<String, Object> params) {
         return params.get("query").toString();
     }

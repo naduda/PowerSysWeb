@@ -64,11 +64,6 @@ public class MessageDecoder implements Decoder.Text<Message> {
 			
 			break;
 		}
-//		ChatMessage chatMessage = new ChatMessage();
-//		JsonObject jsonObject = Json.createReader(new StringReader(s)).readObject();
-//		chatMessage.setMessage(jsonObject.getString("message"));
-//		chatMessage.setLocation(jsonObject.getString("location"));
-//		return chatMessage;
 		return message;
 	}
 

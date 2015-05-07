@@ -4,7 +4,10 @@ function selectable(svg) {
 
 	function createRectangle(){
 		var rectangle = document.createElementNS(svgNS,"rect");
-		rectangle.setAttribute("id","selectableRectangle");
+		if ($('#selectableRectangle')[0] === undefined)
+			rectangle.setAttribute("id","selectableRectangle");
+		else
+			rectangle.setAttribute("class","selectableRectangle");
 		rectangle.setAttribute("x",0);
 		rectangle.setAttribute("y",0);
 		rectangle.setAttribute("width",50);
@@ -20,11 +23,28 @@ function selectable(svg) {
 	}
 
 	function clearSelection(obj) {
-		rect.setAttribute("stroke","none");
-		rect.setAttribute("selectedId",'');
+		var sels = $('.selectableRectangle');
+		if (!keysF.ctrl) {
+			sels.each(function(){
+				$(this).remove();
+			});
+			rect.setAttribute("stroke","none");
+			rect.setAttribute("selectedId",'');
+		}
 	}
 
 	function onselect(obj) {
+		if((rect.getAttribute('stroke') !== 'none') && (keysF.ctrl == true)) {
+			var nRect = createRectangle();
+			selectRect(nRect, obj);
+		} else {
+			clearSelection();
+			selectRect(rect, obj);
+			setObjectProperties(obj);
+		}
+	}
+
+	function selectRect(rect, obj) {
 		var bbox = obj.getBBox();
 		var transform = obj.getAttribute('transform');
 
@@ -36,7 +56,6 @@ function selectable(svg) {
 		rect.setAttribute("transform",transform);
 
 		rect.setAttribute("selectedId",obj.getAttribute('id'));
-		setObjectProperties(obj);
 	}
 
 	function setObjectProperties(obj) {
@@ -88,9 +107,11 @@ function selectable(svg) {
 					if (gs[j].nodeName === 'g') {
 						gs[j].onclick = function(){
 							onselect(this);
+							runFuncByName(this, 'onclick');
 						};
-						gs[j].ondblclick = function(){
-							alert('dbl');
+						gs[j].ondblclick = function(e){
+							runFuncByName(this, 'ondblclick');
+							e.preventDefault();
 						},
 						gs[j].oncontextmenu = function(){
 							onselect(this);
@@ -106,5 +127,25 @@ function selectable(svg) {
 				}
 			}
 		}
+	}
+
+	function runFuncByName(target, name) {
+		var activeGroup = getGroupByName(target.id);
+		var scriptName = './scripts/' + activeGroup.script + '.js';
+
+		psFunctions.run(scriptName, function() {
+			var func = psFunctions.results[scriptName];
+			if (!func) return false;
+			switch(name) {
+				case 'ondblclick':
+					if(typeof func(activeGroup.element).onDoubleClick === 'function')
+						func(activeGroup.element).onDoubleClick();
+					break;
+				case 'onclick':
+					if(typeof func(activeGroup.element).onClick === 'function')
+						func(activeGroup.element).onClick();
+					break;
+			}
+		});
 	}
 }

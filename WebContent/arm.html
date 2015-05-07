@@ -8,10 +8,12 @@
 		<link rel="stylesheet" href="./css/layout/jquery-ui.css"/>
 		<link rel="stylesheet" href="./css/awesome/font-awesome.min.css"/>
 		<link rel="stylesheet" href="./css/bootstrap/bootstrap.min.css">
+		<link rel="stylesheet" href="./css/bootstrap/BootstrapDialog.css">
 		<link rel="stylesheet" href="./css/pr/style.css" />
 
 		<script src="./js/jquery-2.1.3.min.js"></script>
 		<script src="./js/bootstrap/bootstrap.min.js"></script>
+		<script src="./js/bootstrap/BootstrapDialog.js"></script>
 		<script src="./js/layout/jquery-ui.min.js"></script>
 		<script src="./js/layout/jquery.layout-14.js"></script>
 
@@ -21,6 +23,8 @@
 		<script src="./js/tree/jstree.min.js"></script>
 		<script src="./js/colResizable-1.5.min.js"></script>
 		<script src="./js/jquery.tablesorter.min.js"></script>
+		<script src="./js/jquery.tablesorter.header.js"></script>
+		<script src="./js/jquery.tablesorter.selector.js"></script>
 		<link rel="stylesheet" href="./themesTableOrder/tableStyle.css"/>
 		<script src="./js/highcharts.js"></script>
 
@@ -28,15 +32,38 @@
 	</head>
 	<body>
 		<div id="menubar" class="ui-layout-north menubar">
-			<div class="btn-group btn-group-sm">
-				<button type="button" class="btn menubutton">#{keyFile}</button>
-				<button type="button" class="btn menubutton">#{keyJournals}</button>
-				<button type="button" class="btn menubutton">#{keyReports}</button>
-				<button type="button" class="btn menubutton">#{keyTools}</button>
-				<button type="button" class="btn menubutton">#{keySettings}</button>
-				<button type="button" class="btn menubutton tree-toggler">#{key_miExit}</button>
-				<button type="button" class="btn menubutton">#{keyAbout}</button>
-				<select id="lang" class="btn menubutton" onchange="translateARM();">
+			<div>
+				<div id="menubarId">
+					<button type="button" class="btn-sm menubutton">#{keyFile}</button>
+
+					<span class="dropdown">
+						<button type="button" class="btn-sm menubutton dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+							#{keyJournals}
+							<span class="caret"></span>
+							</button>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="journalAlarms.html?id=1" target="_blank">#{key_miJAlarms}</a></li>
+						</ul>
+					</span>
+
+					<span class="dropdown">
+						<button type="button" class="btn-sm menubutton dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+							#{keyReports}
+							<span class="caret"></span>
+							</button>
+						<ul class="dropdown-menu" role="menu">
+							<li><button type="button" class="btn-xs menubutton">Report 1</button></li>
+						</ul>
+					</span>
+
+					<button type="button" class="btn-sm menubutton">#{keyTools}</button>
+					<button type="button" class="btn-sm menubutton">#{keySettings}</button>
+					<button type="button" class="btn-sm menubutton" onclick="open(location, '_self').close();return false;">#{key_miExit}</button>
+					<button type="button" class="btn-sm menubutton">#{keyAbout}</button>
+				</div>
+			</div>
+			<div id="langSelector" class="pull-right">
+				<select id="lang" class="btn-sm menubutton" onchange="translateARM();">
 					<option value="en">English</option>
 					<option value="uk">Українська</option>
 					<option value="ru">Русский</option>
@@ -47,8 +74,8 @@
 		<div id="statusbar" class="ui-layout-south">
 			<div class="toolbar">
 				<span id="tAlarms" class="toolbarItem alarm-toggler fa fa-angle-double-down"></span>
-				<span style="color: blue; margin-left: -5px;">Hide alarm panel </span>
-				<span id="connectInfo">User - postgres; Server - vik-soft.com.ua:5432; DB - PowerSys;</span>
+				#{keyHideAlarms}
+				<span id="connectInfo">   User - postgres; Server - vik-soft.com.ua:5432; DB - PowerSys;</span>
 			</div>
 		</div>
 
@@ -70,7 +97,7 @@
 					<a class="toolbarItem" href="#"><i class="fa fa-arrows-h"></i></a>
 					<span class="devider">.</span>
 					<span id="tFull" class="toolbarItem fa statusbar-toggler menubar-toggler fa-arrows-alt"></span>
-					<span class="toolbarItem fa fa-info-circle" title="" id="${keyTooltip_info}" onclick="setObjectPuoperties();"></span>
+					<span class="toolbarItem fa fa-info-circle" title="" id="${keyTooltip_info}" onclick="setObjectProperties();"></span>
 					<a class="toolbarItem" href="#"><i class="fa fa-warning"></i></a>
 					<span class="toolbarItem fa fa-bar-chart" title="" id="${keyTooltip_showChart}" onclick="showChartPowerSys();"></span>
 					<span class="devider">.</span>
@@ -131,16 +158,21 @@
 			</div>
 			<div id="southPane" class="ui-layout-south">
 				<div id='toolbarDIV' class="toolbar">
-					<span id="confirmOne" class="toolbarItem fa fa-check"></span>
+					<span onclick="confirmOne();" class="toolbarItem fa fa-check"></span>
 					<span id="confirmSS" class="toolbarItem fa fa-check-square-o"></span>
-					<span id="confirmAll" class="toolbarItem fa fa-check-square"></span>
+					<span onclick="confirmAll();" class="toolbarItem fa fa-check-square"></span>
 					<span class="devider">.</span>
 					<div class="fa fa-filter">
 						<select id="alarmFilter" class="menubutton">
 							<option value="0">*</option>
 						</select>
-						<button type="button" class="menubutton" onclick="$('#alarmTable tbody').trigger('sorton', [[[7,0],[12,0],[4,1]]]);">#{keyTooltip_btnSorting}</button>
-						<button id="btnAlarmColumns" type="button" class="menubutton" onclick="setAlarmColumns();">Columns</button>
+					</div>
+
+					<button type="button" class="menubutton" onclick="$('#alarmTable tbody').trigger('sorton', [[[7,0],[12,0],[4,1]]]);">#{keyTooltip_btnSorting}</button>
+					<button id="btnAlarmColumns" type="button" class="menubutton" onclick="setAlarmColumns();">Columns</button>
+
+					<div class="pull-right">
+						<span id='alarmsCount' class="badge">0</span>
 					</div>
 				</div>
 				<div id="divTableAlarm">
@@ -154,14 +186,17 @@
 								<th id="eventDT">#{key_pEventDT}</th>
 								<th id="alarmMES">#{key_pAlarmMes}</th>
 								<th id="logState">#{key_pLogState}</th>
-								<th id="logStateInt">#{key_pLogState}P</th>
+								<th id="logStateInt" style="display:none;">#{key_pLogState}P</th>
 								<th id="confirmDT">#{key_pConfirmDT}</th>
 								<th id="userRef">#{key_pUserRef}</th>
 								<th id="logNote">#{key_pLogNote}</th>
 								<th id="alarmPriority">#{key_pAlarmPriority}</th>
-								<th id="alarmPriorityInt">#{key_pAlarmPriority}P</th>
+								<th id="alarmPriorityInt" style="display:none;">#{key_pAlarmPriority}P</th>
 								<th id="eventType">#{key_pEventType}</th>
 								<th id="schemeObject">#{key_pSchemeObject}</th>
+								<th id="objectRef" style="display:none;">#{key_pObject}P</th>
+								<th id="eventDTorign" style="display:none;">#{key_pEventDT}P</th>
+								<th id="recordDTorign" style="display:none;">#{key_pRecordDT}P</th>
 							</tr>
 						</thead>
 						<tbody></tbody>
@@ -198,7 +233,6 @@
 								<thead>
 									<tr>
 										<th>#{key_pDate}</th>
-										<th>#{key_pValue}</th>
 									</tr>
 								</thead>
 								<tbody></tbody>
@@ -221,6 +255,7 @@
 
 		<script src="./js/pr/selectable.js"></script>
 		<script src="./js/pr/iscroll-zoom.js"></script>
+		<script src="./js/pr/tools.js"></script>
 		<script src="./js/pr/load.js"></script>
 	</body>
 </html>

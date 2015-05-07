@@ -10,7 +10,7 @@
 .tablesorter-default th,.tablesorter-default thead td{
 	text-align: center;
 	font-weight: bold;
-	padding: 0 15px;
+	padding: 0 5px;
 	margin: 0;
 	cursor:pointer;
 	border-top: #555 2px solid;

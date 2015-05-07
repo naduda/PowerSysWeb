@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Journal</title>
+
+		<link rel="stylesheet" href="./css/awesome/font-awesome.min.css"/>
+		<link rel="stylesheet" href="./css/bootstrap/bootstrap.min.css">
+		<link rel="stylesheet" href="./css/pr/style.css" />
+
+		<script src="./js/jquery-2.1.3.min.js"></script>
+		<script src="./js/bootstrap/bootstrap.min.js"></script>
+
+		<script src="./js/messageResource.min.js"></script>
+
+		<script src="./js/colResizable-1.5.min.js"></script>
+		<script src="./js/jquery.tablesorter.min.js"></script>
+		<script src="./js/jquery.tablesorter.header.js"></script>
+		<script src="./js/jquery.tablesorter.selector.js"></script>
+		<link rel="stylesheet" href="./themesTableOrder/tableStyle.css"/>
+	</head>
+	<body>
+		<div class="menubar">
+			<div>
+				<div id="menubarId">
+					<button type="button" class="btn-sm menubutton">#{keyFile}</button>
+					<label>Period from </label>
+				</div>
+			</div>
+			<div id="langSelector" class="pull-right">
+				<select id="lang" class="btn-sm menubutton" onchange="translateARM();">
+					<option value="en">English</option>
+					<option value="uk">Українська</option>
+					<option value="ru">Русский</option>
+				</select>
+			</div>
+		</div>
+
+		<div>
+			<div id='toolbarDIV' class="toolbar">
+				<span onclick="confirmOne();" class="toolbarItem fa fa-check"></span>
+				<span id="confirmSS" class="toolbarItem fa fa-check-square-o"></span>
+				<span onclick="confirmAll();" class="toolbarItem fa fa-check-square"></span>
+				<span class="devider">.</span>
+				<div class="fa fa-filter">
+					<select id="alarmFilter" class="menubutton">
+						<option value="0">*</option>
+					</select>
+				</div>
+
+				<button type="button" class="menubutton" onclick="$('#alarmTable tbody').trigger('sorton', [[[7,0],[12,0],[4,1]]]);">#{keyTooltip_btnSorting}</button>
+				<button id="btnAlarmColumns" type="button" class="menubutton" onclick="setAlarmColumns();">Columns</button>
+
+				<div class="pull-right">
+					<span id='alarmsCount' class="badge">0</span>
+				</div>
+			</div>
+		</div>
+		<div id="divTableAlarm">
+				<table id="alarmTable" class="tablesorter">
+					<thead>
+						<tr>
+							<th id="object">#{key_pObject}</th>
+							<th id="location">#{key_pLocation}</th>
+							<th id="alarmName">#{key_pAlarmName}</th>
+							<th id="recordDT">#{key_pRecordDT}</th>
+							<th id="eventDT">#{key_pEventDT}</th>
+							<th id="alarmMES">#{key_pAlarmMes}</th>
+							<th id="logState">#{key_pLogState}</th>
+							<th id="logStateInt" style="display:none;">#{key_pLogState}P</th>
+							<th id="confirmDT">#{key_pConfirmDT}</th>
+							<th id="userRef">#{key_pUserRef}</th>
+							<th id="logNote">#{key_pLogNote}</th>
+							<th id="alarmPriority">#{key_pAlarmPriority}</th>
+							<th id="alarmPriorityInt" style="display:none;">#{key_pAlarmPriority}P</th>
+							<th id="eventType">#{key_pEventType}</th>
+							<th id="schemeObject">#{key_pSchemeObject}</th>
+							<th id="objectRef" style="display:none;">#{key_pObject}P</th>
+							<th id="eventDTorign" style="display:none;">#{key_pEventDT}P</th>
+							<th id="recordDTorign" style="display:none;">#{key_pRecordDT}P</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+
+		<script src="./js/pr/translate.js"></script>
+		<script src="./js/pr/alarms.js"></script>
+		<script src="./js/pr/tools.js"></script>
+		<script src="./js/pr/journals/alarmJ.js"></script>
+	</body>
+</html>

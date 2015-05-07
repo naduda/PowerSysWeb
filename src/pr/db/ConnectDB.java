@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 import pr.db.jdbc.BatisJDBC;
 import pr.db.jdbc.PostgresDB;
 import pr.db.jdbc.mappers.IMapper;
+import pr.db.jdbc.mappers.IMapperAction;
 import pr.db.jdbc.mappers.IMapperSP;
 import pr.db.jdbc.mappers.IMapperT;
 import pr.db.jdbc.mappers.IMapperV;
@@ -35,6 +36,7 @@ import pr.model.Tscheme;
 import pr.model.Tsignal;
 import pr.model.Tuser;
 import pr.model.VsignalView;
+import pr.server.topic.MainTopic;
 
 @SuppressWarnings("unchecked")
 public class ConnectDB {
@@ -154,11 +156,29 @@ public class ConnectDB {
 		return (List<LinkedValue>) new BatisJDBC(s -> s.getMapper(IMapper.class).getDataIntegrArc(idSignal, dtBeg, dtEnd, period)).get();
 	}
 	
+	public static void setTU(int idsignal, double val, int rCode, int userId, int schemeref) {
+		new BatisJDBC(s -> s.getMapper(IMapper.class).setTU(idsignal, val, rCode, userId, schemeref)).get();
+	}
+	
+	public static void confirmAlarm(Timestamp recordDT, Timestamp eventDT, int objref, 
+			Timestamp confirmDT, String comment, int userref) {		
+		new BatisJDBC(s -> {
+			s.getMapper(IMapperAction.class).confirmAlarm(recordDT, eventDT, objref, confirmDT, comment, userref);
+			return 0;
+		}).get();
+	}
+	
+	public static void confirmAlarmAll(String lognote, int userref) {
+		new BatisJDBC(s -> {s.getMapper(IMapperAction.class).confirmAlarmAll(lognote, userref);return 0;}).get();
+	}
+	
 	private static PostgresDB postgressDB;
 	public static PostgresDB getPostgressDB() {
 		if (postgressDB == null) {
-			System.out.println("New connection");
 			postgressDB = new PostgresDB("localDS");
+			MainTopic mTopic = new MainTopic();
+			mTopic.start();
+			System.out.println("New connection");
 		}
 		return postgressDB;
 	}

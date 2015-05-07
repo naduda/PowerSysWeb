@@ -2,34 +2,55 @@ body {
 	font-family: "Courier New", "Arial"
 }
 
-::selection {background: transparent;}
+::selection {background-color: transparent;}
+.canSelect::selection {
+	background-color: rgb(123, 180, 199);
+}
+
+.pull-right{
+	padding-right: 5px !important;
+}
 
 .ui-layout-pane {
 	padding: 0px !important;
-	background: -webkit-linear-gradient(#D8D8D8, #d0d0d0);
+	background: linear-gradient(#D8D8D8, #d0d0d0);
 }
 
 #main {border: 0px;}
 
 #menubar, #statusbar {border: none; overflow: hidden;}
-.menubar, .menubutton {background: -webkit-linear-gradient(#D8D8D8, #d0d0d0);}
+
+.menubar {
+	overflow: visible !important;
+	z-index: 1 !important;
+	background: linear-gradient(#D8D8D8, #d0d0d0);
+	height: 30px;
+}
+
+.dropdown-menu{
+	background: linear-gradient(#D8D8D8, #d0d0d0);
+}
+
 .menubutton{
+	background: linear-gradient(#D8D8D8, #d0d0d0);
 	display: inline-block;
 	touch-action: manipulation;
 	border: 1px solid transparent;
 }
 
+#menubarId{float: left;}
+
 .toolbar {
-	background: -webkit-linear-gradient(#D8D8D8, #d0d0d0);
+	background: linear-gradient(#D8D8D8, #d0d0d0);
 	padding: 2px 0;
 	color: green;
-	height: 25px;
-	display: table;
+	display: block;
+	overflow: visible !important;
+	z-index: 1 !important;
+	width: 100%;
 }
 
 .toolbar div {
-	display: table-cell;
-	vertical-align:middle;
 	padding: 0 0 0 10px;
 }
 
@@ -82,9 +103,9 @@ body {
 	height: 100%;
 }
 
-#scheme::-webkit-scrollbar {display: none;}
-#southPane::-webkit-scrollbar {display: none;}
-#schemeContainer::-webkit-scrollbar {display: none;}
+#scheme::scrollbar {display: none;}
+#southPane::scrollbar {display: none;}
+#schemeContainer::scrollbar {display: none;}
 
 .glyphicon, .fa {color: green;}
 
@@ -96,6 +117,11 @@ body {
 	display: none;
 	border-color: rgb(123, 180, 199);
 	border-style: solid;
+	border-top-right-radius: 4px;
+	border-top-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+	z-index: 2;
 }
 .triangleLeft{
 	position: absolute;
@@ -129,7 +155,10 @@ body {
 .popupContent table tr td:first-child {text-align: right;}
 .popupContent table tr td:last-child {text-align: left;}
 
-#divTableAlarm {overflow: scroll;}
+#divTableAlarm {
+	position: relative;
+	overflow: auto;
+}
 
 .nav li a{padding: 3px 3px;}
 .tabs-below > .nav-tabs{

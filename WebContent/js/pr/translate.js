@@ -33,11 +33,12 @@ function translateARMByLocale(locale) {
 				if (key === 'keyChart') {
 					var chart = $('#tabChart').highcharts();
 					var selRect = $('#selectableRectangle')[0];
-					if(selRect != undefined) {
+					if(selRect != undefined && selRect.hasAttribute('selectedId')
+							&& selRect.getAttribute('selectedId') != undefined) {
 						var curItem = $('#' + selRect.getAttribute('selectedId'))[0];
 						chart.yAxis[0].setTitle({
 							text: messageResource.get('key_pValue', locale) + ', ' +
-										curItem.getAttribute('unit')
+										(curItem !== undefined ? curItem.getAttribute('unit'): '')
 						});
 					}
 				}

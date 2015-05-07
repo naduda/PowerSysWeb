@@ -1,13 +1,9 @@
 package pr.server.messages;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class ValueMessage extends Message {
-	private static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
-
 	private double value;
 	private String mode;
 	private int rCode;
@@ -44,10 +40,6 @@ public class ValueMessage extends Message {
 
 	public Timestamp getDate() {
 		return date;
-	}
-
-	public String getDateFormated() {
-		return dateFormat.format(date);
 	}
 
 	public void setDate(Timestamp date) {

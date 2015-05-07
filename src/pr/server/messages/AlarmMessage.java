@@ -7,7 +7,7 @@ public class AlarmMessage extends Message {
 	
 	public AlarmMessage(AlarmItem alarmItem) {
 		setType(this.getClass().getSimpleName());
-		this.alarmItem = alarmItem; 
+		this.alarmItem = alarmItem;
 	}
 
 	public AlarmItem getAlarmItem() {
