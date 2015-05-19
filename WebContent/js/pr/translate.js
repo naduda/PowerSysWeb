@@ -57,12 +57,16 @@ function translateARMByLocale(locale) {
 }
 
 function translateValueByKey(key) {
-	var locale = 'Language_' + document.getElementById('lang').value;
+	var lang = document.getElementById('lang'),
+			localeName = lang === null ? 'en' : lang.value,
+			locale = 'Language_' + localeName;
 	return messageResource.get(key, locale);
 }
 
 function translateARM() {
-	var locale = 'Language_' + document.getElementById('lang').value;
+	var lang = document.getElementById('lang'),
+			localeName = lang === null ? 'en' : lang.value,
+			locale = 'Language_' + localeName;
 	translateARMByLocale(locale);
 }
 

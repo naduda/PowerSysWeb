@@ -42,7 +42,7 @@
 							<span class="caret"></span>
 							</button>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="journalAlarms.html?id=1" target="_blank">#{key_miJAlarms}</a></li>
+							<li><a href="journal.html?id=1;" target="_blank">#{key_miJAlarms}</a></li>
 						</ul>
 					</span>
 
@@ -158,6 +158,7 @@
 			</div>
 			<div id="southPane" class="ui-layout-south">
 				<div id='toolbarDIV' class="toolbar">
+					<b><ins>#{keyAlarms}</ins></b>
 					<span onclick="confirmOne();" class="toolbarItem fa fa-check"></span>
 					<span id="confirmSS" class="toolbarItem fa fa-check-square-o"></span>
 					<span onclick="confirmAll();" class="toolbarItem fa fa-check-square"></span>
@@ -220,10 +221,7 @@
 					<option value="10"></option>
 					<option value="60"></option>
 				</select>
-				<span id="${keyPeriodFrom}"></span>
-				<input type="text" id="dpBeg" class="datePicker menubutton">
-				<span id="${keyTo}"></span>
-				<input type="text" id="dpEnd" class="datePicker menubutton">
+				<div id="chartDates"></div>
 			</div>
 			<div class="tabs-below">
 				<div class="tab-content">
@@ -248,14 +246,14 @@
 			</div>
 		</div>
 
+		<script src="./js/pr/tools.js"></script>
 		<script src="./js/pr/translate.js"></script>
 		<script src="./js/pr/tree.js"></script>
 		<script src="./js/pr/alarms.js"></script>
 		<script src="./js/pr/chart.js"></script>
 
 		<script src="./js/pr/selectable.js"></script>
-		<script src="./js/pr/iscroll-zoom.js"></script>
-		<script src="./js/pr/tools.js"></script>
+		<script src="./js/iscroll-zoom.js"></script>
 		<script src="./js/pr/load.js"></script>
 	</body>
 </html>

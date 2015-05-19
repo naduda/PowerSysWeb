@@ -16,18 +16,6 @@ $('#chartsPowerSys').resizable({
 $("#sInstantaneous").change(function() {
 	setDataTable();
 });
-$(".datePicker").datepicker({
-	showOn: "button",
-	dateFormat: "dd.mm.yy",
-	buttonText: "<i class='fa fa-calendar'></i>",
-	onSelect: onDateChange
-});
-var curDate1 = new Date();
-curDate1.setDate(curDate1.getDate() + 1);
-$("#dpBeg").datepicker('setDate', new Date());
-$("#dpEnd").datepicker('setDate', curDate1);
-$("#dpBeg").datepicker( "option", "maxDate", new Date());
-$("#dpEnd").datepicker( "option", "minDate", curDate1);
 
 $('#sInstantaneous option').each(function(){
 	if(this.value == 0) {
@@ -41,32 +29,22 @@ $("#dataTable").tablesorter({
 	headers: {0: { sorter:'customDate' }}
 });
 
-function onDateChange(dateText) {
-	var arr = dateText.split('.');
-	var dd = parseInt(arr[0]);
-	var mm = parseInt(arr[1]) - 1;
-	var yy = parseInt(arr[2]);
-
-	if(this.id === 'dpBeg') {
-		$("#dpEnd").datepicker("option", "minDate", new Date(yy, mm, dd));
-	} else if(this.id === 'dpEnd') {
-		$("#dpBeg").datepicker("option", "maxDate", new Date(yy, mm, dd));
-	}
-
-	setDataTable();
-}
-
 function showChartPowerSys() {
-	var md = document.getElementById('chartsPowerSys');
-	var sp = $('#sInstantaneous option:first span:first');
-	if(!sp.html()) sp.html(translateValueByKey('keyInstantaneous'));
+	var md = document.getElementById('chartsPowerSys'),
+	sp = $('#sInstantaneous option:first span:first');
 
+	if(!sp.html()) sp.html(translateValueByKey('keyInstantaneous'));
 	if (!(md.style.display === 'block')) {
 		setDataTable();
 	}
 
 	setPopupWindow('chartsPowerSys', 'main');
 }
+
+var tbDates = dateToolbar(document.getElementById('chartDates'), 
+	function (dateText) {
+		setDataTable();
+	});
 
 function setDataTable() {
 	var chart = $('#tabChart').highcharts();
@@ -105,16 +83,16 @@ function setDataTable() {
 	}, 250);
 
 	function addDataById(id) {
-		var integr = $("#sInstantaneous")[0].value;
-		var url = 'http:' + docURL + '/dataServer/db/getDataById?params=' + 
-							id + '_' + 
-							$("#dpBeg")[0].value +'_' + $("#dpEnd")[0].value + '_' + 
-							integr;
+		var integr = $("#sInstantaneous")[0].value,
+		url = 'http:' + docURL + '/dataServer/db/getDataById?params=' + id + '_' + 
+							tbDates.from.value +'_' + tbDates.to.value + '_' + integr;
+
 		$.getJSON(url, function(data){
-			var chart = $('#tabChart').highcharts();
-			var dataTable = document.getElementById('dataTable');
-			var htr = document.querySelector('#dataTable thead tr');
-			var seriesCount = chart.series.length;
+			var chart = $('#tabChart').highcharts(),
+			dataTable = document.getElementById('dataTable'),
+			htr = document.querySelector('#dataTable thead tr'),
+			seriesCount = chart.series.length;
+
 			if(seriesCount > htr.getElementsByTagName('th').length - 2) {
 				var nth = document.createElement('th');
 				nth.innerHTML = data.signalName;

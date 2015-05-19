@@ -14,6 +14,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import pr.common.Encryptor;
 import pr.db.ConnectDB;
 import pr.model.Tuser;
 import pr.server.messages.CommandMessage;
@@ -86,17 +87,23 @@ public class Server {
 				if (user != null) {
 					users.get(session).setUserId(user.getIduser());
 					putScheme(session, users.get(session).getIdScheme());
-					Tools.sendAlarms(session, ConnectDB.getCurDayAlarms());
+					Tools.sendAlarms(session, ConnectDB.getAlarmsByPeriod(null, null));
 					Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
 
 					parameters.put("status", "1");
 					String connString = ConnectDB.getPostgressDB().getConnStr();
-					System.out.println(connString);
 					parameters.put("user", userName);
 					parameters.put("server", connString.substring(0, connString.indexOf("_")));
 					parameters.put("db", connString.substring(connString.indexOf("_") + 1));
-					System.out.println(parameters);
+					
 					rm.setParameters(parameters);
+					String unicUser = cm.getParameters().get("IP") + System.currentTimeMillis();
+					Encryptor encryptor = new Encryptor();
+					unicUser = encryptor.encrypt(unicUser);
+					System.out.println("unicUser = " + unicUser);
+					users.get(session).setIp(cm.getParameters().get("IP"));
+					users.get(session).setUniqId(unicUser);
+					parameters.put("uniqId", unicUser);
 					session.getBasicRemote().sendObject(rm);
 					System.out.println("Login user - " + cm.getParameters().get("IP") + " at " + new Date(System.currentTimeMillis()));
 				} else {

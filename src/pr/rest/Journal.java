@@ -1,25 +1,16 @@
 package pr.rest;
 
-import java.util.List;
-
-
-
-
 import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-
-
-
-import pr.db.ConnectDB;
-import pr.model.Alarm;import pr.server.tools.model.AlarmItem;
-
+import pr.rest.journalTools.AlarmTools;
+import pr.server.Server;
 
 @Path("/journal")
 public class Journal {
@@ -27,37 +18,24 @@ public class Journal {
 
 	@Produces(MediaType.APPLICATION_JSON)
     @GET
-	public static String getSignalByIdTree(@QueryParam("id") String id) {
+	public static String getSignalByIdTree(@QueryParam("id") String id, @Context HttpServletRequest request) {
+		System.out.println("qqq");
+		String uniqId = id.substring(id.indexOf(";") + 1).replaceAll(" ", "+");
+		String[] arr = id.substring(0, id.indexOf(";")).split("_");
+		String dtBeg = null;
+		String dtEnd = null;
+		id = arr[0];
+		if (arr.length > 1) {
+			dtBeg = arr[1];
+			dtEnd = arr[2];
+		}
+		if (Server.getUsers().values().stream().filter(u -> u.getUniqId().equals(uniqId)).count() != 1) return null;
 //		http://localhost:8080/PowerSysWeb/dataServer/journal?id=1
 		String ret = null;
 		System.out.println(id + " === " + Integer.parseInt(id));
 		switch (Integer.parseInt(id)) {
 		case ALARM_JOURNAL:
-			List<Alarm> alarms = ConnectDB.getCurDayAlarms();
-			JsonArrayBuilder arr = Json.createArrayBuilder();
-			alarms.forEach(v ->{
-				AlarmItem a = new AlarmItem(v);
-				JsonObjectBuilder al = Json.createObjectBuilder();
-				al.add("object", a.getObject())
-					.add("location", a.getLocation())
-					.add("alarmName", a.getAlarmName())
-					.add("recordDT", a.getRecordDT())
-					.add("eventDT", a.getEventDT())
-					.add("alarmMES", a.getAlarmMES())
-					.add("logState", a.getLogState())
-					.add("logStateInt", a.getLogStateInt())
-					.add("confirmDT", a.getConfirmDT())
-					.add("userRef", a.getUserRef())
-					.add("logNote", a.getLogNote())
-					.add("alarmPriority", a.getAlarmPriority())
-					.add("alarmPriorityInt", a.getAlarmPriorityInt())
-					.add("eventType", a.getEventType())
-					.add("schemeObject", a.getSchemeObject())
-					.add("color", a.getColor())
-					.add("objectRef", a.getObjectRef());
-				arr.add(al);
-			});
-			ret = arr.build().toString();
+			ret = new AlarmTools().getAlarmsByPeriod(dtBeg, dtEnd);
 			break;
 		default:
 			ret = Json.createObjectBuilder().add("Id", id).build().toString();

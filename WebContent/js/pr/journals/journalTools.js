@@ -2,39 +2,63 @@
 	//		http://localhost:8080/PowerSysWeb/dataServer/journal?id=1
 	var docURL = document.URL,
 	params = docURL.substring(docURL.lastIndexOf("?")),
-	id = params.slice(4, params.indexOf(';'));
+	id = params.slice(4, params.indexOf(';')),
+	uniqId = params.slice(params.indexOf(';') + 1), 
+	docJournal = docURL.substring(docURL.indexOf('://'), docURL.lastIndexOf("/")),
+	urlRequest;
 
-	docURL = docURL.substring(docURL.indexOf('://'), docURL.lastIndexOf("/"));
-	docURL = 'http' + docURL + '/dataServer/journal' + params;
+	console.log(uniqId);
+	docJournal = 'http' + docJournal + '/dataServer/journal';
+	urlRequest = docJournal + params;
 
 	switch(id){
 		case '1':
 			document.title = 'Alarms';
 			var north = document.getElementsByClassName('ui-layout-north')[0],
-					center = document.getElementsByClassName('ui-layout-center')[0];
-			createDateToolbar(north, function (dateText) {
-					console.log(dateText);
-			});
-			createAlarmToolbar(north);
-			createAlarmTable(center);
+					center = document.getElementsByClassName('ui-layout-center')[0],
+					table = createAlarmTable(center),
+					header = elt('DIV', {style:'height:70px;background-color:#ddd;'}),
+					dates;
 
-			$.getJSON(docURL, function(data){
-				Array.prototype.forEach.call(data, function(alarm){
-					onAlarmMessage(alarm);
-				});
-			}).fail(function( jqxhr, textStatus, error ) {
-				var err = textStatus + ', ' + error;
-				console.log( "Request Failed: " + err);
-				modalInfo.close();
+			north.appendChild(header);
+			header.appendChild(elt('b', null, 
+				elt('center', {style:'line-height: 70px;'},
+					elt('span', {id:'${key_miJAlarms}'},
+						translateValueByKey('Journal of alarms'))
+			)));
+
+			dates = createDateToolbar(north, function (dateText) {
+				urlRequest = docJournal + '?id=' + id + '_' + 
+					dates.from.value + '_' + dates.to.value + ';' + uniqId;
+				$.tablesorter.clearTableBody($('#alarmTable')[0]);
+				getAlarms(urlRequest);
 			});
+
+			createAlarmToolbar(north);
+
+			getAlarms(urlRequest);
 			break;
 		default:
 			console.log('Not implementation for id = ' + id);
 			break;
 	}
 
+	function getAlarms(docURL){
+		$.getJSON(docURL, function(data){
+			Array.prototype.forEach.call(data, function(alarm){
+				onAlarmMessage(alarm);
+			});
+		}).fail(function( jqxhr, textStatus, error ) {
+			var err = textStatus + ', ' + error;
+			console.log( "Request Failed: " + err);
+			console.log(docURL);
+			modalInfo.close();
+		});
+	}
+
 	function createDateToolbar(parent, onDateChange){
-		var menubar = elt('DIV', {class:'menubar'}),
+		var menubar = elt('DIV', {class:'menubar',
+				style:'border-top-style:solid; border-top-width:1px;'}),
 				menubarId = elt('DIV', {id:'menubarId'}),
 				tbDates,
 				langSelector = elt('DIV', {id:'langSelector', class:'pull-right'}),
@@ -49,8 +73,9 @@
 		parent.appendChild(menubar);
 		tbDates = dateToolbar(menubarId, onDateChange);
 		tbDates.div.style.lineHeight = '29px';
+		return tbDates;
 	}
-// ======================== ALARM ============================
+
 	function createAlarmToolbar(parent){
 		var toolbarDIV = elt('DIV', {id:'toolbarDIV', class:'toolbar'},
 							elt('b', null, elt('ins', null, 
@@ -130,6 +155,7 @@
 				elt('tbody')
 			)
 		);
-	parent.appendChild(divTableAlarm);
+		parent.appendChild(divTableAlarm);
+		return divTableAlarm;
 	}
 })();

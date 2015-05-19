@@ -1,6 +1,5 @@
-body {
-	font-family: "Courier New", "Arial"
-}
+body {font-family: "Courier New", "Arial"}
+b>ins{color: blue;}
 
 ::selection {background-color: transparent;}
 .canSelect::selection {
@@ -54,11 +53,6 @@ body {
 	padding: 0 0 0 10px;
 }
 
-.toolbar div select {
-	margin: 0 -5px;
-	color: black;
-}
-
 .toolbar i {color: green;}
 
 .toolbarItem {
@@ -105,7 +99,7 @@ body {
 
 #scheme::scrollbar {display: none;}
 #southPane::scrollbar {display: none;}
-#schemeContainer::scrollbar {display: none;}
+#schemeContainer{overflow: hidden;}
 
 .glyphicon, .fa {color: green;}
 
@@ -188,7 +182,7 @@ body {
 
 .datePicker {
 	line-height: normal;
-	background-color: #ddd;
+	background: #ddd;
 	color: inherit;
 	width: 100px;
 }

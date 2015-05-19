@@ -4,6 +4,8 @@ public class SessionParams {
 	private long userId;
 	private int idScheme;
 	private String name;
+	private String ip;
+	private String uniqId;
 	
 	public SessionParams(long userId, int idScheme) {
 		this.idScheme = idScheme;
@@ -36,5 +38,21 @@ public class SessionParams {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getUniqId() {
+		return uniqId;
+	}
+
+	public void setUniqId(String uniqId) {
+		this.uniqId = uniqId;
 	}
 }

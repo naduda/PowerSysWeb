@@ -184,6 +184,12 @@ function onCommandMessage(data) {
 			document.getElementById('connectInfo').innerHTML = '   User - ' +
 				param.user + '; Server - ' + param.server + '; DB - ' +
 				param.db + '.';
+
+			Array.prototype.forEach.call(
+				document.getElementById('menubarId').getElementsByTagName('a'),
+				function(a){
+					a.href += param.uniqId;
+				});
 		} else {
 			showLogin();
 		}

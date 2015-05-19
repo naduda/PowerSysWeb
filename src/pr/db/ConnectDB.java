@@ -136,12 +136,17 @@ public class ConnectDB {
 			s.getMapper(IMapperSP.class).getSpTypeSignalMap()).get();
 	}
 	
-	public static List<Alarm> getCurDayAlarms() {
+	public static List<Alarm> getAlarmsByPeriod(String dtBeg, String dtEnd) {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 		try {
 //			Timestamp dt = new Timestamp(formatter.parse(formatter.format(new Date())).getTime());
-			Timestamp dt = new Timestamp(formatter.parse("01.01.2015").getTime());
-			return (List<Alarm>) new BatisJDBC(s -> s.getMapper(IMapper.class).getAlarms(dt)).get();
+			if (dtBeg == null) {
+				dtBeg = "01.01.2015";
+				dtEnd = "01.05.2015";
+			}
+			Timestamp dtB = new Timestamp(formatter.parse(dtBeg).getTime());
+			Timestamp dtE = new Timestamp(formatter.parse(dtEnd).getTime());
+			return (List<Alarm>) new BatisJDBC(s -> s.getMapper(IMapper.class).getAlarmsPeriod(dtB, dtE)).get();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

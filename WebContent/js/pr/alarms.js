@@ -44,6 +44,66 @@ $('#alarmTable tbody').on('click', 'tr', function(){
 		$(this).removeClass('selectedAlarm') : $(this).addClass('selectedAlarm');
 });
 
+function onAlarmMessage(data) {
+	var headerRowCols = $('#alarmTable thead tr:first').find('th'), newColumn = '';
+
+	data.eventDTorign = data.eventDT;
+	data.recordDTorign = data.recordDT;
+	data.eventDT = data.eventDT.length > 23 ? 
+		data.eventDT.substring(0, 23) : data.eventDT;
+	data.recordDT = data.recordDT.length > 23 ? 
+		data.recordDT.substring(0, 23) : data.recordDT;
+
+	// $("#alarmTable").colResizable({disable : true});
+	$('#alarmTable tbody tr').each(function(){
+		var eventDT = $(this).find('td').eq(4).html(),
+		recordDT = $(this).find('td').eq(3).html(),
+		objectRef = $(this).find('td').eq(15).html();
+
+		if(data.eventDT === eventDT && data.recordDT === recordDT &&
+			data.objectRef === objectRef) {
+			$(this).remove();
+		}
+	});
+
+	headerRowCols.each(function(){
+		var colName = headerRowCols.eq($(this).index()),
+		val = data[colName[0].id] || '-', actual = val.length * 9,
+		hName = colName[0].getElementsByTagName('span')[0].innerHTML.length * 12;
+
+		actual = actual > hName ? actual : hName;
+		if ($(this).css('display') !== 'none') {
+			if (val === '-') {
+				newColumn += '<td style="text-align: center;">' + 
+					val + '</td>';
+			} else {
+				newColumn += '<td>' + val + '</td>';
+			}
+			if (actual > $(this).width()) {
+				$(this).width(actual);
+			}
+		} else {
+			newColumn += '<td style="display: none;">' + val + '</td>';
+		}
+	});
+
+	$('#alarmTable tbody').append('<tr style="background-color:' + 
+		data.color + '">' + newColumn + '</tr>')
+		.trigger("update").trigger("sorton", [[[7,0],[12,0],[4,1]]]);
+	var status = $('#alarmTable tbody tr:first').find('td')[7];
+	if(status.innerHTML === 1)
+		$('#alarmTable tbody').trigger("sorton", [[[4,1]]]);
+
+	$("#alarmTable").colResizable({
+		liveDrag:true,
+		fixed:false
+	});
+	document.getElementById('alarmsCount').innerHTML =
+		document.getElementById('alarmTable')
+			.getElementsByTagName("tbody")[0]
+			.getElementsByTagName("tr").length;
+}
+
 function showHideColumn(col, isShow) {
 	var header2 = $('.tablesorter-sticky-wrapper');
 	$('#alarmTable').find('tr').each(function(){
