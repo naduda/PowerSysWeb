@@ -54,7 +54,10 @@ public class Tools {
 			oldValue.setrCode(v.getRcode());
 
 			List<Group> groups = new ArrayList<>();
+			if (scheme == null) return;
 			List<String> listGroups = scheme.getSignalMap().get(v.getSignalref());
+			
+			if (listGroups == null) return;
 			listGroups.forEach(g -> {
 				Group group = new Group();
 				group.setName(g);
@@ -74,7 +77,8 @@ public class Tools {
 			try {
 				session.getBasicRemote().sendObject(oldValue);
 			} catch (Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				System.err.println("The connection has been closed.");
 			}
 		});
 	}
@@ -159,6 +163,12 @@ public class Tools {
 		Optional<Tuser> filter = TUSERS.values().stream().filter(f -> f.getUn().equals(userName)).findFirst();
 		Encryptor encryptor = new Encryptor();
 		String psw = encryptor.decrypt(password);
+		long timeLogin = Long.parseLong(psw.substring(0, psw.indexOf("_")));
+		if (System.currentTimeMillis() - timeLogin > 3000) {
+			System.out.println("More than 3s login");
+			return null;
+		}
+		
 		psw = psw.substring(psw.indexOf("_") + 1);
 		
 		if (filter.isPresent()) {

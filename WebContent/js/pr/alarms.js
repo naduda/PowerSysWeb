@@ -57,8 +57,8 @@ function onAlarmMessage(data) {
 	// $("#alarmTable").colResizable({disable : true});
 	$('#alarmTable tbody tr').each(function(){
 		var eventDT = $(this).find('td').eq(4).html(),
-		recordDT = $(this).find('td').eq(3).html(),
-		objectRef = $(this).find('td').eq(15).html();
+				recordDT = $(this).find('td').eq(3).html(),
+				objectRef = $(this).find('td').eq(15).html();
 
 		if(data.eventDT === eventDT && data.recordDT === recordDT &&
 			data.objectRef === objectRef) {
@@ -121,8 +121,7 @@ function showHideColumn(col, isShow) {
 
 function confirmOne() {
 	var isConfirm = true;
-	var cm = {};
-	var par = {};
+	var cm = {}, par = {};
 	cm.type = 'CommandMessage';
 	cm.command = 'confimAlarmOne';
 	cm.parameters = [];
@@ -196,6 +195,7 @@ function confirmAll(){
 			autospin: true,
 			action: function(dialog){
 				par.text = dialog.getModalBody().find('textarea').val();
+				cm.parameters.push(par);
 
 				dialog.enableButtons(false);
 				webSocket.send(JSON.stringify(cm));

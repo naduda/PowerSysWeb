@@ -1,15 +1,19 @@
+var webSocket;
 (function(){
 	//		http://localhost:8080/PowerSysWeb/dataServer/journal?id=1
 	var docURL = document.URL,
 	params = docURL.substring(docURL.lastIndexOf("?")),
 	id = params.slice(4, params.indexOf(';')),
 	uniqId = params.slice(params.indexOf(';') + 1), 
-	docJournal = docURL.substring(docURL.indexOf('://'), docURL.lastIndexOf("/")),
+	docJournal = docURL.substring(docURL.indexOf('://'), docURL.indexOf("?")),
 	urlRequest;
 
-	console.log(uniqId);
+	docJournal = docJournal.substring(0, docJournal.lastIndexOf("/"));
+	webSocket = new WebSocket('ws' + docJournal + '/load');
 	docJournal = 'http' + docJournal + '/dataServer/journal';
 	urlRequest = docJournal + params;
+
+	initWebSocket(webSocket);
 
 	switch(id){
 		case '1':
@@ -43,10 +47,80 @@
 			break;
 	}
 
+	function initWebSocket(ws) {
+		ws.onmessage = function (message) {
+			var jsonData = JSON.parse(message.data);
+			if(jsonData.type === 'CommandMessage') {
+				onCommandMessage(jsonData);
+			} else if (jsonData.type === 'ValueMessage') {
+				onValueMessage(jsonData);
+			} else if (jsonData.type === 'AlarmMessage') {
+				// tools.js
+				onAlarmMessage(jsonData);
+			} else if (jsonData.type === 'KeyValueArrayMessage') {
+				onArrayMessage(jsonData);
+			}
+		}
+		ws.onerror = function (e) {
+			console.log(e);
+		}
+		ws.onclose = function () {
+			console.log('session close');
+		}
+		ws.onopen = function () {
+			console.log('session open');
+		}
+	}
+
+	function sendUserId(id){
+		var cm = {}, par = {};
+		cm.type = 'CommandMessage';
+		cm.command = 'setUserId';
+		cm.parameters = [];
+		par.userId = id + '';
+		cm.parameters.push(par);
+
+		webSocket.send(JSON.stringify(cm));
+	}
+
 	function getAlarms(docURL){
+		$('#progressDiv').css('text-align','left');
 		$.getJSON(docURL, function(data){
-			Array.prototype.forEach.call(data, function(alarm){
-				onAlarmMessage(alarm);
+			var len = data.alarms.length, i = 1;
+
+			sendUserId(data.userId);
+			Array.prototype.forEach.call(data.alarms, function (alarm){
+				setTimeout(function(){
+					var w = (i++)*100/len;
+					onAlarmMessage(alarm);
+					if(w === 100){
+						$('#progressDiv').html('Complete');
+						$('#progressDiv').css('text-align','center');
+					} else
+						$('#progressDiv').html('Loading - ' + Number(w.toFixed(2)) + ' %');
+					$('#progressDiv').width(w + '%');
+				},10);
+			});
+		}).fail(function( jqxhr, textStatus, error ) {
+			var err = textStatus + ', ' + error;
+			console.log( "Request Failed: " + err);
+			console.log(docURL);
+			//modalInfo.close();
+		});
+	}
+
+	function getPriorities(docURL){
+		$.getJSON(docURL, function(data){
+			var sel = document.getElementById('alarmFilter');
+			Array.prototype.forEach.call(data, function(priority){
+				var op = elt('option', {value:priority.value}, priority.name);
+				switch(op.value) {
+					case '1': op.style.backgroundColor = 'red'; break;
+					case '2': op.style.backgroundColor = 'yellow'; break;
+					case '3': op.style.backgroundColor = 'green'; break;
+				default: op.style.backgroundColor = '#eee'; break;
+			}
+				sel.appendChild(op);
 			});
 		}).fail(function( jqxhr, textStatus, error ) {
 			var err = textStatus + ', ' + error;
@@ -101,6 +175,7 @@
 							elt('DIV', {class:'pull-right'},
 									elt('span', {id:'alarmsCount', class:'badge'}, '0'))
 		);
+		getPriorities('http://localhost:8080/PowerSysWeb/dataServer/db/priority');
 		parent.appendChild(toolbarDIV);
 	}
 
@@ -156,6 +231,7 @@
 			)
 		);
 		parent.appendChild(divTableAlarm);
+		divTableAlarm.style.height = '100%';
 		return divTableAlarm;
 	}
 })();

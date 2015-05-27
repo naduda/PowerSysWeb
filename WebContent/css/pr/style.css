@@ -201,3 +201,8 @@ b>ins{color: blue;}
 }
 #dataTable{width: inherit;}
 #dataTable thead tr th{width: 200px;}
+#progressDiv{
+	background-color: blue;
+	color: white;
+	width: 0;
+}

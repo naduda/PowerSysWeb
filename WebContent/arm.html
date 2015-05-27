@@ -58,6 +58,9 @@
 
 					<button type="button" class="btn-sm menubutton">#{keyTools}</button>
 					<button type="button" class="btn-sm menubutton">#{keySettings}</button>
+					<form action="LogoutServlet" method="post" class="menubutton">
+						<input type="submit" value="Logout" class="btn-sm menubutton">
+					</form>
 					<button type="button" class="btn-sm menubutton" onclick="open(location, '_self').close();return false;">#{key_miExit}</button>
 					<button type="button" class="btn-sm menubutton">#{keyAbout}</button>
 				</div>
@@ -217,7 +220,7 @@
 				<select id="sInstantaneous" class="menubutton">
 					<option value="0"></option>
 					<option value="1"><span id="#{keyMinute}"></span></option>
-					<option  value="5"></option>
+					<option value="5"></option>
 					<option value="10"></option>
 					<option value="60"></option>
 				</select>
@@ -253,7 +256,7 @@
 		<script src="./js/pr/chart.js"></script>
 
 		<script src="./js/pr/selectable.js"></script>
-		<script src="./js/iscroll-zoom.js"></script>
+		<script src="./js/iscroll-zoom.min.js"></script>
 		<script src="./js/pr/load.js"></script>
 	</body>
 </html>

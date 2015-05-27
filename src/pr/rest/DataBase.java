@@ -23,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import pr.common.Encryptor;
 import pr.db.ConnectDB;
 import pr.model.LinkedValue;
+import pr.rest.journalTools.AlarmTools;
 import pr.server.tools.Tools;
 
 @Path("/db")
@@ -65,6 +66,9 @@ public class DataBase {
 			ret = Json.createObjectBuilder()
 					.add("signalName", Tools.VSIGNALS.get(idSignal).getNamesignal())
 					.add("data", dataArray).build().toString();
+			break;
+		case "priority":
+			ret = AlarmTools.getTSysParam("ALARM_PRIORITY");
 			break;
 		default: ret = "Get: > Comand <" + comand + "> not found"; break;
 		}

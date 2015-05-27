@@ -3,6 +3,8 @@ package pr.db;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import pr.model.Tscheme;
 import pr.model.Tsignal;
 import pr.model.Tuser;
 import pr.model.VsignalView;
+import pr.server.Server;
 import pr.server.topic.MainTopic;
 
 @SuppressWarnings("unchecked")
@@ -139,13 +142,17 @@ public class ConnectDB {
 	public static List<Alarm> getAlarmsByPeriod(String dtBeg, String dtEnd) {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 		try {
-//			Timestamp dt = new Timestamp(formatter.parse(formatter.format(new Date())).getTime());
-			if (dtBeg == null) {
-				dtBeg = "01.01.2015";
-				dtEnd = "01.05.2015";
+			Date curDate = null;
+			Calendar c = Calendar.getInstance(); 
+			if (dtBeg == null){
+				curDate = new Date();
+				c.setTime(curDate); 
+				c.add(Calendar.DATE, 1);
 			}
-			Timestamp dtB = new Timestamp(formatter.parse(dtBeg).getTime());
-			Timestamp dtE = new Timestamp(formatter.parse(dtEnd).getTime());
+			Timestamp dtB = dtBeg == null ? new Timestamp(formatter.parse(formatter.format(curDate)).getTime()) : 
+											new Timestamp(formatter.parse(dtBeg).getTime());
+			Timestamp dtE = dtBeg == null ? new Timestamp(formatter.parse(formatter.format(c.getTime())).getTime()) : 
+											new Timestamp(formatter.parse(dtEnd).getTime());
 			return (List<Alarm>) new BatisJDBC(s -> s.getMapper(IMapper.class).getAlarmsPeriod(dtB, dtE)).get();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -178,17 +185,29 @@ public class ConnectDB {
 	}
 	
 	private static PostgresDB postgressDB;
+	private static MainTopic mTopic;
+	private static boolean isFirstStart = true;
 	public static PostgresDB getPostgressDB() {
 		if (postgressDB == null) {
-			postgressDB = new PostgresDB("localDS");
-			MainTopic mTopic = new MainTopic();
-			mTopic.start();
-			System.out.println("New connection");
+			synchronized (ConnectDB.class) {
+				if (!isFirstStart) Server.clearUsers();
+				postgressDB = new PostgresDB("localDS");
+				isFirstStart = false;
+				System.out.println("New connection");
+			}
 		}
+		restartMainTopic();
 		return postgressDB;
 	}
 	
 	public static void setPostgressDB(PostgresDB value) {
 		postgressDB = value;
+	}
+
+	public static void restartMainTopic() {
+		if (mTopic == null) {
+			mTopic = new MainTopic();
+			mTopic.start();
+		}
 	}
 }

@@ -44,4 +44,14 @@ public class AlarmTools {
 		
 		return arr.build().toString();
 	}
+	
+	public static String getTSysParam(String param) {
+		JsonArrayBuilder arr = Json.createArrayBuilder();
+		ConnectDB.getTSysParam(param).values().forEach(e -> {
+			JsonObjectBuilder al = Json.createObjectBuilder();
+			al.add("name", e.getParamdescr()).add("value", e.getVal());
+			arr.add(al);
+		});
+		return arr.build().toString();
+	}
 }

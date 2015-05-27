@@ -21,9 +21,14 @@ public class BatisJDBC {
 					Thread.sleep(1000);
 				}
 				session = ConnectDB.getPostgressDB().getSqlSessionFactory().openSession(true);
-				return iBatis.getResult(session);
+				try {
+					return iBatis.getResult(session);
+				} catch (Exception e) {
+					System.out.println("Error!!! (In BatisJDBC.class)");
+				}
 			} catch (Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				System.out.println("Reconnect!!! (In BatisJDBC.class)");
 				ConnectDB.setPostgressDB(null);
 			} finally {
 				if (session != null) session.close();

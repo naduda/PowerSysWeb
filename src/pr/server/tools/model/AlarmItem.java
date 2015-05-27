@@ -47,7 +47,7 @@ public class AlarmItem {
 		logState = ConnectDB.getTSysParam("LOG_STATE").get("" + a.getLogstate()).getParamdescr();
 		confirmDT = a.getConfirmdt() != null ? dFormat.format(a.getConfirmdt()) + cMilli : "";
 		userRef = a.getUserref() == 0 ? "" : 
-			a.getUserref() == -1 ? "Administrator" : Tools.TUSERS.get(a.getUserref()).getFio();
+			a.getUserref() == -1 ? "Administrator" : Tools.TUSERS.get(a.getUserref()) != null ? Tools.TUSERS.get(a.getUserref()).getFio() : "Admin";
 		logNote = a.getLognote();
 		alarmPriority = ConnectDB.getTSysParam("ALARM_PRIORITY").get("" + a.getAlarmpriority()).getParamdescr();
 		alarmPriorityInt = a.getAlarmpriority();

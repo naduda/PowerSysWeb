@@ -676,11 +676,12 @@ IScroll.prototype = {
 		this.wrapperHeight	= this.wrapper.clientHeight;
 
 /* REPLACE START: refresh */
-	this.scrollerWidth	= Math.round(this.scroller.offsetWidth * this.scale);
-	this.scrollerHeight	= Math.round(this.scroller.offsetHeight * this.scale);
+	this.scrollerWidth	= Math.round(this.scroller.parentNode.offsetWidth * this.scale);
+	this.scrollerHeight	= Math.round(this.scroller.parentNode.offsetHeight * this.scale);
 
 	this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
 	this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
+
 /* REPLACE END: refresh */
 
 		this.hasHorizontalScroll	= this.options.scrollX && this.maxScrollX < 0;
@@ -1180,14 +1181,13 @@ IScroll.prototype = {
 			wheelDeltaY = e.wheelDeltaY / Math.abs(e.wheelDeltaY);
 		} else if('wheelDelta' in e) {
 			wheelDeltaY = e.wheelDelta / Math.abs(e.wheelDelta);
-		} else if ('detail' in e) {
+		} else if ('detail22' in e) {
 			wheelDeltaY = -e.detail / Math.abs(e.wheelDelta);
 		} else {
 			return;
 		}
 
 		deltaScale = this.scale + wheelDeltaY / 5;
-
 		this.zoom(deltaScale, e.pageX, e.pageY, 0);
 	},
 

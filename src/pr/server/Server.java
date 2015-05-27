@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.websocket.EncodeException;
@@ -29,7 +30,7 @@ public class Server {
 	private static final Map<Integer, Scheme> schemes = Collections.synchronizedMap(new HashMap<>());
 	
 	public Server() throws UnsupportedEncodingException, IOException {
-		
+		System.out.println("==================== new Server ====================");
 	}
 	
 	@OnOpen
@@ -100,7 +101,7 @@ public class Server {
 					String unicUser = cm.getParameters().get("IP") + System.currentTimeMillis();
 					Encryptor encryptor = new Encryptor();
 					unicUser = encryptor.encrypt(unicUser);
-					System.out.println("unicUser = " + unicUser);
+					
 					users.get(session).setIp(cm.getParameters().get("IP"));
 					users.get(session).setUniqId(unicUser);
 					parameters.put("uniqId", unicUser);
@@ -121,6 +122,9 @@ public class Server {
 			case "confimalarmall":
 				messConfirm = cm.getParameters().get("text").trim();
 				ConnectDB.confirmAlarmAll(messConfirm, (int)users.get(session).getUserId());
+				break;
+			case "setuserid":
+				users.get(session).setUserId(Long.parseLong(cm.getParameters().get("userId")));
 				break;
 			default:
 				System.err.println(cm.getCommand().toLowerCase());
@@ -159,7 +163,15 @@ public class Server {
 		long id = System.currentTimeMillis();
 		System.out.println("User disconnect at " + id + ". Now " + users.size() + " users.");
 	}
-
+	
+	public static void clearUsers() {
+		Iterator<Session> iter = users.keySet().iterator();
+		while (iter.hasNext()) {
+			Session session = (Session) iter.next();
+			users.remove(session);
+		}
+	}
+	
 	public static Map<Session, SessionParams> getUsers() {
 		return users;
 	}

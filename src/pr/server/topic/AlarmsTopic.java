@@ -4,16 +4,12 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-
 import javax.websocket.Session;
 
 import pr.db.jdbc.BatisJDBC;
 import pr.db.jdbc.mappers.IMapper;
-import pr.log.LogFiles;
 import pr.model.Alarm;
-import pr.server.SessionParams;
+import pr.server.Server;
 import pr.server.messages.AlarmMessage;
 import pr.server.tools.model.AlarmItem;
 
@@ -22,8 +18,8 @@ public class AlarmsTopic extends ATopic {
 	private List<Alarm> confirmed = new ArrayList<>();
 	private Timestamp dtConfirmed = new Timestamp(System.currentTimeMillis());
 	
-	public AlarmsTopic(Map<Session, SessionParams> users) {
-		super(users);
+	public AlarmsTopic() {
+		super();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -39,7 +35,7 @@ public class AlarmsTopic extends ATopic {
 			if (ls != null && ls.size() > 0) {
 				dt = ls.get(0).getRecorddt();
 				ls.forEach(a -> {
-					Iterator<Session> iter = users.keySet().iterator();
+					Iterator<Session> iter = Server.getUsers().keySet().iterator();
 					while (iter.hasNext()) {
 						Session session = (Session) iter.next();
 						try {
@@ -55,7 +51,7 @@ public class AlarmsTopic extends ATopic {
 				dtConfirmed = confirmed.get(0).getConfirmdt();
 
 				confirmed.forEach(a -> {
-					Iterator<Session> iter = users.keySet().iterator();
+					Iterator<Session> iter = Server.getUsers().keySet().iterator();
 					while (iter.hasNext()) {
 						Session session = (Session) iter.next();
 						try {
@@ -67,11 +63,12 @@ public class AlarmsTopic extends ATopic {
 				});
 			}
 		} catch (Exception e) {
-			LogFiles.log.log(Level.SEVERE, e.getMessage(), e);
+//			LogFiles.log.log(Level.SEVERE, e.getMessage(), e);
+			System.out.println("Error in AlarmsTopic.class!!!");
 			try {
 				if (ls == null) Thread.sleep(60000); //Connection broken
 			} catch (InterruptedException e1) {
-				LogFiles.log.log(Level.SEVERE, e1.getMessage(), e1);
+//				LogFiles.log.log(Level.SEVERE, e1.getMessage(), e1);
 			}
 		}
 		return dt;

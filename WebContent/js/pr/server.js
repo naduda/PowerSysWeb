@@ -1,6 +1,8 @@
 var docURL = document.URL;
 docURL = docURL.substring(docURL.indexOf('://'), docURL.lastIndexOf("/"));
 var webSocket = new WebSocket('ws' + docURL + '/load');
+var myScroll;
+
 function showLogin() {
 	var userID = 'admin', psw;
 	BootstrapDialog.show({
@@ -75,6 +77,7 @@ function initWebSocket(ws) {
 	}
 	ws.onclose = function () {
 		console.log('session close');
+		//alert('Session closed! You need update your page.');
 		// var isConnect = false;
 		// while (!isConnect) {
 		// 	try {
@@ -117,8 +120,8 @@ function onCommandMessage(data) {
 		}
 
 		var svg = document.getElementsByTagName('svg').item(0);
-		svg.setAttribute('width', '98%');
-		svg.setAttribute('height', '98%');
+		svg.setAttribute('width', '100%');
+		svg.setAttribute('height', '100%');
 
 		selectable(svg);
 
@@ -197,14 +200,14 @@ function onCommandMessage(data) {
 }
 
 function onValueMessage(data) {
-	var dti = {};
-	var lastDate = document.getElementById('lastDate');
-	var timestamp = lastDate.getAttribute('timestamp');
-	var dateFormated = timestamp2date(Number(timestamp));
+	var dti = {},
+			lastDate = document.getElementById('lastDate'),
+			timestamp = lastDate.getAttribute('timestamp'),
+			dateFormated = timestamp2date(Number(timestamp));
 
 	if(data.timestamp > timestamp) {
 		lastDate.setAttribute('timestamp', data.timestamp);
-		lastDate.innerHTML = dateFormated;
+		lastDate.innerHTML = timestamp2date(Number(data.timestamp));
 	}
 
 	for (var key in data) {
@@ -215,8 +218,8 @@ function onValueMessage(data) {
 	}
 
 	for (i = 0; i < data.groups.length; i++) {
-		var group = data.groups[i];
-		var activeGroup = getGroupByName(group.name);
+		var group = data.groups[i],
+				activeGroup = getGroupByName(group.name);
 
 		for (var key in group) {
 			if (group.hasOwnProperty(key)) {
@@ -229,21 +232,22 @@ function onValueMessage(data) {
 		dti.precision = activeGroup.precision;
 		dti.unit = activeGroup.unit;
 
-		function Elem(activeGroup, dti){
-			var scriptName = './scripts/' + activeGroup.script + '.js';
-			var element = activeGroup.element;
-			this.dti = dti;
-			this.scriptName = scriptName;
-			this.run = function() {
-				var func = psFunctions.results[scriptName];
-				if (func){
-					func(element).onChange(dti);
-					element.setAttribute('value', dti.value);
-				} else console.log(scriptName);
-			}
-		}
 		var elem = new Elem(activeGroup, dti);
 		psFunctions.run(elem.scriptName, elem.run);
+	}
+}
+
+function Elem(activeGroup, dti){
+	var scriptName = './scripts/' + activeGroup.script + '.js';
+	var element = activeGroup.element;
+	this.dti = dti;
+	this.scriptName = scriptName;
+	this.run = function() {
+		var func = psFunctions.results[scriptName];
+		if (func){
+			func(element).onChange(dti);
+			element.setAttribute('value', dti.value);
+		} else console.log(scriptName);
 	}
 }
 

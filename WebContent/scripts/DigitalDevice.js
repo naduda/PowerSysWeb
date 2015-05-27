@@ -1,12 +1,12 @@
 return {
 	onChange : function (dti) {
-		var newX = 0;
-		var rect = obj.getElementsByTagName('rect')[0];
-		var text = obj.getElementsByTagName('text')[0];
-		var style = obj.getAttribute('style');
+		var newX = 0,
+			rect = obj.getElementsByTagName('rect')[0],
+			text = obj.getElementsByTagName('text')[0],
+			style = obj.getAttribute('style');
 
-		text.innerHTML = parseFloat(dti.value * dti.koef).toFixed(dti.precision) + ' \
-			' + dti.unit;
+		text.innerHTML = parseFloat(dti.value * dti.koef).toFixed(dti.precision)
+									 + ' ' + dti.unit;
 		var width = parseFloat(rect.getAttribute('width'));
 		var textWidth = parseFloat(text.getBBox().width);
 		

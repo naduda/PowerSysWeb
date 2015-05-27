@@ -1,26 +1,19 @@
 package pr.server.topic;
 
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
-import javax.websocket.Session;
-
 import pr.model.Tsignal;
-import pr.server.SessionParams;
 import pr.server.tools.Tools;
 
 public abstract class ATopic implements Runnable {
-	public final Map<Session, SessionParams> users = Collections.synchronizedMap(new HashMap<>());
 	public final Map<Integer, Tsignal> signals = Tools.TSIGNALS;
 	private boolean isRun;
 	private long sleepTimeout = 100;
 	private Timestamp dt;
 
-	public ATopic(Map<Session, SessionParams> users) {
-		this.users.putAll(users);
+	public ATopic() {
 		isRun = true;
 		dt = new Timestamp(new Date().getTime());
 	}

@@ -15,6 +15,18 @@ window.addEventListener("keyup", function(event) {
 		}
 }, false);
 
+if ( !window.requestAnimationFrame ) {
+	window.requestAnimationFrame = ( function() {
+		return window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame ||
+		window.oRequestAnimationFrame ||
+		window.msRequestAnimationFrame ||
+		function(callback, element ) {
+			window.setTimeout( callback, 1000 / 60 );
+		};
+	})();
+}
+
 function elt(name, attributes) {
 	var node = document.createElement(name);
 	if (attributes) {
