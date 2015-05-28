@@ -4,7 +4,6 @@ var webSocket;
 	var docURL = document.URL,
 	params = docURL.substring(docURL.lastIndexOf("?")),
 	id = params.slice(4, params.indexOf(';')),
-	uniqId = params.slice(params.indexOf(';') + 1), 
 	docJournal = docURL.substring(docURL.indexOf('://'), docURL.indexOf("?")),
 	urlRequest;
 
@@ -32,9 +31,10 @@ var webSocket;
 			)));
 
 			dates = createDateToolbar(north, function (dateText) {
-				urlRequest = docJournal + '?id=' + id + '_' + 
-					dates.from.value + '_' + dates.to.value + ';' + uniqId;
+				urlRequest = docJournal + '?id=1;' + 
+					dates.from.value + '_' + dates.to.value;
 				$.tablesorter.clearTableBody($('#alarmTable')[0]);
+				console.log(urlRequest);
 				getAlarms(urlRequest);
 			});
 
@@ -51,14 +51,16 @@ var webSocket;
 		ws.onmessage = function (message) {
 			var jsonData = JSON.parse(message.data);
 			if(jsonData.type === 'CommandMessage') {
-				onCommandMessage(jsonData);
+				// switch(jsonData.command){
+				// 	default: console.log(jsonData.command);break;
+				// }
 			} else if (jsonData.type === 'ValueMessage') {
-				onValueMessage(jsonData);
+				//onValueMessage(jsonData);
 			} else if (jsonData.type === 'AlarmMessage') {
 				// tools.js
 				onAlarmMessage(jsonData);
 			} else if (jsonData.type === 'KeyValueArrayMessage') {
-				onArrayMessage(jsonData);
+				//onArrayMessage(jsonData);
 			}
 		}
 		ws.onerror = function (e) {

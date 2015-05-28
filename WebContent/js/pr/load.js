@@ -13,11 +13,11 @@ $(document).ready(function () {
 	,	south__resizable:					false //StatusBar
 	,	south__spacing_closed:		0
 	,	south__spacing_open:			0
-	,	south__initClosed:				true
+	// ,	south__initClosed:				true
 	,	north__resizable:					false //MenuBar
 	,	north__spacing_closed:		0
 	,	north__spacing_open:			0
-	,	north__initClosed:				true
+	// ,	north__initClosed:				true
 	});
 
 	myLayout
@@ -35,20 +35,20 @@ $(document).ready(function () {
 	,	north__closable: 					false
 	,	north__spacing_open:			0
 	,	north__spacing_closed:		0
-	,	north__initClosed:				true
+	// ,	north__initClosed:				true
 	,	south__spacing_closed:		0						//Alarms
 	,	south__spacing_open:			2
 	,	south__onclose:						onHideShow
 	,	south__onopen:						onHideShow
 	,	south__onresize_end:			resizePane
 	,	south__size:							200
-	,	south__initClosed:				true
+	// ,	south__initClosed:				true
 	,	west__size:								300					//Tree
 	,	west__spacing_open:				2
 	,	west__spacing_closed:			0
 	,	west__onclose:						onHideShow
 	,	west__onopen:							onHideShow
-	,	west__initClosed:					true
+	// ,	west__initClosed:					true
 	});
 
 	myLayoutInner

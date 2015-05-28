@@ -10,7 +10,9 @@ import java.util.Optional;
 
 
 
+
 import javax.websocket.Session;
+
 
 
 
@@ -25,6 +27,7 @@ import pr.model.Tsignal;
 import pr.model.Tuser;
 import pr.model.VsignalView;
 import pr.server.Scheme;
+import pr.server.Server;
 import pr.server.messages.AlarmMessage;
 import pr.server.messages.CommandMessage;
 import pr.server.messages.KeyValueArrayMessage;
@@ -159,17 +162,29 @@ public class Tools {
 		});
 	}
 	
+	public static void sendConnStr(Session session) {
+		try {
+			String connString = ConnectDB.getPostgressDB().getConnStr() + "_" + Server.getUsers().get(session).getName();
+			CommandMessage cm = new CommandMessage();
+			cm.setCommand("connString");
+			cm.setParameters("value", connString);
+			session.getBasicRemote().sendObject(cm);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static Tuser checkUser(String userName, String password) {
 		Optional<Tuser> filter = TUSERS.values().stream().filter(f -> f.getUn().equals(userName)).findFirst();
 		Encryptor encryptor = new Encryptor();
 		String psw = encryptor.decrypt(password);
-		long timeLogin = Long.parseLong(psw.substring(0, psw.indexOf("_")));
+		long timeLogin = psw.indexOf("_") > 0 ? Long.parseLong(psw.substring(0, psw.indexOf("_"))) : System.currentTimeMillis();
 		if (System.currentTimeMillis() - timeLogin > 3000) {
 			System.out.println("More than 3s login");
 			return null;
 		}
 		
-		psw = psw.substring(psw.indexOf("_") + 1);
+		psw = psw.indexOf("_") > 0 ? psw.substring(psw.indexOf("_") + 1) : psw;
 		
 		if (filter.isPresent()) {
 			Tuser currentUser = filter.get();

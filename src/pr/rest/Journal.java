@@ -19,26 +19,21 @@ public class Journal {
 	@Produces(MediaType.APPLICATION_JSON)
     @GET
 	public static String getSignalByIdTree(@QueryParam("id") String id, @Context HttpServletRequest request) {
-		String uniqId = id.substring(id.indexOf(";") + 1).replaceAll(" ", "+");
-		String[] arr = id.substring(0, id.indexOf(";")).split("_");
+		String[] arr = id.substring(id.indexOf(";") + 1).split("_");
 		String dtBeg = null;
 		String dtEnd = null;
-		id = arr[0];
+		id = id.substring(0, id.indexOf(";"));
+		
 		if (arr.length > 1) {
-			dtBeg = arr[1];
-			dtEnd = arr[2];
+			dtBeg = arr[0];
+			dtEnd = arr[1];
 		}
 		
-		if (Server.getUsers().values().stream().filter(u -> uniqId.equals(u.getUniqId())).count() != 1) return null;
-		if (!Server.getUsers().values().stream().filter(u -> uniqId.equals(u.getUniqId())).findFirst().get().getIp()
-				.equals(request.getRemoteAddr())) return null;
-//		http://localhost:8080/PowerSysWeb/dataServer/journal?id=1
 		String ret = null;
 		switch (Integer.parseInt(id)) {
 		case ALARM_JOURNAL:
-			ret = "{\"userId\": " + 
-					Server.getUsers().values().stream().filter(u -> uniqId.equals(u.getUniqId())).findFirst().get().getUserId() + 
-					", \"alarms\": " + new AlarmTools().getAlarmsByPeriod(dtBeg, dtEnd) + "}";
+			ret = "{\"userId\": " + Server.getUserId() + 
+				 ", \"alarms\": " + new AlarmTools().getAlarmsByPeriod(dtBeg, dtEnd) + "}";
 			break;
 		default:
 			ret = Json.createObjectBuilder().add("Id", id).build().toString();

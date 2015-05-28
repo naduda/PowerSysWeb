@@ -3,29 +3,31 @@ package pr.server;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
 import javax.websocket.EncodeException;
+import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import pr.common.Encryptor;
 import pr.db.ConnectDB;
-import pr.model.Tuser;
 import pr.server.messages.CommandMessage;
 import pr.server.messages.Message;
 import pr.server.messages.coders.MessageDecoder;
 import pr.server.messages.coders.MessageEncoder;
 import pr.server.tools.Tools;
 
-@ServerEndpoint(value = "/load", encoders = {MessageEncoder.class}, decoders = {MessageDecoder.class})
+@ServerEndpoint(value = "/load", configurator = GetHttpSessionConfigurator.class,
+	encoders = {MessageEncoder.class}, decoders = {MessageDecoder.class})
 public class Server {
+	private HttpSession httpSession;
+	private static int userId;
 	private static final Map<Session, SessionParams> users = Collections.synchronizedMap(new HashMap<>());
 	private static final Map<Integer, Scheme> schemes = Collections.synchronizedMap(new HashMap<>());
 	
@@ -34,10 +36,14 @@ public class Server {
 	}
 	
 	@OnOpen
-	public void handlerOpen(Session session) throws UnsupportedEncodingException, IOException, EncodeException {
-		long id = System.currentTimeMillis();
-		users.put(session, new SessionParams(id, 0));
-		System.out.println("User connect at " + id + ". Now " + users.size() + " users.");
+	public void handlerOpen(Session session, EndpointConfig config) throws UnsupportedEncodingException, IOException, EncodeException {
+		httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+		userId = Integer.parseInt(httpSession.getAttribute("userId").toString());
+		users.put(session, new SessionParams(userId, 0));
+		users.get(session).setName(httpSession.getAttribute("user").toString());
+		Tools.sendAlarms(session, ConnectDB.getAlarmsByPeriod(null, null));
+		Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
+		Tools.sendConnStr(session);
 	}
 	
 	@OnMessage
@@ -48,7 +54,6 @@ public class Server {
 			case "getscheme":
 				int idScheme = Integer.parseInt(cm.getParameters().get("idNode"));
 				users.get(session).setIdScheme(idScheme);
-				if (users.get(session).getUserId() > Integer.MAX_VALUE) return;
 				putScheme(session, idScheme);
 				break;
 			case "getoldvalues" :
@@ -77,43 +82,43 @@ public class Server {
 					e.printStackTrace();
 				}
 				break;
-			case "checkuser":
-				String userName = cm.getParameters().get("name");
-				String password = cm.getParameters().get("password");
-				CommandMessage rm = new CommandMessage();
-				rm.setCommand("runAll");
-				Map<String, String> parameters = new HashMap<>();
-				
-				Tuser user = Tools.checkUser(userName, password);
-				if (user != null) {
-					users.get(session).setUserId(user.getIduser());
-					putScheme(session, users.get(session).getIdScheme());
-					Tools.sendAlarms(session, ConnectDB.getAlarmsByPeriod(null, null));
-					Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
-
-					parameters.put("status", "1");
-					String connString = ConnectDB.getPostgressDB().getConnStr();
-					parameters.put("user", userName);
-					parameters.put("server", connString.substring(0, connString.indexOf("_")));
-					parameters.put("db", connString.substring(connString.indexOf("_") + 1));
-					
-					rm.setParameters(parameters);
-					String unicUser = cm.getParameters().get("IP") + System.currentTimeMillis();
-					Encryptor encryptor = new Encryptor();
-					unicUser = encryptor.encrypt(unicUser);
-					
-					users.get(session).setIp(cm.getParameters().get("IP"));
-					users.get(session).setUniqId(unicUser);
-					parameters.put("uniqId", unicUser);
-					session.getBasicRemote().sendObject(rm);
-					System.out.println("Login user - " + cm.getParameters().get("IP") + " at " + new Date(System.currentTimeMillis()));
-				} else {
-					parameters.put("status", "0");
-					rm.setParameters(parameters);					
-					session.getBasicRemote().sendObject(rm);
-					System.out.println("Faul connection - " + cm.getParameters().get("IP"));
-				}
-				break;
+//			case "checkuser":
+//				String userName = cm.getParameters().get("name");
+//				String password = cm.getParameters().get("password");
+//				CommandMessage rm = new CommandMessage();
+//				rm.setCommand("runAll");
+//				Map<String, String> parameters = new HashMap<>();
+//				
+//				Tuser user = Tools.checkUser(userName, password);
+//				if (user != null) {
+//					users.get(session).setUserId(user.getIduser());
+//					putScheme(session, users.get(session).getIdScheme());
+//					Tools.sendAlarms(session, ConnectDB.getAlarmsByPeriod(null, null));
+//					Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
+//
+//					parameters.put("status", "1");
+//					String connString = ConnectDB.getPostgressDB().getConnStr();
+//					parameters.put("user", userName);
+//					parameters.put("server", connString.substring(0, connString.indexOf("_")));
+//					parameters.put("db", connString.substring(connString.indexOf("_") + 1));
+//					
+//					rm.setParameters(parameters);
+//					String unicUser = cm.getParameters().get("IP") + System.currentTimeMillis();
+//					Encryptor encryptor = new Encryptor();
+//					unicUser = encryptor.encrypt(unicUser);
+//					
+//					users.get(session).setIp(cm.getParameters().get("IP"));
+//					users.get(session).setUniqId(unicUser);
+//					parameters.put("uniqId", unicUser);
+//					session.getBasicRemote().sendObject(rm);
+//					System.out.println("Login user - " + cm.getParameters().get("IP") + " at " + new Date(System.currentTimeMillis()));
+//				} else {
+//					parameters.put("status", "0");
+//					rm.setParameters(parameters);					
+//					session.getBasicRemote().sendObject(rm);
+//					System.out.println("Faul connection - " + cm.getParameters().get("IP"));
+//				}
+//				break;
 			case "confimalarmone":
 				String messConfirm = cm.getParameters().get("text").trim();
 				cm.getParameters().remove("text");
@@ -178,5 +183,9 @@ public class Server {
 
 	public static Map<Integer, Scheme> getSchemes() {
 		return schemes;
+	}
+
+	public static int getUserId() {
+		return userId;
 	}
 }

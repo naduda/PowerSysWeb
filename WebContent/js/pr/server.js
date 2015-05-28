@@ -3,60 +3,60 @@ docURL = docURL.substring(docURL.indexOf('://'), docURL.lastIndexOf("/"));
 var webSocket = new WebSocket('ws' + docURL + '/load');
 var myScroll;
 
-function showLogin() {
-	var userID = 'admin', psw;
-	BootstrapDialog.show({
-		size: BootstrapDialog.SIZE_SMALL,
-		title: 'Login',
-		message: '<form action="">' +
-						'<table><tr><td style="padding:5px;">' +
-						'User name</td><td>' + 
-						'<input type="text" value="' + userID +
-						'" style="padding:0 5px;" class="canSelect"><br>' + 
-						'</td></tr>' + 
-						'<tr><td style="padding:5px;">Password</td><td>' + 
-						'<input type="password" name="password" ' + 
-						'style="padding:0 5px;" class="canSelect">' + 
-						'</td></tr></table>' +
-						'</form>',
-		onshown: function(dialog) {
-			dialog.getModalBody().find('input').focus();
-			dialog.getModalBody().find('input').select();
-		},
-		buttons: [{
-			icon: 'glyphicon glyphicon-send',
-			label: '  Login (Enter)',
-			cssClass: 'menubutton',
-			hotkey: 13, // Enter.
-			autospin: true,
-			action: function(dialog){
-				var user = dialog.getModalBody().find('input:first').val();
-				var psw = dialog.getModalBody().find('input:last').val();
-				dialog.enableButtons(false);
-				var urlData = 'http:' + docURL + '/dataServer/db/checkuser?params=' + psw;
-				var req = new XMLHttpRequest();
-				req.open("POST", urlData, true);
-				req.addEventListener("load", function() {
-					if (req.status == 200) {
-						var uData = JSON.parse(req.responseText);
+// function showLogin() {
+// 	var userID = 'admin', psw;
+// 	BootstrapDialog.show({
+// 		size: BootstrapDialog.SIZE_SMALL,
+// 		title: 'Login',
+// 		message: '<form action="">' +
+// 						'<table><tr><td style="padding:5px;">' +
+// 						'User name</td><td>' + 
+// 						'<input type="text" value="' + userID +
+// 						'" style="padding:0 5px;" class="canSelect"><br>' + 
+// 						'</td></tr>' + 
+// 						'<tr><td style="padding:5px;">Password</td><td>' + 
+// 						'<input type="password" name="password" ' + 
+// 						'style="padding:0 5px;" class="canSelect">' + 
+// 						'</td></tr></table>' +
+// 						'</form>',
+// 		onshown: function(dialog) {
+// 			dialog.getModalBody().find('input').focus();
+// 			dialog.getModalBody().find('input').select();
+// 		},
+// 		buttons: [{
+// 			icon: 'glyphicon glyphicon-send',
+// 			label: '  Login (Enter)',
+// 			cssClass: 'menubutton',
+// 			hotkey: 13, // Enter.
+// 			autospin: true,
+// 			action: function(dialog){
+// 				var user = dialog.getModalBody().find('input:first').val();
+// 				var psw = dialog.getModalBody().find('input:last').val();
+// 				dialog.enableButtons(false);
+// 				var urlData = 'http:' + docURL + '/dataServer/db/checkuser?params=' + psw;
+// 				var req = new XMLHttpRequest();
+// 				req.open("POST", urlData, true);
+// 				req.addEventListener("load", function() {
+// 					if (req.status == 200) {
+// 						var uData = JSON.parse(req.responseText);
 
-						webSocket.send(JSON.stringify({
-							'type' : 'CommandMessage', 'command' : 'checkuser',
-							'parameters' : [{
-								'name' : user,
-								'password' : uData.encript,
-								'IP' : uData.clientIP
-							}]
-						}));
-					}
-				});
-				req.send();
-			}
-		}],
-		draggable: true,
-		closable: false
-	});
-}
+// 						webSocket.send(JSON.stringify({
+// 							'type' : 'CommandMessage', 'command' : 'checkuser',
+// 							'parameters' : [{
+// 								'name' : user,
+// 								'password' : uData.encript,
+// 								'IP' : uData.clientIP
+// 							}]
+// 						}));
+// 					}
+// 				});
+// 				req.send();
+// 			}
+// 		}],
+// 		draggable: true,
+// 		closable: false
+// 	});
+// }
 
 function initWebSocket(ws) {
 	ws.onmessage = function (message) {
@@ -76,7 +76,8 @@ function initWebSocket(ws) {
 		console.log(e);
 	}
 	ws.onclose = function () {
-		console.log('session close');
+		console.log('session close ' + docURL);
+		window.location = docURL;
 		//alert('Session closed! You need update your page.');
 		// var isConnect = false;
 		// while (!isConnect) {
@@ -93,7 +94,8 @@ function initWebSocket(ws) {
 	}
 	ws.onopen = function () {
 		console.log('session open');
-		showLogin();
+		// showLogin();
+		initTree();
 	}
 }
 
@@ -168,34 +170,11 @@ function onCommandMessage(data) {
 		var param = data.parameters[0];
 		if (param.status === '1')
 			$('.modal.bootstrap-dialog').remove();
-	} else if(data.command === 'runAll'){
-		var param = {};
-		for(var k in data.parameters) {
-			var ob = data.parameters[k];
-			for(var j in ob) param[j] = ob[j];
-		}
-
-		$('.modal.bootstrap-dialog').remove();
-		if (param.status === '1') {
-			initTree();
-			myLayout.toggle('south');
-			myLayout.toggle('north');
-			myLayoutInner.toggle('west');
-			myLayoutInner.toggle('south');
-			myLayoutInner.toggle('north');
-
-			document.getElementById('connectInfo').innerHTML = '   User - ' +
-				param.user + '; Server - ' + param.server + '; DB - ' +
-				param.db + '.';
-
-			Array.prototype.forEach.call(
-				document.getElementById('menubarId').getElementsByTagName('a'),
-				function(a){
-					a.href += param.uniqId;
-				});
-		} else {
-			showLogin();
-		}
+	} else if(data.command === 'connString'){
+		var arr = data.parameters[0].value.split('_');
+		document.getElementById('connectInfo').innerHTML = '   User - ' +
+				arr[3] + '; Server - ' + arr[0] + '; DB - ' +
+				arr[1] + '.';
 	}
 }
 
