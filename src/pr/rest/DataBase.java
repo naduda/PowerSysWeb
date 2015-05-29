@@ -20,11 +20,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import pr.common.Encryptor;
 import pr.db.ConnectDB;
 import pr.model.LinkedValue;
+import pr.model.tools.Tools;
 import pr.rest.journalTools.AlarmTools;
-import pr.server.tools.Tools;
 
 @Path("/db")
 public class DataBase {
@@ -83,13 +82,13 @@ public class DataBase {
 		
 		String ret = "";
 		switch (comand.toLowerCase()) {
-		case "checkuser":
-			Encryptor encryptor = new Encryptor();
-			String encript = encryptor.encrypt(System.currentTimeMillis() + "_" + params);
-			ret = Json.createObjectBuilder()
-					.add("encript", encript)
-					.add("clientIP", request.getRemoteAddr()).build().toString();
-			break;
+//		case "checkuser":
+//			Encryptor encryptor = new Encryptor();
+//			String encript = encryptor.encrypt(System.currentTimeMillis() + "_" + params);
+//			ret = Json.createObjectBuilder()
+//					.add("encript", encript)
+//					.add("clientIP", request.getRemoteAddr()).build().toString();
+//			break;
 		default: ret = "Post: > Comand <" + comand + "> not found"; break;
 		}
 		return ret;

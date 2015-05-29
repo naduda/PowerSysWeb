@@ -1,4 +1,4 @@
-package pr.server;
+package pr.model.tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import pr.SVGModel;
+import pr.model.Scheme;
 import pr.svgObjects.G;
 import pr.svgObjects.SVG;
 import pr.svgObjects.Vparagraph;

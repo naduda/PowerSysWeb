@@ -32,9 +32,8 @@ var webSocket;
 
 			dates = createDateToolbar(north, function (dateText) {
 				urlRequest = docJournal + '?id=1;' + 
-					dates.from.value + '_' + dates.to.value;
+										 dates.from.value + '_' + dates.to.value;
 				$.tablesorter.clearTableBody($('#alarmTable')[0]);
-				console.log(urlRequest);
 				getAlarms(urlRequest);
 			});
 

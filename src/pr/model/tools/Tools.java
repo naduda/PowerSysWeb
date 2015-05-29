@@ -1,4 +1,4 @@
-package pr.server.tools;
+package pr.model.tools;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -11,7 +11,11 @@ import java.util.Optional;
 
 
 
+
+
 import javax.websocket.Session;
+
+
 
 
 
@@ -20,20 +24,20 @@ import javax.websocket.Session;
 import pr.common.Encryptor;
 import pr.db.ConnectDB;
 import pr.model.Alarm;
+import pr.model.AlarmItem;
 import pr.model.DvalTI;
+import pr.model.Scheme;
 import pr.model.TSysParam;
 import pr.model.TViewParam;
 import pr.model.Tsignal;
 import pr.model.Tuser;
 import pr.model.VsignalView;
-import pr.server.Scheme;
 import pr.server.Server;
 import pr.server.messages.AlarmMessage;
 import pr.server.messages.CommandMessage;
 import pr.server.messages.KeyValueArrayMessage;
 import pr.server.messages.ValueMessage;
 import pr.server.messages.ValueMessage.Group;
-import pr.server.tools.model.AlarmItem;
 
 public class Tools {
 	public static final Map<Integer, VsignalView> VSIGNALS = ConnectDB.getVsignalsMap();

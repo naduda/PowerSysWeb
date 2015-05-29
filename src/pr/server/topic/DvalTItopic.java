@@ -10,10 +10,10 @@ import javax.websocket.Session;
 import pr.db.jdbc.BatisJDBC;
 import pr.db.jdbc.mappers.IMapper;
 import pr.model.DvalTI;
-import pr.server.Scheme;
+import pr.model.Scheme;
+import pr.model.tools.Tools;
 import pr.server.Server;
 import pr.server.SessionParams;
-import pr.server.tools.Tools;
 
 public class DvalTItopic extends ATopic {
 	private List<DvalTI> ls = null;

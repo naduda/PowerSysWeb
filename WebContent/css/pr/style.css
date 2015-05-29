@@ -35,6 +35,7 @@ b>ins{color: blue;}
 	display: inline-block;
 	touch-action: manipulation;
 	border: 1px solid transparent;
+	color: black;
 }
 
 #menubarId{float: left;}

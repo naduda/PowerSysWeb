@@ -18,7 +18,7 @@ public class Journal {
 
 	@Produces(MediaType.APPLICATION_JSON)
     @GET
-	public static String getSignalByIdTree(@QueryParam("id") String id, @Context HttpServletRequest request) {
+	public static String getJournalById(@QueryParam("id") String id, @Context HttpServletRequest request) {
 		String[] arr = id.substring(id.indexOf(";") + 1).split("_");
 		String dtBeg = null;
 		String dtEnd = null;

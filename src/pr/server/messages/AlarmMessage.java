@@ -1,6 +1,6 @@
 package pr.server.messages;
 
-import pr.server.tools.model.AlarmItem;
+import pr.model.AlarmItem;
 
 public class AlarmMessage extends Message {
 	private final AlarmItem alarmItem;

@@ -1,4 +1,4 @@
-package pr.server.tools.model;
+package pr.model;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import pr.db.ConnectDB;
 import pr.model.Alarm;
 import pr.model.TViewParam;
-import pr.server.tools.Tools;
+import pr.model.tools.Tools;
 
 public class AlarmItem {
 	private final String object;

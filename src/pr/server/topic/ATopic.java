@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Map;
 
 import pr.model.Tsignal;
-import pr.server.tools.Tools;
+import pr.model.tools.Tools;
 
 public abstract class ATopic implements Runnable {
 	public final Map<Integer, Tsignal> signals = Tools.TSIGNALS;

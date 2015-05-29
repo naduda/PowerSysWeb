@@ -3,6 +3,7 @@ package pr.server;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,11 +18,13 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import pr.db.ConnectDB;
+import pr.model.Scheme;
+import pr.model.tools.SVGtrans;
+import pr.model.tools.Tools;
 import pr.server.messages.CommandMessage;
 import pr.server.messages.Message;
 import pr.server.messages.coders.MessageDecoder;
 import pr.server.messages.coders.MessageEncoder;
-import pr.server.tools.Tools;
 
 @ServerEndpoint(value = "/load", configurator = GetHttpSessionConfigurator.class,
 	encoders = {MessageEncoder.class}, decoders = {MessageDecoder.class})
@@ -44,6 +47,9 @@ public class Server {
 		Tools.sendAlarms(session, ConnectDB.getAlarmsByPeriod(null, null));
 		Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
 		Tools.sendConnStr(session);
+		
+		long id = System.currentTimeMillis();
+		System.out.println("Socket connected at " + new Date(id));
 	}
 	
 	@OnMessage
@@ -166,7 +172,7 @@ public class Server {
 	public void handlerClose(Session session) {
 		users.remove(session);
 		long id = System.currentTimeMillis();
-		System.out.println("User disconnect at " + id + ". Now " + users.size() + " users.");
+		System.out.println("Socket disconnected at " + new Date(id));
 	}
 	
 	public static void clearUsers() {

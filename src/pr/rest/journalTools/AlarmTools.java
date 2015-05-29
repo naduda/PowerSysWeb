@@ -8,7 +8,7 @@ import javax.json.JsonObjectBuilder;
 
 import pr.db.ConnectDB;
 import pr.model.Alarm;
-import pr.server.tools.model.AlarmItem;
+import pr.model.AlarmItem;
 
 public class AlarmTools {
 	
