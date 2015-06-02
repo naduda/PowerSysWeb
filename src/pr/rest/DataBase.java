@@ -50,17 +50,36 @@ public class DataBase {
 			}
 			int idSignal = Integer.parseInt(pArray[0]);
 			int period = Integer.parseInt(pArray[3]);
-			Timestamp dtBeg = new Timestamp(DATE_FORMAT.parse(pArray[1] + " 00:00:00.000").getTime());
-			Timestamp dtEnd = new Timestamp(DATE_FORMAT.parse(pArray[2] + " 00:00:00.000").getTime());;
+			boolean dateIsLong = false;
+			try {
+				Long.parseLong(pArray[1]);
+				dateIsLong = true;
+			} catch (Exception e) {
+
+			}
+			Timestamp dtBeg = dateIsLong ? new Timestamp(Long.parseLong(pArray[1])) : 
+										   new Timestamp(DATE_FORMAT.parse(pArray[1] + " 00:00:00.000").getTime());
+			Timestamp dtEnd = dateIsLong ? new Timestamp(Long.parseLong(pArray[2])) : 
+										   new Timestamp(DATE_FORMAT.parse(pArray[2] + " 00:00:00.000").getTime());
+			
 			List<LinkedValue> data = ConnectDB.getDataIntegrArc(idSignal, dtBeg, dtEnd, period);
 			
+			int r = Math.round(data.size()/50);
+			if (r == 0) r = 1;
 			JsonArrayBuilder dataArray = Json.createArrayBuilder();
-			data.forEach(v -> {
-				JsonObjectBuilder jData = Json.createObjectBuilder()
-						.add("value", v.getVal().toString())
-						.add("timestamp", ((Date)v.getDt()).getTime());
-				dataArray.add(jData);
-			});
+			for (int i = 0; i < data.size(); i++) {
+				try {
+					if (i % r == 0) {
+						LinkedValue v = data.get(i);
+						JsonObjectBuilder jData = Json.createObjectBuilder()
+								.add("value", v.getVal().toString())
+								.add("timestamp", ((Date)v.getDt()).getTime());
+						dataArray.add(jData);
+					}
+				} catch (Exception e) {
+					System.out.println(i + " ===> " + r);
+				}
+			}
 			
 			ret = Json.createObjectBuilder()
 					.add("signalName", Tools.VSIGNALS.get(idSignal).getNamesignal())

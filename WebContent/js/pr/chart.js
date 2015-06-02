@@ -1,11 +1,10 @@
 $('#chartsPowerSys').resizable({
 	stop: function(e, ui) {
-			var chart = $('#tabChart').highcharts();
 			var toolbar = $('#chartsPowerSys .popupToolbar');
 			var newHeight = ui.size.height - (56 + toolbar.height() + 4);
 			var newWidth = ui.size.width - 6;
 
-			chart.setSize(newWidth, newHeight);
+			chart.chart.setSize(newWidth, newHeight);
 			$('#dataWrapper').css({
 					'height' : newHeight + 'px',
 					'max-height' : newHeight + 'px',
@@ -14,7 +13,7 @@ $('#chartsPowerSys').resizable({
 	}
 });
 $("#sInstantaneous").change(function() {
-	setDataTable();
+	chart.setDataTable();
 });
 
 $('#sInstantaneous option').each(function(){
@@ -29,38 +28,41 @@ $("#dataTable").tablesorter({
 	headers: {0: { sorter:'customDate' }}
 });
 
+var chart = {};
+chart.isReset = false;
+chart.dates = dateToolbar(document.getElementById('chartDates'), 
+	function (dateText) {
+		chart.setDataTable();
+	});
+
 function showChartPowerSys() {
 	var md = document.getElementById('chartsPowerSys'),
 	sp = $('#sInstantaneous option:first span:first');
 
 	if(!sp.html()) sp.html(translateValueByKey('keyInstantaneous'));
 	if (!(md.style.display === 'block')) {
-		setDataTable();
+		chart.setDataTable();
 	}
 
 	setPopupWindow('chartsPowerSys', 'main');
+	chart.chart = $('#tabChart').highcharts();
 }
 
-var tbDates = dateToolbar(document.getElementById('chartDates'), 
-	function (dateText) {
-		setDataTable();
-	});
-
-function setDataTable() {
-	var chart = $('#tabChart').highcharts();
-	var closeId;
-	var modalInfo = new BootstrapDialog({
-		size: BootstrapDialog.SIZE_SMALL,
-			type: BootstrapDialog.TYPE_SUCCESS,
-			title: 'Information: ',
-			message: '<i class="fa fa-spinner fa-spin"></i> Creating chart ...',
-			closable: false
-	});
+chart.setDataTable = function setDataTable() {
+	var closeId,
+			modalInfo = new BootstrapDialog({
+				size: BootstrapDialog.SIZE_SMALL,
+				type: BootstrapDialog.TYPE_SUCCESS,
+				title: 'Information: ',
+				message: '<i class="fa fa-spinner fa-spin"></i> Creating chart ...',
+				closable: false
+			});
 	modalInfo.open();
 
 	setTimeout(function() {
-		while(chart.series.length > 0) {
-			chart.series[0].remove(true);
+		chart.chart = $('#tabChart').highcharts();
+		while(chart.chart.series.length > 0) {
+			chart.chart.series[0].remove(true);
 		}
 		$.tablesorter.clearTableBody($('#dataTable')[0]);
 		var items = document.querySelectorAll('#dataTable thead tr th');
@@ -75,23 +77,23 @@ function setDataTable() {
 			var curItem = document.getElementById(selRect.getAttribute('selectedId'));
 			closeId = curItem.getAttribute('idSignal');
 
-			chart.yAxis[0].setTitle({
+			chart.chart.yAxis[0].setTitle({
 				text: translateValueByKey('key_pValue') + ', ' + curItem.getAttribute('unit')
 			});
-			addDataById(curItem.getAttribute('idSignal'));
+			addDataById(curItem.getAttribute('idSignal'), 
+					chart.dates.from.value, chart.dates.to.value);
 		});
 	}, 250);
 
-	function addDataById(id) {
+	function addDataById(id, dtBeg, dtEnd) {
 		var integr = $("#sInstantaneous")[0].value,
 		url = 'http:' + docURL + '/dataServer/db/getDataById?params=' + id + '_' + 
-							tbDates.from.value +'_' + tbDates.to.value + '_' + integr;
+							dtBeg +'_' + dtEnd + '_' + integr;
 
 		$.getJSON(url, function(data){
-			var chart = $('#tabChart').highcharts(),
-			dataTable = document.getElementById('dataTable'),
+			var dataTable = document.getElementById('dataTable'),
 			htr = document.querySelector('#dataTable thead tr'),
-			seriesCount = chart.series.length;
+			seriesCount = chart.chart.series.length;
 
 			if(seriesCount > htr.getElementsByTagName('th').length - 2) {
 				var nth = document.createElement('th');
@@ -126,7 +128,8 @@ function setDataTable() {
 			if (charDada.length > 1) charDada = charDada.substring(0, charDada.length - 1);
 			charDada += ']';
 
-			chart.addSeries({
+			chart.chart.addSeries({
+				id: id,
 				name: data.signalName, 
 				data: JSON.parse(charDada),
 				step: 'right'
@@ -142,6 +145,35 @@ function setDataTable() {
 	}
 }
 
+chart.afterSetExtremes = function afterSetExtremes(e) {
+	var dtBeg = chart.isReset ? chart.dates.from.value:Math.round(e.min),
+			dtEnd = chart.isReset ? chart.dates.to.value:Math.round(e.max),
+			integr = $("#sInstantaneous")[0].value, url,
+			paras = document
+				.querySelectorAll(".selectableRectangle, #selectableRectangle");
+
+	Array.prototype.forEach.call(paras, function(selRect) {
+		var curItem = document.getElementById(selRect.getAttribute('selectedId'));
+		closeId = curItem.getAttribute('idSignal');
+
+		url = 'http:' + docURL + '/dataServer/db/getDataById?params=' + 
+					closeId + '_' + dtBeg +'_' + dtEnd + '_' + integr;
+		$.getJSON(url, function (data) {
+			var charDada = '[';
+
+			$.each(data.data, function(key, val) {
+				charDada += '[' + val.timestamp + ',' + val.value + '],';
+			});
+			if (charDada.length > 1) 
+				charDada = charDada.substring(0, charDada.length - 1);
+			charDada += ']';
+
+			chart.chart.get(closeId).setData(JSON.parse(charDada));
+		});
+	});
+	if (chart.isReset) chart.isReset = false;
+}
+
 Highcharts.setOptions({global: {useUTC: false}});
 $('#tabChart').highcharts({
 	tooltip: {
@@ -155,6 +187,14 @@ $('#tabChart').highcharts({
 		zoomType: 'xy'
 	},
 	xAxis: {
+		events : {
+			setExtremes: function (e) {
+				if(typeof e.min == 'undefined' && typeof e.max == 'undefined'){
+						chart.isReset = true;
+				}
+			},
+			afterSetExtremes : chart.afterSetExtremes
+		},
 		type: 'datetime'
 	},
 	yAxis: {
