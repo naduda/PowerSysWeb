@@ -35,3 +35,5 @@ public class AuthenticationFilter implements Filter {
     
     public void destroy() {}
 }
+//$ mvn archetype:generate -DgroupId=com.mkyong -DartifactId=CounterWebApp -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+//

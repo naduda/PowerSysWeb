@@ -87,7 +87,7 @@ chart.setDataTable = function setDataTable() {
 
 	function addDataById(id, dtBeg, dtEnd) {
 		var integr = $("#sInstantaneous")[0].value,
-		url = 'http:' + docURL + '/dataServer/db/getDataById?params=' + id + '_' + 
+		url = 'http' + docURL + '/dataServer/db/getDataById?params=' + id + '_' + 
 							dtBeg +'_' + dtEnd + '_' + integr;
 
 		$.getJSON(url, function(data){
@@ -149,15 +149,15 @@ chart.afterSetExtremes = function afterSetExtremes(e) {
 	var dtBeg = chart.isReset ? chart.dates.from.value:Math.round(e.min),
 			dtEnd = chart.isReset ? chart.dates.to.value:Math.round(e.max),
 			integr = $("#sInstantaneous")[0].value, url,
-			paras = document
-				.querySelectorAll(".selectableRectangle, #selectableRectangle");
+			paras = document.querySelectorAll(".selectableRectangle, #selectableRectangle");
 
 	Array.prototype.forEach.call(paras, function(selRect) {
 		var curItem = document.getElementById(selRect.getAttribute('selectedId'));
-		closeId = curItem.getAttribute('idSignal');
+		idSignal = curItem.getAttribute('idSignal');
 
-		url = 'http:' + docURL + '/dataServer/db/getDataById?params=' + 
-					closeId + '_' + dtBeg +'_' + dtEnd + '_' + integr;
+		url = 'http' + docURL + '/dataServer/db/getDataById?params=' + 
+					idSignal + '_' + dtBeg +'_' + dtEnd + '_' + integr;
+
 		$.getJSON(url, function (data) {
 			var charDada = '[';
 
@@ -168,7 +168,7 @@ chart.afterSetExtremes = function afterSetExtremes(e) {
 				charDada = charDada.substring(0, charDada.length - 1);
 			charDada += ']';
 
-			chart.chart.get(closeId).setData(JSON.parse(charDada));
+			chart.chart.get(data.idSignal).setData(JSON.parse(charDada));
 		});
 	});
 	if (chart.isReset) chart.isReset = false;

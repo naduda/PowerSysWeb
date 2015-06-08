@@ -1,27 +1,29 @@
-var docURL = document.URL;
-docURL = docURL.substring(docURL.indexOf('://') + 1, docURL.lastIndexOf("/"));
+// var docURL = document.URL;
+// docURL = docURL.substring(docURL.indexOf('://') + 1, docURL.lastIndexOf("/"));
+
 function initTree() {
 	$('#treeDIV').jstree({
 		'core' : {
 			'data' : {
-				"url" : docURL + "/dataServer/db/?",
-				"data" : function (node) {
+				'url' : docURL.substring(1) + '/dataServer/db/?',
+				'data' : function (node) {
 					return { "id" : node.id };
-				}
+				},
+				'dataType': 'json'
 			}
 		},
-		"types" : {
-			"default" : {
-				"icon" : "glyphicon glyphicon-blackboard"
+		'types' : {
+			'default' : {
+				'icon' : 'glyphicon glyphicon-blackboard'
 			},
-			"demo" : {
-				"icon" : "glyphicon glyphicon-ok"
+			'demo' : {
+				'icon' : 'glyphicon glyphicon-ok'
 			}
 		},
-		"contextmenu" : {
-			"items" : customMenu
+		'contextmenu' : {
+			'items' : customMenu
 		},
-		"plugins" : ["types", "contextmenu", "state"]
+		'plugins' : ['types', 'contextmenu', 'state']
 	}).on('changed.jstree', function (e, data) {
 		if(data.selected.length) {
 			parent.webSocket.send(JSON.stringify({
@@ -36,14 +38,9 @@ function initTree() {
 	});
 
 	function customMenu(node) {
-		// alert(node.original.dt);
-		// for (var key in node) {
-		// 	console.log(key + ' -> ' + node[key])
-		// }
-		
 		var items = {
 			item1: {
-				label: "item1",
+				label: 'item1',
 				action: function () {
 					alert('Test 1');
 				},
@@ -52,19 +49,15 @@ function initTree() {
 			item2: {
 				separator_before : true,
 				separator_after : true,
-				label: "item2",
+				label: 'item2',
 				action: function () {
 					console.log(node.original);
 				},
-				icon : "glyphicon glyphicon-ok",
+				icon : 'glyphicon glyphicon-ok',
 				shortcut : 113,
-				shortcut_label : "F2"
+				shortcut_label : 'F2'
 			}
 		};
-
-		if ($(node).hasClass("folder")) {
-			delete items.deleteItem;
-		}
 
 		return items;
 	}

@@ -3,61 +3,6 @@ docURL = docURL.substring(docURL.indexOf('://'), docURL.lastIndexOf("/"));
 var webSocket = new WebSocket('ws' + docURL + '/load');
 var myScroll;
 
-// function showLogin() {
-// 	var userID = 'admin', psw;
-// 	BootstrapDialog.show({
-// 		size: BootstrapDialog.SIZE_SMALL,
-// 		title: 'Login',
-// 		message: '<form action="">' +
-// 						'<table><tr><td style="padding:5px;">' +
-// 						'User name</td><td>' + 
-// 						'<input type="text" value="' + userID +
-// 						'" style="padding:0 5px;" class="canSelect"><br>' + 
-// 						'</td></tr>' + 
-// 						'<tr><td style="padding:5px;">Password</td><td>' + 
-// 						'<input type="password" name="password" ' + 
-// 						'style="padding:0 5px;" class="canSelect">' + 
-// 						'</td></tr></table>' +
-// 						'</form>',
-// 		onshown: function(dialog) {
-// 			dialog.getModalBody().find('input').focus();
-// 			dialog.getModalBody().find('input').select();
-// 		},
-// 		buttons: [{
-// 			icon: 'glyphicon glyphicon-send',
-// 			label: '  Login (Enter)',
-// 			cssClass: 'menubutton',
-// 			hotkey: 13, // Enter.
-// 			autospin: true,
-// 			action: function(dialog){
-// 				var user = dialog.getModalBody().find('input:first').val();
-// 				var psw = dialog.getModalBody().find('input:last').val();
-// 				dialog.enableButtons(false);
-// 				var urlData = 'http:' + docURL + '/dataServer/db/checkuser?params=' + psw;
-// 				var req = new XMLHttpRequest();
-// 				req.open("POST", urlData, true);
-// 				req.addEventListener("load", function() {
-// 					if (req.status == 200) {
-// 						var uData = JSON.parse(req.responseText);
-
-// 						webSocket.send(JSON.stringify({
-// 							'type' : 'CommandMessage', 'command' : 'checkuser',
-// 							'parameters' : [{
-// 								'name' : user,
-// 								'password' : uData.encript,
-// 								'IP' : uData.clientIP
-// 							}]
-// 						}));
-// 					}
-// 				});
-// 				req.send();
-// 			}
-// 		}],
-// 		draggable: true,
-// 		closable: false
-// 	});
-// }
-
 function initWebSocket(ws) {
 	ws.onmessage = function (message) {
 		var jsonData = JSON.parse(message.data);
@@ -77,25 +22,16 @@ function initWebSocket(ws) {
 	}
 	ws.onclose = function () {
 		console.log('session close ' + docURL);
-		window.location = docURL;
-		//alert('Session closed! You need update your page.');
-		// var isConnect = false;
-		// while (!isConnect) {
-		// 	try {
-		// 		//setTimeout(function() {
-		// 			webSocket = new WebSocket('ws' + docURL + '/load');
-		// 			initWebSocket(webSocket);
-		// 			isConnect = true;
-		// 		//}, 1000);
-		// 	} catch (e) {
-		// 		console.log('Failed connect ...')
-		// 	}
-		// }
+		alert('Session closed! You need update your page.');
 	}
 	ws.onopen = function () {
 		console.log('session open');
-		// showLogin();
-		initTree();
+		if (typeof(initTree) != 'undefined') {
+			initTree();
+		} else {
+			console.log('250');
+			setTimeout(initTree, 250);
+		}
 	}
 }
 

@@ -80,9 +80,10 @@ public class DataBase {
 					System.out.println(i + " ===> " + r);
 				}
 			}
-			
+
 			ret = Json.createObjectBuilder()
 					.add("signalName", Tools.VSIGNALS.get(idSignal).getNamesignal())
+					.add("idSignal", idSignal)
 					.add("data", dataArray).build().toString();
 			break;
 		case "priority":
