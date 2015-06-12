@@ -107,10 +107,14 @@ function onCommandMessage(data) {
 		if (param.status === '1')
 			$('.modal.bootstrap-dialog').remove();
 	} else if(data.command === 'connString'){
-		var arr = data.parameters[0].value.split('_');
+		var connStr = data.parameters[0].value,
+			arr = connStr.split('_'), 
+			user = arr[arr.length - 1],
+			server = arr[0],
+			dbName = connStr.substring(server.length + 1, connStr.length - user.length - 1);	
+
 		document.getElementById('connectInfo').innerHTML = '   User - ' +
-				arr[3] + '; Server - ' + arr[0] + '; DB - ' +
-				arr[1] + '.';
+				user + '; Server - ' + server + '; DB - ' + dbName + '.';
 	}
 }
 

@@ -73,6 +73,26 @@ var webSocket;
 		}
 	}
 
+	function sendMessage(msg){
+		waitForSocketConnection(webSocket, function(){
+				webSocket.send(msg);
+		});
+	}
+
+	function waitForSocketConnection(socket, callback){
+		setTimeout(function () {
+				if (socket.readyState === 1) {
+						if(callback != null){
+								callback();
+						}
+						return;
+				} else {
+						waitForSocketConnection(socket, callback);
+				}
+
+		}, 5);
+	}
+
 	function sendUserId(id){
 		var cm = {}, par = {};
 		cm.type = 'CommandMessage';
@@ -81,7 +101,7 @@ var webSocket;
 		par.userId = id + '';
 		cm.parameters.push(par);
 
-		webSocket.send(JSON.stringify(cm));
+		sendMessage(JSON.stringify(cm));
 	}
 
 	function getAlarms(docURL){

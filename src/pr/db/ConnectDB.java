@@ -191,7 +191,7 @@ public class ConnectDB {
 		if (postgressDB == null) {
 			synchronized (ConnectDB.class) {
 				if (!isFirstStart) Server.clearUsers();
-				postgressDB = new PostgresDB("localDS");
+				postgressDB = new PostgresDB();
 				isFirstStart = false;
 				System.out.println("New connection");
 			}
@@ -209,5 +209,9 @@ public class ConnectDB {
 			mTopic = new MainTopic();
 			mTopic.start();
 		}
+	}
+
+	public static DataSource getDsLocal() {
+		return dsLocal;
 	}
 }

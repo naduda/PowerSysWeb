@@ -169,6 +169,7 @@ public class Tools {
 	public static void sendConnStr(Session session) {
 		try {
 			String connString = ConnectDB.getPostgressDB().getConnStr() + "_" + Server.getUsers().get(session).getName();
+			System.out.println(connString.toUpperCase());
 			CommandMessage cm = new CommandMessage();
 			cm.setCommand("connString");
 			cm.setParameters("value", connString);
