@@ -1,7 +1,7 @@
 var docURL = document.URL;
 docURL = docURL.substring(docURL.indexOf('://'), docURL.lastIndexOf("/"));
-var webSocket = new WebSocket('ws' + docURL + '/load');
-var myScroll;
+var webSocket = new WebSocket('ws' + docURL + '/load'),
+		myScroll, fileWebSocket = initWebSocketFileServer();
 
 function initWebSocket(ws) {
 	ws.onmessage = function (message) {
@@ -26,16 +26,48 @@ function initWebSocket(ws) {
 	}
 	ws.onopen = function () {
 		console.log('session open');
-		if (typeof(initTree) != 'undefined') {
+		$.getScript("./js/pr/tree.js", function(){
 			initTree();
-		} else {
-			console.log('250');
-			setTimeout(initTree, 250);
-		}
+		});
 	}
 }
-
 initWebSocket(webSocket);
+
+function initWebSocketFileServer() {
+	var ws = new WebSocket('ws' + docURL + '/fileserver');
+
+	ws.binaryType = "arraybuffer";
+	ws.onopen = function() {
+			console.log("FileServer Connected.")
+	};
+
+	ws.onmessage = function(evt) {
+			try{
+				var msg = JSON.parse(evt.data);
+				switch(msg.type.toLowerCase()){
+					case 'ok':
+						alert('Done! OK!');
+						break;
+					case 'error':
+						alert('Error! See log file.');
+						break;
+					default:
+						console.log('Message type = ' + msg.type);
+						break;
+				}
+			} catch(e) {
+				console.log('Error: ' + e);
+			}
+	};
+
+	ws.onclose = function() {
+			console.log("Connection is closed...");
+	};
+	ws.onerror = function(e) {
+			console.log(e.msg);
+	}
+	return ws;
+}
 
 function onCommandMessage(data) {
 	var parName;

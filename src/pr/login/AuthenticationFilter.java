@@ -24,7 +24,10 @@ public class AuthenticationFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
          
         String uri = req.getRequestURI();
-         
+        if (uri.contains("/dataServer/")) {
+        	chain.doFilter(request, response);
+        	return;
+        }
         HttpSession session = req.getSession(false);
         if(session == null && !(uri.endsWith("login.html") || uri.endsWith("LoginServlet") || (!uri.endsWith(".html") && (uri.indexOf(".") > 0)))) {
             res.sendRedirect("login.html");

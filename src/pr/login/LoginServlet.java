@@ -41,8 +41,7 @@ public class LoginServlet extends HttpServlet {
             		") connect at " + new Date(System.currentTimeMillis()) + ". Now " + 
             		(Server.getUsers().size() + 1) + " users.");
         } else {
-        	HttpServletResponse res = (HttpServletResponse) response;
-        	res.sendRedirect("login.html");
+        	response.sendRedirect("login.html");
         }
     }
 }

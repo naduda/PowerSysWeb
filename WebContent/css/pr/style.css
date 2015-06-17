@@ -101,6 +101,7 @@ b>ins{color: blue;}
 #schemeContainer{overflow: hidden;}
 
 .glyphicon, .fa {color: green;}
+.alarm {color: red;}
 
 .popupW {
 	position: absolute;

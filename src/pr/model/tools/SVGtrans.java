@@ -1,5 +1,6 @@
 package pr.model.tools;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,55 @@ public class SVGtrans {
 		try {
 			SVGModel svgModel = SVGModel.getInstance();
 			SVG svg = svgModel.getSVG(filePath);
+			svg.setTitle(null);
+			svg.setDocumentProperties(null);
+			
+			String clazz = svg.getG().get(0).getListG().get(0).getlRect().get(0).getClazz();
+			String fill = svg.getStyleByName(clazz);
+			fill = fill.substring(fill.indexOf("fill"));
+			fill = fill.substring(0, fill.indexOf(";"));
+			fill = fill.substring(fill.indexOf(":") + 1);
+			
+			Map<String, Map<String, String>> custProps = new HashMap<>();
+			Map<Integer, List<String>> signalMap = new HashMap<>();
+			svg.getG().forEach(g -> clean(svg, g, custProps, signalMap));
+			contSVG = svgModel.setObject(svg);
+			
+			result.setBackground(fill);
+			result.setCustProps(custProps);
+			result.setSignalMap(signalMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		int k = 0;
+		while (flag) {
+			String newCont = contSVG.substring(k);
+			int ind = newCont.indexOf("transform=\"t");
+			
+			if (ind < 0 ) {
+				flag = false;
+				result.setContent(contSVG);
+				return result;
+			} else {
+				lastInd = newCont.substring(ind + 12).indexOf("\"") + 12;
+				String transform = newCont.substring(ind, lastInd + ind);
+				contSVG = contSVG.replace(transform, "transform=\"" + getMatrix(transform).trim());
+				k = lastInd + ind + k;
+			}
+		}
+		return null;
+	}
+	
+	public static Scheme convert2matrix(InputStream is) {
+		Scheme result = new Scheme();
+		String contSVG = "";
+		boolean flag = true;
+		int lastInd = 0;
+		
+		try {
+			SVGModel svgModel = SVGModel.getInstance();
+			SVG svg = svgModel.getSVG(is);
 			svg.setTitle(null);
 			svg.setDocumentProperties(null);
 			

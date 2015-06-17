@@ -13,7 +13,9 @@ import java.util.Optional;
 
 
 
+
 import javax.websocket.Session;
+
 
 
 
@@ -29,6 +31,7 @@ import pr.model.DvalTI;
 import pr.model.Scheme;
 import pr.model.TSysParam;
 import pr.model.TViewParam;
+import pr.model.Tscheme;
 import pr.model.Tsignal;
 import pr.model.Tuser;
 import pr.model.VsignalView;
@@ -169,7 +172,6 @@ public class Tools {
 	public static void sendConnStr(Session session) {
 		try {
 			String connString = ConnectDB.getPostgressDB().getConnStr() + "_" + Server.getUsers().get(session).getName();
-			System.out.println(connString.toUpperCase());
 			CommandMessage cm = new CommandMessage();
 			cm.setCommand("connString");
 			cm.setParameters("value", connString);
@@ -183,12 +185,6 @@ public class Tools {
 		Optional<Tuser> filter = TUSERS.values().stream().filter(f -> f.getUn().equals(userName)).findFirst();
 		Encryptor encryptor = new Encryptor();
 		String psw = encryptor.decrypt(password);
-		long timeLogin = psw.indexOf("_") > 0 ? Long.parseLong(psw.substring(0, psw.indexOf("_"))) : System.currentTimeMillis();
-		if (System.currentTimeMillis() - timeLogin > 3000) {
-			System.out.println("More than 3s login");
-			return null;
-		}
-		
 		psw = psw.indexOf("_") > 0 ? psw.substring(psw.indexOf("_") + 1) : psw;
 		
 		if (filter.isPresent()) {
@@ -228,5 +224,13 @@ public class Tools {
 				e.printStackTrace();
 			}
 		});
+	}
+	
+	public static void updateScheme(int idScheme, byte[] content) {
+		Tscheme nodeScheme = ConnectDB.getNodesMap().get(idScheme);
+		ConnectDB.updateTScheme(idScheme, nodeScheme.getSchemedenom(), nodeScheme.getSchemename(), 
+				nodeScheme.getSchemedescr(), nodeScheme.getParentref(), content, nodeScheme.getUserid());
+		Server.getSchemes().remove(idScheme);
+		ConnectDB.setNodesMap(null);
 	}
 }

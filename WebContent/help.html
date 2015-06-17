@@ -15,6 +15,17 @@
 		1.2.1 GET -> /journal?id
 			id ==> id=N;[dtBeg_dtEnd]
 			ALARM_JOURNAL = 1;
+2. Windows Service
+	2.1 GlassFish4
+		2.1.1 cd [GlassFish]/bin
+		2.1.2 Create: asadmin create-service --name PowerSys_G
+		2.1.3 Edit desc: sc config PowerSys_G DisplayName= "GlassFish4 Server"
+		2.1.4 Delete: sc delete PowerSys_G
+	2.2 Tomcat8
+		2.1.1 cd [Tomcat]/bin
+		2.1.2 Create: service.bat install PowerSys_T
+		2.1.3 Edit desc: tomcat8 //US//PowerSys_T --DisplayName="Apache Tomcat8 Server"
+		2.1.4 Delete: tomcat8 //DS//PowerSys_T
 </pre>
 </body>
 </html>

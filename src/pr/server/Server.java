@@ -1,5 +1,6 @@
 package pr.server;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import javax.websocket.server.ServerEndpoint;
 
 import pr.db.ConnectDB;
 import pr.model.Scheme;
+import pr.model.Tscheme;
 import pr.model.tools.SVGtrans;
 import pr.model.tools.Tools;
 import pr.server.messages.CommandMessage;
@@ -88,43 +90,6 @@ public class Server {
 					e.printStackTrace();
 				}
 				break;
-//			case "checkuser":
-//				String userName = cm.getParameters().get("name");
-//				String password = cm.getParameters().get("password");
-//				CommandMessage rm = new CommandMessage();
-//				rm.setCommand("runAll");
-//				Map<String, String> parameters = new HashMap<>();
-//				
-//				Tuser user = Tools.checkUser(userName, password);
-//				if (user != null) {
-//					users.get(session).setUserId(user.getIduser());
-//					putScheme(session, users.get(session).getIdScheme());
-//					Tools.sendAlarms(session, ConnectDB.getAlarmsByPeriod(null, null));
-//					Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
-//
-//					parameters.put("status", "1");
-//					String connString = ConnectDB.getPostgressDB().getConnStr();
-//					parameters.put("user", userName);
-//					parameters.put("server", connString.substring(0, connString.indexOf("_")));
-//					parameters.put("db", connString.substring(connString.indexOf("_") + 1));
-//					
-//					rm.setParameters(parameters);
-//					String unicUser = cm.getParameters().get("IP") + System.currentTimeMillis();
-//					Encryptor encryptor = new Encryptor();
-//					unicUser = encryptor.encrypt(unicUser);
-//					
-//					users.get(session).setIp(cm.getParameters().get("IP"));
-//					users.get(session).setUniqId(unicUser);
-//					parameters.put("uniqId", unicUser);
-//					session.getBasicRemote().sendObject(rm);
-//					System.out.println("Login user - " + cm.getParameters().get("IP") + " at " + new Date(System.currentTimeMillis()));
-//				} else {
-//					parameters.put("status", "0");
-//					rm.setParameters(parameters);					
-//					session.getBasicRemote().sendObject(rm);
-//					System.out.println("Faul connection - " + cm.getParameters().get("IP"));
-//				}
-//				break;
 			case "confimalarmone":
 				String messConfirm = cm.getParameters().get("text").trim();
 				cm.getParameters().remove("text");
@@ -150,7 +115,13 @@ public class Server {
 		if (schemes.containsKey(idScheme)) {
 			scheme = schemes.get(idScheme);
 		} else {
-			scheme = SVGtrans.convert2matrix("d:/GIT/PowerSysWeb/PowerSysWeb/WebContent/schemes/" + idScheme + ".svg");
+			try {
+				Tscheme sch = ConnectDB.getNodesMap().get(idScheme);
+				scheme = SVGtrans.convert2matrix(new ByteArrayInputStream((byte[])sch.getSchemefile()));
+			} catch (Exception e) {
+				scheme = SVGtrans.convert2matrix("d:/GIT/PowerSysWeb/PowerSysWeb/WebContent/schemes/" + idScheme + ".svg");
+			}
+			
 			schemes.put(idScheme, scheme);
 		}
 

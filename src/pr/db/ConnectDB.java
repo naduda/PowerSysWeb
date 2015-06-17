@@ -43,9 +43,25 @@ import pr.server.topic.MainTopic;
 
 @SuppressWarnings("unchecked")
 public class ConnectDB {
-	private static DataSource dsLocal = null;
+	private static DataSource dsLocal;
 	private static Context context = null;
+	private static Map<Integer, Tscheme> nodesMap = null;
 	
+	public ConnectDB() {
+		System.out.println("create ConnectDB " + this.toString());
+	}
+	
+	public static Map<Integer, Tscheme> getNodesMap() {
+		if (nodesMap == null) {
+			nodesMap = (Map<Integer, Tscheme>) new BatisJDBC(s -> s.getMapper(IMapperT.class).getSchemesMap()).get();
+		}
+		return nodesMap;
+	}
+
+	public static void setNodesMap(Map<Integer, Tscheme> nodesMap) {
+		ConnectDB.nodesMap = nodesMap;
+	}
+
 	public static DataSource getDataSource() {
 		if (dsLocal != null) return dsLocal;
 		try {
@@ -54,7 +70,11 @@ public class ConnectDB {
 			}
 			dsLocal = (DataSource) context.lookup("localDS");
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			try {
+				dsLocal = (DataSource) context.lookup("java:comp/env/localDS");
+			} catch (Exception e1) {
+				System.out.println(e1.getMessage());
+			}
 		}
 		return dsLocal;
 	}
@@ -64,9 +84,7 @@ public class ConnectDB {
 		final int intId = Integer.parseInt(id);
 		
 		JsonArrayBuilder json = Json.createArrayBuilder();
-		Map<Integer, Tscheme> nodesMap = (Map<Integer, Tscheme>) 
-				new BatisJDBC(s -> s.getMapper(IMapperT.class).getSchemesMap()).get();
-		nodesMap.values().stream().filter(f -> f.getParentref() == intId)
+		getNodesMap().values().stream().filter(f -> f.getParentref() == intId)
 			.forEach(n -> {
 				JsonObjectBuilder ch = Json.createObjectBuilder();
 				ch.add("id", n.getIdscheme())
@@ -184,6 +202,14 @@ public class ConnectDB {
 		new BatisJDBC(s -> {s.getMapper(IMapperAction.class).confirmAlarmAll(lognote, userref);return 0;}).get();
 	}
 	
+	public static void updateTScheme(int idscheme, String schemedenom, String schemename, 
+							  String schemedescr, int parentref, Object schemefile, int userid) {
+		new BatisJDBC(s -> {
+			s.getMapper(IMapperAction.class).updateTScheme(idscheme, schemedenom, schemename, schemedescr, parentref, schemefile, userid);
+			return 0;
+		}).get();
+	}
+	
 	private static PostgresDB postgressDB;
 	private static MainTopic mTopic;
 	private static boolean isFirstStart = true;
@@ -209,9 +235,5 @@ public class ConnectDB {
 			mTopic = new MainTopic();
 			mTopic.start();
 		}
-	}
-
-	public static DataSource getDsLocal() {
-		return dsLocal;
 	}
 }

@@ -40,25 +40,57 @@ function initTree() {
 	function customMenu(node) {
 		var items = {
 			item1: {
-				label: 'item1',
+				label: 'Delete Scheme',
 				action: function () {
-					alert('Test 1');
+					alert('Delete Scheme is impossible now');
 				},
 				_disabled : true,
+				icon : 'glyphicon glyphicon-remove alarm'
 			},
 			item2: {
 				separator_before : true,
 				separator_after : true,
-				label: 'item2',
+				label: 'Change Scheme',
 				action: function () {
 					console.log(node.original);
+					var iFile = elt('input', {type: 'file', id: 'fileOpenDialog'});
+					iFile.addEventListener("change", function(event) {
+						var i = 0, file = iFile.files[0], reader = new FileReader();
+
+						fileWebSocket.send('idScheme:' + node.id + ';');
+
+						var reader = new FileReader();
+						var rawData = new ArrayBuffer();
+						reader.onload = function(e) {
+								rawData = e.target.result;
+								fileWebSocket.send(rawData);
+								fileWebSocket.send('end');
+						}
+						reader.readAsArrayBuffer(file);
+					}, false);
+					performClick(iFile);
 				},
-				icon : 'glyphicon glyphicon-ok',
+				icon : 'glyphicon glyphicon-pencil',
 				shortcut : 113,
 				shortcut_label : 'F2'
+			},
+			item3: {
+				label: 'Create Scheme',
+				action: function () {
+					alert('Create Scheme is impossible now');
+				},
+				icon : 'glyphicon glyphicon-plus',
 			}
 		};
 
 		return items;
+	}
+
+	function performClick(elem) {
+		if(elem && document.createEvent) {
+			var evt = document.createEvent("MouseEvents");
+			evt.initEvent("click", true, false);
+			elem.dispatchEvent(evt);
+		}
 	}
 }
