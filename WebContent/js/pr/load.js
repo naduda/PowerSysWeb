@@ -152,19 +152,3 @@ $('#schemeContainer').on('scroll', function (e) {
 	schemeContainer.scrollTop = 0;
 	schemeContainer.scrollLeft = 0;
 });
-
-function setObjectProperties() {
-	setPopupWindow('objectProperties', 'schemeContainer');
-}
-
-function getGroupByName(name) {
-	var gr = {};
-	gr.element = document.getElementById(name);
-	gr.script = gr.element.getAttribute('script') || '';
-	gr.FunctionName = gr.script.length > 0 ?
-		gr.script.substring(gr.script.lastIndexOf('/') + 1) : '';
-	gr.koef = gr.element.getAttribute('koef');
-	gr.precision = gr.element.getAttribute('precision');
-	gr.unit = gr.element.getAttribute('unit');
-	return gr;
-}

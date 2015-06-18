@@ -74,6 +74,10 @@ function setPopupWindow(popup, parent) {
 	}
 }
 
+function setObjectProperties() {
+	setPopupWindow('objectProperties', 'main');
+}
+
 function setAlarmColumns() {
 	var isExist = document.getElementById('alarmColumns') != null,
 	alarmColumns = isExist ? document.getElementById('alarmColumns') :
@@ -193,4 +197,16 @@ function dateToolbar(parent, onDateChange){
 	$(toolbar.to).datepicker( "option", "minDate", curDate);
 
 	return toolbar;
+}
+
+function getGroupByName(name) {
+	var gr = {};
+	gr.element = document.getElementById(name);
+	gr.script = gr.element.getAttribute('script') || '';
+	gr.FunctionName = gr.script.length > 0 ?
+		gr.script.substring(gr.script.lastIndexOf('/') + 1) : '';
+	gr.koef = gr.element.getAttribute('koef');
+	gr.precision = gr.element.getAttribute('precision');
+	gr.unit = gr.element.getAttribute('unit');
+	return gr;
 }

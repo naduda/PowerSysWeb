@@ -46,6 +46,9 @@ function initWebSocketFileServer() {
 				var msg = JSON.parse(evt.data);
 				switch(msg.type.toLowerCase()){
 					case 'ok':
+						var selectedNodeId = $('#treeDIV').jstree('get_selected').toString();
+						$("#treeDIV").jstree("deselect_node", "#" + selectedNodeId);
+						$("#treeDIV").jstree("select_node", "#" + selectedNodeId);
 						alert('Done! OK!');
 						break;
 					case 'error':
@@ -154,17 +157,17 @@ function onValueMessage(data) {
 	var dti = {},
 			lastDate = document.getElementById('lastDate'),
 			timestamp = lastDate.getAttribute('timestamp'),
-			dateFormated = timestamp2date(Number(timestamp));
+			dateFormated = timestamp2date(Number(timestamp)),
+			lastDateFormated = timestamp2date(Number(data.timestamp));
 
 	if(data.timestamp > timestamp) {
 		lastDate.setAttribute('timestamp', data.timestamp);
-		lastDate.innerHTML = timestamp2date(Number(data.timestamp));
+		lastDate.innerHTML = lastDateFormated;
 	}
 
 	for (var key in data) {
 		if (data.hasOwnProperty(key)) {
-			var val = data[key];
-			if (key !== 'groups') dti[key] = val;
+			if (key !== 'groups') dti[key] = data[key];
 		}
 	}
 
@@ -172,10 +175,12 @@ function onValueMessage(data) {
 		var group = data.groups[i],
 				activeGroup = getGroupByName(group.name);
 
+		activeGroup.element.setAttribute('dateFormated', lastDateFormated);
+		activeGroup.element.setAttribute('rcode', data.rcode);
+		activeGroup.element.setAttribute('infoMode', data.mode);
 		for (var key in group) {
 			if (group.hasOwnProperty(key)) {
-				var val = group[key];
-				dti[key] = val;
+				dti[key] = group[key];
 			}
 		}
 
@@ -185,6 +190,9 @@ function onValueMessage(data) {
 
 		var elem = new Elem(activeGroup, dti);
 		psFunctions.run(elem.scriptName, elem.run);
+	}
+	if (model.currentItem != null) {
+		model.updateObjectProperties();
 	}
 }
 

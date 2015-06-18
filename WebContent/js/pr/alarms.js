@@ -44,8 +44,8 @@ $('#alarmTable tbody').on('click', 'tr', function(){
 		$(this).removeClass('selectedAlarm') : $(this).addClass('selectedAlarm');
 });
 
-function onAlarmMessage(data) {
-	var headerRowCols = $('#alarmTable thead tr:first').find('th'), newColumn = '';
+function onAlarmMessage(data, isUpdate) {
+	var newColumn = '';
 
 	data.eventDTorign = data.eventDT;
 	data.recordDTorign = data.recordDT;
@@ -66,8 +66,8 @@ function onAlarmMessage(data) {
 		}
 	});
 
-	headerRowCols.each(function(){
-		var colName = headerRowCols.eq($(this).index()),
+	model.alarm.table.headerRowCols.each(function(){
+		var colName = model.alarm.table.headerRowCols.eq($(this).index()),
 		val = data[colName[0].id] || '-', actual = val.length * 9,
 		hName = colName[0].getElementsByTagName('span')[0].innerHTML.length * 12;
 
@@ -87,21 +87,17 @@ function onAlarmMessage(data) {
 		}
 	});
 
-	$('#alarmTable tbody').append('<tr style="background-color:' + 
-		data.color + '">' + newColumn + '</tr>')
-		.trigger("update").trigger("sorton", [[[7,0],[12,0],[4,1]]]);
-	var status = $('#alarmTable tbody tr:first').find('td')[7];
-	if(status.innerHTML === 1)
-		$('#alarmTable tbody').trigger("sorton", [[[4,1]]]);
+	model.alarm.addRow('<tr style="background-color:' + 
+			data.color + '">' + newColumn + '</tr>')
+	if (isUpdate == false) {
+	} else {
+		model.alarm.sortTable();
+	}
 
 	$("#alarmTable").colResizable({
 		liveDrag:true,
 		fixed:false
 	});
-	document.getElementById('alarmsCount').innerHTML =
-		document.getElementById('alarmTable')
-			.getElementsByTagName("tbody")[0]
-			.getElementsByTagName("tr").length;
 }
 
 function showHideColumn(col, isShow) {

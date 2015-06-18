@@ -33,7 +33,9 @@ var webSocket;
 			dates = createDateToolbar(north, function (dateText) {
 				urlRequest = docJournal + '?id=1;' + 
 										 dates.from.value + '_' + dates.to.value;
-				$.tablesorter.clearTableBody($('#alarmTable')[0]);
+				model.alarm.clearTable();
+				$('#progressDiv').html('');
+				$('#progressDiv').width('0');
 				getAlarms(urlRequest);
 			});
 
@@ -107,15 +109,19 @@ var webSocket;
 	function getAlarms(docURL){
 		$('#progressDiv').css('text-align','left');
 		$.getJSON(docURL, function(data){
-			var len = data.alarms.length, i = 1;
+			var len = data.alarms.length, i = 1,
+					start = new Date().getTime();
 
 			sendUserId(data.userId);
+
 			Array.prototype.forEach.call(data.alarms, function (alarm){
 				setTimeout(function(){
 					var w = (i++)*100/len;
-					onAlarmMessage(alarm);
+					onAlarmMessage(alarm, false);
 					if(w === 100){
-						$('#progressDiv').html('Complete');
+						model.alarm.sortTable();
+						$('#progressDiv').html('Complete (' +
+							(new Date().getTime() - start)/1000 + ' s)');
 						$('#progressDiv').css('text-align','center');
 					} else
 						$('#progressDiv').html('Loading - ' + Number(w.toFixed(2)) + ' %');
@@ -187,7 +193,7 @@ var webSocket;
 								elt('select', {id:'alarmFilter', class:'menubutton'},
 									elt('option', {value:'0'}, '*'))),
 							elt('button', {type:'button', class:'menubutton',
-									onclick:'$("#alarmTable tbody").trigger("sorton", [[[7,0],[12,0],[4,1]]]);'},
+									onclick:'model.alarm.sortTable();'},
 									elt('span', {id:'${keyTooltip_btnSorting}'},
 										translateValueByKey('keyTooltip_btnSorting'))),
 							elt('button', {type:'button', class:'menubutton',

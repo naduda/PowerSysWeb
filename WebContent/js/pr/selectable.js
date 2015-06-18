@@ -40,8 +40,8 @@ function selectable(svg) {
 		} else {
 			clearSelection();
 			selectRect(rect, obj);
-			setObjectProperties(obj);
 		}
+		model.setCurrentItem(obj);
 	}
 
 	function selectRect(rect, obj) {
@@ -56,47 +56,6 @@ function selectable(svg) {
 		rect.setAttribute("transform",transform);
 
 		rect.setAttribute("selectedId",obj.getAttribute('id'));
-	}
-
-	function setObjectProperties(obj) {
-		if (obj.getElementsByTagName('title')[0] !== undefined) {
-			document.getElementById('infoName').innerHTML = 
-				obj.getElementsByTagName('title')[0].innerHTML;
-			document.getElementById('infoCode').innerHTML = obj.getAttribute('idSignal');
-			document.getElementById('infoType').innerHTML = obj.getAttribute('typeSignal');
-			document.getElementById('infoMode').innerHTML = obj.getAttribute('infoMode');
-			if (obj.getAttribute('TS') === '1') {
-				document.getElementById('infoValue').innerHTML = obj.getAttribute('value') + '·\
-					' + obj.getAttribute('koef') + ' = \
-					' +(obj.getAttribute('value') * obj.getAttribute('koef'));
-			} else {
-				document.getElementById('infoValue').innerHTML = obj.getAttribute('value');
-			}
-			document.getElementById('infoUnit').innerHTML = obj.getAttribute('unit');
-			var quality;
-			var locale = 'Language_' + document.getElementById('lang').value;
-			switch(obj.getAttribute('rcode')) {
-				case '0': 
-					quality = '<span id="${keyAuto}"\
-						>' + translateValueByKey('keyAuto') + '</span>';
-					break;
-				case '107': 
-					quality = '<span id="${keyManual}"\
-						>' + translateValueByKey('keyManual') + '</span>';
-					break;
-			}
-			document.getElementById('infoQuality').innerHTML = quality;
-			document.getElementById('infoDate').innerHTML = obj.getAttribute('dateFormated');
-		} else {
-			document.getElementById('infoName').innerHTML = '';
-			document.getElementById('infoCode').innerHTML = '';
-			document.getElementById('infoType').innerHTML = '';
-			document.getElementById('infoMode').innerHTML = '';
-			document.getElementById('infoValue').innerHTML = '';
-			document.getElementById('infoUnit').innerHTML = '';
-			document.getElementById('infoQuality').innerHTML = '';
-			document.getElementById('infoDate').innerHTML = '';
-		}
 	}
 
 	for(i = 0; i < svg.childNodes.length; i++) {

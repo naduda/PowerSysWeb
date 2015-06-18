@@ -50,8 +50,7 @@ public class Server {
 		Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
 		Tools.sendConnStr(session);
 		
-		long id = System.currentTimeMillis();
-		System.out.println("Socket connected at " + new Date(id));
+		System.out.println("Socket connected at " + new Date(System.currentTimeMillis()));
 	}
 	
 	@OnMessage

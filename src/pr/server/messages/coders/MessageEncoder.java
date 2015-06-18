@@ -5,9 +5,6 @@ import java.util.Iterator;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
-import javax.websocket.EncodeException;
-import javax.websocket.Encoder;
-import javax.websocket.EndpointConfig;
 
 import pr.server.messages.AlarmMessage;
 import pr.server.messages.KeyValueArrayMessage;
@@ -16,20 +13,10 @@ import pr.server.messages.CommandMessage;
 import pr.server.messages.ResultMessage;
 import pr.server.messages.ValueMessage;
 
-public class MessageEncoder implements Encoder.Text<Message> {
-
+public class MessageEncoder extends AEncoder {
 	@Override
-	public void destroy() {
-		
-	}
-
-	@Override
-	public void init(EndpointConfig config) {
-		
-	}
-
-	@Override
-	public String encode(Message message) throws EncodeException {
+	public String encodeImpl(Object mess) {
+		Message message = (Message)mess;
 		String result = null;
 		if (message instanceof CommandMessage) {
 			CommandMessage commandMessage = (CommandMessage) message;

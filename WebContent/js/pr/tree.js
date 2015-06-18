@@ -40,19 +40,18 @@ function initTree() {
 	function customMenu(node) {
 		var items = {
 			item1: {
-				label: 'Delete Scheme',
+				label: 'Create Scheme',
 				action: function () {
-					alert('Delete Scheme is impossible now');
+					alert('Create Scheme is impossible now');
 				},
-				_disabled : true,
-				icon : 'glyphicon glyphicon-remove alarm'
+				icon : 'glyphicon glyphicon-plus',
 			},
 			item2: {
 				separator_before : true,
 				separator_after : true,
 				label: 'Change Scheme',
 				action: function () {
-					console.log(node.original);
+					// console.log(node.original);
 					var iFile = elt('input', {type: 'file', id: 'fileOpenDialog'});
 					iFile.addEventListener("change", function(event) {
 						var i = 0, file = iFile.files[0], reader = new FileReader();
@@ -75,11 +74,12 @@ function initTree() {
 				shortcut_label : 'F2'
 			},
 			item3: {
-				label: 'Create Scheme',
+				label: 'Delete Scheme',
 				action: function () {
-					alert('Create Scheme is impossible now');
+					alert('Delete Scheme is impossible now');
 				},
-				icon : 'glyphicon glyphicon-plus',
+				_disabled : true,
+				icon : 'glyphicon glyphicon-remove alarm'
 			}
 		};
 
