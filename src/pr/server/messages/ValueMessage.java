@@ -8,7 +8,7 @@ public class ValueMessage extends Message {
 	private String mode;
 	private int rCode;
 	private Timestamp date;
-	private List<Group> groups;
+	private List<String> groups;
 	
 	public ValueMessage() {
 		setType(this.getClass().getSimpleName());
@@ -46,36 +46,11 @@ public class ValueMessage extends Message {
 		this.date = date;
 	}
 
-	public List<Group> getGroups() {
+	public List<String> getGroups() {
 		return groups;
 	}
 
-	public void setGroups(List<Group> groups) {
+	public void setGroups(List<String> groups) {
 		this.groups = groups;
-	}
-
-	public static class Group {
-		private String script;
-		private String name;
-		
-		public Group() {
-			
-		}
-
-		public String getScript() {
-			return script;
-		}
-
-		public void setScript(String script) {
-			this.script = script;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
 	}
 }

@@ -74,10 +74,6 @@ function setPopupWindow(popup, parent) {
 	}
 }
 
-function setObjectProperties() {
-	setPopupWindow('objectProperties', 'main');
-}
-
 function setAlarmColumns() {
 	var isExist = document.getElementById('alarmColumns') != null,
 	alarmColumns = isExist ? document.getElementById('alarmColumns') :

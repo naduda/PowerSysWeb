@@ -2,26 +2,11 @@ package pr.model.tools;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
-
-
-
-
-
-
 import javax.websocket.Session;
-
-
-
-
-
-
-
 
 import pr.common.Encryptor;
 import pr.db.ConnectDB;
@@ -40,7 +25,6 @@ import pr.server.messages.AlarmMessage;
 import pr.server.messages.CommandMessage;
 import pr.server.messages.KeyValueArrayMessage;
 import pr.server.messages.ValueMessage;
-import pr.server.messages.ValueMessage.Group;
 
 public class Tools {
 	public static final Map<Integer, VsignalView> VSIGNALS = ConnectDB.getVsignalsMap();
@@ -63,27 +47,12 @@ public class Tools {
 					.get(VSIGNALS.get(v.getSignalref()).getStatus() + "").getParamdescr());
 			oldValue.setrCode(v.getRcode());
 
-			List<Group> groups = new ArrayList<>();
 			if (scheme == null) return;
 			List<String> listGroups = scheme.getSignalMap().get(v.getSignalref());
 			
 			if (listGroups == null) return;
-			listGroups.forEach(g -> {
-				Group group = new Group();
-				group.setName(g);
-				String script = scheme.getCustProps().get(g).get("script");
-				if (script == null) {
-					String title = scheme.getCustProps().get(g).get("title");
-					if (title.indexOf(".") != -1) {
-						script = title.substring(0, title.indexOf("."));
-					} else {
-						script = title;
-					}
-				}
-				groups.add(group);
-			});
-			oldValue.setGroups(groups);
-			
+			oldValue.setGroups(listGroups);
+
 			try {
 				session.getBasicRemote().sendObject(oldValue);
 			} catch (Exception e) {
@@ -105,6 +74,13 @@ public class Tools {
 				if (map != null) {
 					String script = map.get("script");
 					String title = scheme.getCustProps().get(g).get("title");
+					String id = scheme.getCustProps().get(g).get("id");
+					if(id == null) id = "0";
+					String idTS = scheme.getCustProps().get(g).get("idTS");
+					if(idTS == null) idTS = "0";
+					String idTU = scheme.getCustProps().get(g).get("idTU");
+					if(idTU == null) idTU = "0";
+
 					if (script == null) {
 						if (title.indexOf(".") != -1) {
 							script = title.substring(0, title.indexOf("."));
@@ -112,17 +88,17 @@ public class Tools {
 							script = title;
 						}
 					}
-					
+
 					int typeSignal = VSIGNALS.get(k) != null ? VSIGNALS.get(k).getTypesignalref() : 0;
 					String precision = scheme.getCustProps().get(g).get("Precision");
 					int precisionInt = precision == null ? 0 : precision.length() - precision.indexOf(".") - 1;
 					String units = VSIGNALS.get(k) != null ? VSIGNALS.get(k).getNameunit() : "";
 					//null or Ne zadano
 					units = ((units == null) || (units.trim().indexOf(" ") != -1)) ? "" : units;
-					arr.putKeyValue(g, k + ":" + 
+					arr.putKeyValue(g, id + ":" + 
 							ConnectDB.getSpTypeSignalMap().get(typeSignal).getNametypesignal() + ":" +
 							typeSignal + ":" + TSIGNALS.get(k).getKoef() + ":" + precisionInt + ":" +
-							units + ":" + script + ":" + VSIGNALS.get(k).getNamesignal());
+							units + ":" + script + ":" + VSIGNALS.get(k).getNamesignal() + ":" + idTS + ":" + idTU);
 				}
 			});
 		});

@@ -79,13 +79,14 @@ function readScript(file, cb) {
 	rawFile.addEventListener("load", function() {
 		if(rawFile.readyState === 4) {
 			if(rawFile.status === 200 || rawFile.status == 0) {
-				var allText = rawFile.responseText;
-				var func = new Function('obj', allText);
+				var allText = rawFile.responseText,
+						func = new Function('obj', allText);
 				psFunctions.results[file] = func;
 
 				try {
 						cb(func);
 				} catch(e) {
+					console.log(e);
 					console.log(file);
 				}
 			}

@@ -93,13 +93,15 @@
 					<a class="toolbarItem" href="#"><i class="fa fa-arrow-circle-left"></i></a>
 					<a class="toolbarItem" href="#"><i class="fa fa-arrow-circle-right"></i></a>
 					<span class="devider">.</span>
+					<span class="toolbarItem fa fa-info" title="" id="${keyTooltip_info}" onclick="model.EditObjectProperties.show();"></span>
+					<span class="devider">.</span>
 					<!--a class="toolbarItem" href="#"><i class="fa fa-minus-circle"></i></a>
 					<a class="toolbarItem" href="#"><i class="fa fa-plus-circle"></i></a>
 					<a class="toolbarItem" href="#"><i class="fa fa-arrows-v"></i></a>
 					<a class="toolbarItem" href="#"><i class="fa fa-arrows-h"></i></a>
 					<span class="devider">.</span-->
 					<span id="tFull" class="toolbarItem fa statusbar-toggler menubar-toggler fa-arrows-alt"></span>
-					<span class="toolbarItem fa fa-info-circle" title="" id="${keyTooltip_info}" onclick="setObjectProperties();"></span>
+					<span class="toolbarItem fa fa-info-circle" title="" id="${keyTooltip_info}" onclick="model.ObjectProperties.show();"></span>
 					<a class="toolbarItem" href="#"><i class="fa fa-warning"></i></a>
 					<span class="toolbarItem fa fa-bar-chart" title="" id="${keyTooltip_showChart}" onclick="showChartPowerSys();"></span>
 					<span class="devider">.</span>
@@ -203,48 +205,6 @@
 					<li class="active"><a href="#tabTable" data-toggle="tab">#{keyTable}</a></li>
 					<li><a href="#tabChart" data-toggle="tab">#{keyChart}</a></li>
 				</ul>
-			</div>
-		</div>
-		<div id="objectProperties" class="popupW">
-			<div class="popupHeader">
-				#{keyTooltip_info}
-				<i class="fa fa-times closeButton" onclick="setObjectProperties();"></i>
-			</div>
-			<div class="popupContent">
-				<table>
-					<tr>
-						<td>#{keyName}:</td>
-						<td id="infoName"></td>
-					</tr>
-					<tr>
-						<td>#{keyCode}:</td>
-						<td id="infoCode"></td>
-					</tr>
-					<tr>
-						<td>#{keyType}:</td>
-						<td id="infoType"></td>
-					</tr>
-					<tr>
-						<td>#{keyMode}:</td>
-						<td id="infoMode"></td>
-					</tr>
-					<tr>
-						<td>#{keyValue}:</td>
-						<td id="infoValue"></td>
-					</tr>
-					<tr>
-						<td>#{keyUnit}:</td>
-						<td id="infoUnit"></td>
-					</tr>
-					<tr>
-						<td>#{keyQuality}:</td>
-						<td id="infoQuality"></td>
-					</tr>
-					<tr>
-						<td>#{keyDate}:</td>
-						<td id="infoDate"></td>
-					</tr>
-				</table>
 			</div>
 		</div>
 

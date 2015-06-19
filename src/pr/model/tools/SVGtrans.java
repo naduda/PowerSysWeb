@@ -195,13 +195,13 @@ public class SVGtrans {
 				e.printStackTrace();
 			}
 		}
-		
+
 		if (g.getCustProps() != null) {
 			Map<String, String> gData = new HashMap<>();
 			g.getCustProps().getCustomProps().forEach(p -> {
 				String nameCP = p.getNameU();
 				gData.put(nameCP, p.getVal());
-				if (nameCP.toLowerCase().equals("id") || nameCP.toLowerCase().equals("idts111")) {
+				if (nameCP.toLowerCase().equals("id") || nameCP.toLowerCase().equals("idts2") || nameCP.toLowerCase().equals("idtu2")) {
 					if (p.getVal() != null) {
 						Integer idSignal = Integer.parseInt(p.getVal());
 						if (signalMap.containsKey(idSignal)) {
@@ -214,11 +214,11 @@ public class SVGtrans {
 					}
 				}
 			});
-			
+
 			gData.put("title", g.getTitle());
 			custProps.put(g.getId(), gData);
 		}
-		
+
 		if (g.getlText() != null) {
 			try {
 				Vparagraph paragraph = g.getlText().get(0).getvParagraph();
@@ -243,7 +243,7 @@ public class SVGtrans {
 				e.printStackTrace();
 			}
 		}
-		
+
 		g.setCustProps(null);
 		g.setUserDefs(null);
 		g.setDesc(null);
@@ -257,13 +257,13 @@ public class SVGtrans {
 		g.setLayerMember(null);
 		g.setTextBlock(null);
 		g.setTextRect(null);
-		
+
 		if (g.getlText() != null) g.getlText().forEach(t -> {
 			t.setvParagraph(null);
 			t.setLangID(null);
 			t.getMixedValue().removeIf(v -> v.toString().indexOf("v:") != -1);
 		});
-		
+
 		if (g.getListG() != null) g.getListG().forEach(gr -> clean(svg, gr, custProps, signalMap));
 	}
 	

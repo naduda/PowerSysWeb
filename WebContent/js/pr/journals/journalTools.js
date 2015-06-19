@@ -202,7 +202,8 @@ var webSocket;
 							elt('DIV', {class:'pull-right'},
 									elt('span', {id:'alarmsCount', class:'badge'}, '0'))
 		);
-		getPriorities('http://localhost:8080/PowerSysWeb/dataServer/db/priority');
+		getPriorities(docJournal.slice(0, docJournal.lastIndexOf('/')) + 
+			'/db/priority');
 		parent.appendChild(toolbarDIV);
 	}
 

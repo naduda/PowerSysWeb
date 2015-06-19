@@ -42,6 +42,7 @@ function selectable(svg) {
 			selectRect(rect, obj);
 		}
 		model.setCurrentItem(obj);
+		model.EditObjectProperties.update();
 	}
 
 	function selectRect(rect, obj) {

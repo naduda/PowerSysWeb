@@ -48,7 +48,7 @@ function showChartPowerSys() {
 	chart.chart = $('#tabChart').highcharts();
 }
 
-chart.setDataTable = function setDataTable() {
+chart.setDataTable = function(){
 	var closeId,
 			modalInfo = new BootstrapDialog({
 				size: BootstrapDialog.SIZE_SMALL,
@@ -75,25 +75,29 @@ chart.setDataTable = function setDataTable() {
 		var paras = document.querySelectorAll(".selectableRectangle, #selectableRectangle");
 		Array.prototype.forEach.call(paras, function(selRect) {
 			var curItem = document.getElementById(selRect.getAttribute('selectedId'));
-			closeId = curItem.getAttribute('idSignal');
+			if (curItem != null) {
+				closeId = curItem.getAttribute('idSignal');
 
-			chart.chart.yAxis[0].setTitle({
-				text: translateValueByKey('key_pValue') + ', ' + curItem.getAttribute('unit')
-			});
-			addDataById(curItem.getAttribute('idSignal'), 
-					chart.dates.from.value, chart.dates.to.value);
+				chart.chart.yAxis[0].setTitle({
+					text: translateValueByKey('key_pValue') + ', ' + curItem.getAttribute('unit')
+				});
+				addDataById(closeId, chart.dates.from.value, chart.dates.to.value);
+			} else {
+				modalInfo.close();
+			}
 		});
 	}, 250);
 
 	function addDataById(id, dtBeg, dtEnd) {
 		var integr = $("#sInstantaneous")[0].value,
-		url = 'http' + docURL + '/dataServer/db/getDataById?params=' + id + '_' + 
-							dtBeg +'_' + dtEnd + '_' + integr;
+				url = 'http' + docURL + '/dataServer/db/getDataById?params=' + 
+							id + '_' + dtBeg +'_' + dtEnd + '_' + integr;
 
 		$.getJSON(url, function(data){
 			var dataTable = document.getElementById('dataTable'),
-			htr = document.querySelector('#dataTable thead tr'),
-			seriesCount = chart.chart.series.length;
+					htr = document.querySelector('#dataTable thead tr'),
+					seriesCount = chart.chart.series.length,
+					charDada = '[';
 
 			if(seriesCount > htr.getElementsByTagName('th').length - 2) {
 				var nth = document.createElement('th');
@@ -102,7 +106,6 @@ chart.setDataTable = function setDataTable() {
 				htr.appendChild(nth);
 			}
 
-			var charDada = '[';
 			$.each(data.data, function(key, val) {
 				var dt = timestamp2date(val.timestamp);
 				if(seriesCount == 0) {
@@ -129,7 +132,7 @@ chart.setDataTable = function setDataTable() {
 			charDada += ']';
 
 			chart.chart.addSeries({
-				id: id,
+				id: data.idSignal,
 				name: data.signalName, 
 				data: JSON.parse(charDada),
 				step: 'right'

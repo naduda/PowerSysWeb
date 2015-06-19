@@ -45,7 +45,7 @@ public class MessageEncoder extends AEncoder {
 			JsonArrayBuilder groups = Json.createArrayBuilder();
 			vm.getGroups().forEach(g -> {
 				JsonObjectBuilder group = Json.createObjectBuilder();
-				group.add("name", g.getName());
+				group.add("name", g);
 				groups.add(group);
 			});
 			

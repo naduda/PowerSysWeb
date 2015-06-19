@@ -80,6 +80,13 @@ function initTree() {
 				},
 				_disabled : true,
 				icon : 'glyphicon glyphicon-remove alarm'
+			},
+			item4: {
+				label: 'Save Scheme',
+				action: function () {
+					alert('Save Scheme is impossible now');
+				},
+				icon : 'glyphicon glyphicon-ok',
 			}
 		};
 

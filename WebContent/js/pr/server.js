@@ -197,8 +197,8 @@ function onValueMessage(data) {
 }
 
 function Elem(activeGroup, dti){
-	var scriptName = './scripts/' + activeGroup.script + '.js';
-	var element = activeGroup.element;
+	var scriptName = './scripts/' + activeGroup.script + '.js',
+			element = activeGroup.element;
 	this.dti = dti;
 	this.scriptName = scriptName;
 	this.run = function() {
@@ -229,6 +229,8 @@ function onArrayMessage(data) {
 				selectedGroup.setAttribute('precision', valArray[4]);
 				selectedGroup.setAttribute('unit', valArray[5] || '');
 				selectedGroup.setAttribute('script', valArray[6]);
+				selectedGroup.setAttribute('idTS', valArray[8]);
+				selectedGroup.setAttribute('idTU', valArray[9]);
 			}
 		}
 	}
