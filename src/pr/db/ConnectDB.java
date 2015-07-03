@@ -1,5 +1,9 @@
 package pr.db;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +25,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import pr.common.WMF2PNG;
 import pr.db.jdbc.BatisJDBC;
 import pr.db.jdbc.PostgresDB;
 import pr.db.jdbc.mappers.IMapper;
@@ -34,10 +39,16 @@ import pr.model.LinkedValue;
 import pr.model.SpTypeSignal;
 import pr.model.TSysParam;
 import pr.model.TViewParam;
+import pr.model.Tconftree;
+import pr.model.Transparant;
 import pr.model.Tscheme;
 import pr.model.Tsignal;
+import pr.model.TtranspHistory;
+import pr.model.TtranspLocate;
+import pr.model.Ttransparant;
 import pr.model.Tuser;
 import pr.model.VsignalView;
+import pr.model.tools.Tools;
 import pr.server.Server;
 import pr.server.topic.MainTopic;
 
@@ -46,6 +57,8 @@ public class ConnectDB {
 	private static DataSource dsLocal;
 	private static Context context = null;
 	private static Map<Integer, Tscheme> nodesMap = null;
+	private static Map<Integer, Tconftree> confTreeMap = null;
+	private static Map<Integer, Transparant> transparants = null;
 	
 	public ConnectDB() {
 		System.out.println("create ConnectDB " + this.toString());
@@ -56,6 +69,25 @@ public class ConnectDB {
 			nodesMap = (Map<Integer, Tscheme>) new BatisJDBC(s -> s.getMapper(IMapperT.class).getSchemesMap()).get();
 		}
 		return nodesMap;
+	}
+	
+	public static Map<Integer, Tconftree> getConfTreeMap() {
+		if (confTreeMap == null) {
+			confTreeMap = (Map<Integer, Tconftree>) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTconftreeMap()).get();
+		}
+		return confTreeMap;
+	}
+	
+	public static Ttransparant getTtransparantById(int idtr) {
+		return (Ttransparant) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTtransparantById(idtr)).get();
+	}
+	
+	public static TtranspLocate getTransparantLocate(int trref) {
+		return (TtranspLocate) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTransparantLocate(trref)).get();
+	}
+	
+	public static TtranspHistory getTtranspHistory(int trref) {
+		return (TtranspHistory) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTtranspHistory(trref)).get();
 	}
 
 	public static void setNodesMap(Map<Integer, Tscheme> nodesMap) {
@@ -96,6 +128,56 @@ public class ConnectDB {
 			});
 		
 		return json.build().toString();
+	}
+	
+	public static String getChildSignals(String id) {
+		if (id.equals("#") || id.length() == 0) id = "0";
+		final int intId = Integer.parseInt(id);
+		
+		JsonArrayBuilder json = Json.createArrayBuilder();
+		List<Tconftree> childTreeNodes = getConfTreeMap().values().stream().filter(f -> f.getParentref() == intId)
+				.collect(Collectors.toList());
+		if (childTreeNodes.size() > 0) {
+			childTreeNodes.forEach(n -> {
+				JsonObjectBuilder ch = Json.createObjectBuilder();
+				ch.add("id", n.getIdnode())
+				.add("text", n.getNodename())
+				.add("typeNode", n.getTypedenom())
+				.add("children", true);
+				json.add(ch);
+			});
+		} else {
+			Tools.TSIGNALS.values().stream().filter(f -> f.getNoderef() == intId).forEach(s -> {
+				JsonObjectBuilder ch = Json.createObjectBuilder();
+				ch.add("id", s.getIdsignal())
+				.add("text", s.getNamesignal())
+				.add("typeNode", "signal")
+				.add("children", false);
+				json.add(ch);
+			});
+		}
+		
+		return json.build().toString();
+	}
+	
+	public static String getChildSignalPath(String id) {
+		JsonObjectBuilder ch = Json.createObjectBuilder();
+		try {
+			int idInt = Integer.parseInt(id);
+			if (idInt != 0) {
+				int parent = Tools.TSIGNALS.get(idInt).getNoderef();
+				String ret = parent + "/" + id;
+				
+				while (parent != 0) {
+					parent = getConfTreeMap().get(parent).getParentref();
+					ret = parent + "/" + ret;
+				}
+				ch.add("path", ret);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ch.build().toString();
 	}
 	
 	public static List<DvalTI> getOldValues(Set<Integer> signalsSet) {
@@ -208,6 +290,41 @@ public class ConnectDB {
 			s.getMapper(IMapperAction.class).updateTScheme(idscheme, schemedenom, schemename, schemedescr, parentref, schemefile, userid);
 			return 0;
 		}).get();
+	}
+	
+	public static Map<Integer, Transparant> getTransparants() {
+		if(transparants == null) {
+			System.out.println("transparants");
+			transparants = (Map<Integer, Transparant>) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTransparants()).get();
+			transparants.values().forEach(t -> {
+				byte[] bytes = (byte[]) t.getImg();
+				InputStream is = WMF2PNG.convertWMF2SVG(new ByteArrayInputStream(bytes));
+				t.setImageByteArray(InputStream2ByteArray(is));
+			});
+		}
+		return transparants;
+	}
+	
+	public static Transparant getTransparantById(int idTransparant) {
+		return getTransparants().get(idTransparant);
+	}
+	
+	private static byte[] InputStream2ByteArray(InputStream is) {
+		int nRead;
+		byte[] data = new byte[1024];
+
+		try (ByteArrayOutputStream buffer = new ByteArrayOutputStream();) {
+			while ((nRead = is.read(data, 0, data.length)) != -1) {
+				buffer.write(data, 0, nRead);
+			}
+			buffer.flush();
+			
+			return buffer.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	private static PostgresDB postgressDB;

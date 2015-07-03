@@ -3,13 +3,13 @@ return {
 		var newX = 0,
 			rect = obj.getElementsByTagName('rect')[0],
 			text = obj.getElementsByTagName('text')[0],
-			style = obj.getAttribute('style');
+			style = obj.getAttribute('style'),
+			width = parseFloat(rect.getAttribute('width')),
+			textWidth;
 
-		text.innerHTML = parseFloat(dti.value * dti.koef).toFixed(dti.precision)
-		 							 + ' ' + dti.unit;
-		var width = parseFloat(rect.getAttribute('width'));
-		var textWidth = parseFloat(text.getBBox().width);
-
+		text.innerHTML = parseFloat(dti.value * dti.koef)
+							.toFixed(dti.precision) + ' ' + dti.unit;
+		textWidth = parseFloat(text.getBBox().width);
 		style = style.substring(style.indexOf('text-align:') + 11, 
 								style.length - 1).trim().toLowerCase();
 
@@ -22,8 +22,8 @@ return {
 	},
 
 	onDoubleClick : function() {
-		var mess = translateValueByKey('keyNewValue');
-		var value = obj.getAttribute('value');
+		var mess = translateValueByKey('keyNewValue'),
+			value = obj.getAttribute('value');
 
 		BootstrapDialog.show({
 			size: BootstrapDialog.SIZE_SMALL,

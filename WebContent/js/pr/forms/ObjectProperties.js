@@ -4,8 +4,7 @@ return {
 											translateValueByKey('keyTooltip_info')),
 				closeButton = elt('i', {class:'fa fa-times closeButton'}),
 				header = elt('DIV', {class:'popupHeader'},
-										headerText,
-										closeButton),
+										headerText, closeButton),
 				table = elt('table'),
 				content = elt('DIV', {class:'popupContent'}, table),
 				main = elt('DIV', {id:'objectProperties', class:'popupW'}, 
@@ -49,25 +48,48 @@ return {
 										headerText,
 										closeButton),
 				table = elt('table'),
-				content = elt('DIV', {class:'popupContent'}, table),
+				iName = elt('input', {id:'propKey', type:'text', size:'10'}),
+				iValue = elt('input', {id:'propValue',type:'text', size:'10'}),
+				spanOK = elt('span', {id:'${keyApply}'}, 
+											translateValueByKey('keyApply')),
+				btnApply = elt('button', {type:'button'}, spanOK),
+				top = elt('DIV', null, 
+								'Name: ', iName, ' value: ', iValue, btnApply),
+				content = elt('DIV', {class:'popupContent'}, 
+										top, elt('hr',{style:'margin:5px;'}), table),
 				main = elt('DIV', {id:'editObjectProperties', class:'popupW'}, 
-										header, content),
-				values = [0,0,0];
+										header, content);
 
-			table.style.width = '100%';
+			table.style.maxHeight = '250px';
+			table.style.maxWidth = '500px';
+			table.style.overflowY = 'scroll';
+			table.style.display = 'block';
+
 			if (model.currentItem) {
-				values[0] = model.currentItem.getAttribute('idSignal');
-				values[1] = model.currentItem.getAttribute('idTS');
-				values[2] = model.currentItem.getAttribute('idTU');
-				values[3] = model.currentItem.getAttribute('script');
+				var rowCount = 0;
+				for(var i = 0; i < model.currentItem.attributes.length; i++){
+					var attr = model.currentItem.attributes[i];
+					if(attr.name.slice(0,3) === 'cp_'){
+						tableAddRow(table, rowCount++, attr.name, attr.value);
+					}
+				}
 			}
-			tableAddRow(table, 0, 'id', 'elementId', values[0]);
-			tableAddRow(table, 1, 'idTS', 'elementIdTS', values[1]);
-			tableAddRow(table, 2, 'idTU', 'elementIdTU', values[2]);
-			tableAddRow(table, 3, 'script', 'elementScript', values[3]);
 
 			closeButton.addEventListener('click', function() {
 				model.EditObjectProperties.hide();
+			});
+
+			btnApply.addEventListener('click', function() {
+				var key = document.getElementById('propKey').value,
+						value = document.getElementById('propValue').value,
+						elem = document.getElementById('elem_cp_' + key);
+
+				if(elem){
+					elem.innerHTML = value;
+				} else {
+					tableAddRow(table, table.rows.length, 'cp_' + key, value);
+				}
+				model.currentItem.setAttribute('cp_' + key, value);
 			});
 
 			main.style.left = model.EditObjectProperties.left;
@@ -80,17 +102,53 @@ return {
 					cell2 = row.insertCell(1),
 					cell3 = row.insertCell(2),
 					key = arguments[2],
-					button = elt('input', {type:'button', 
-										id:'btn_' + key, value:'Edit'});
+					value = arguments[3],
+					spanEdit = elt('span', {id:'${keyEdit}'}, 
+											translateValueByKey('keyEdit')),
+					button = elt('button', {type:'button', 
+										id:'btn_' + key}, spanEdit),
+					spanDelete = elt('span', {id:'${keyDelete}'}, 
+											translateValueByKey('keyDelete')),
+					buttonDel = elt('button', {type:'button', 
+										id:'btn_del_' + key}, spanDelete);
 
-			cell1.appendChild(document.createTextNode(key + ' :'));
-			cell2.id = arguments[3];
-			cell2.innerHTML = arguments[4];
+			cell1.appendChild(document.createTextNode(
+							key.slice(key.indexOf('_') + 1) + ' :'));
+			cell1.style.fontWeight = 'bold';
+			cell2.id = 'elem_' + key;
+			cell2.innerHTML = value;
 			cell3.appendChild(button);
-			cell3.style.textAlign = 'right';
+			cell3.appendChild(buttonDel);
+			cell2.style.maxWidth = '100px';
 
 			button.addEventListener('click', function() {
-				console.log(this.id);
+				var idElement = this.id.slice(this.id.indexOf('_') + 1),
+						elem = document.getElementById('elem_' + idElement),
+						idSignal = elem.innerHTML;
+				if(idElement === 'cp_id' ||
+						idElement === 'cp_idTS' ||
+						idElement === 'cp_idTU' ||
+						idElement.indexOf('cp_signal_') > -1){
+					model.SignalsForm.show(idSignal, elem);
+				} else {
+					var key = document.getElementById('propKey'),
+							value = document.getElementById('propValue'),
+							rowId = this.parentNode.parentNode.rowIndex,
+							row = table.rows.item(rowId), text;
+
+					text = row.cells.item(0).innerHTML;
+					key.value = text.slice(0, text.indexOf(' '));
+					text = row.cells.item(1).innerHTML;
+					value.value = text;
+				}
+			});
+
+			buttonDel.addEventListener('click', function() {
+				var pName = this.id.slice(this.id.lastIndexOf('_') + 1),
+						row = this.parentNode.parentNode;
+
+				model.currentItem.removeAttribute('cp_' + pName);
+				table.deleteRow(row.rowIndex);
 			});
 		}
 	}

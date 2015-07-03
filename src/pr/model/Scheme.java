@@ -7,7 +7,7 @@ public class Scheme {
 	private int idScheme;
 	private String content;
 	private String background;
-	private Map<String, Map<String, String>> custProps;
+	private Map<String, Map<String, String>> groupsMap;
 	private Map<Integer, List<String>> signalMap;
 	
 	public Scheme() {
@@ -38,12 +38,12 @@ public class Scheme {
 		this.background = background;
 	}
 
-	public Map<String, Map<String, String>> getCustProps() {
-		return custProps;
+	public Map<String, Map<String, String>> getGroupsMap() {
+		return groupsMap;
 	}
 
-	public void setCustProps(Map<String, Map<String, String>> custProps) {
-		this.custProps = custProps;
+	public void setGroupsMap(Map<String, Map<String, String>> groupsMap) {
+		this.groupsMap = groupsMap;
 	}
 
 	public Map<Integer, List<String>> getSignalMap() {

@@ -69,6 +69,12 @@ b>ins{color: blue;}
 	cursor: pointer;
 }
 
+.context{padding: 0 5px;text-align: left;}
+.context:hover, .toolbarItem:hover {
+	background: rgb(141, 189, 216);
+	cursor: pointer;
+}
+
 .devider {
 	color: transparent;
 	display: inline-block;

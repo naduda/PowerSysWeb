@@ -75,6 +75,8 @@ function readScript(file, cb) {
 
 	var rawFile = new XMLHttpRequest();
 	rawFile.open("GET", file, true);
+	if(model.noCache)
+		rawFile.setRequestHeader('Cache-Control', model.noCache);
 	// rawFile.onreadystatechange = function () {
 	rawFile.addEventListener("load", function() {
 		if(rawFile.readyState === 4) {

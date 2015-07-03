@@ -68,8 +68,9 @@ function onAlarmMessage(data, isUpdate) {
 
 	model.alarm.table.headerRowCols.each(function(){
 		var colName = model.alarm.table.headerRowCols.eq($(this).index()),
-		val = data[colName[0].id] || '-', actual = val.length * 9,
-		hName = colName[0].getElementsByTagName('span')[0].innerHTML.length * 12;
+				val = data[colName[0].id] || '-', actual = val.length * 9,
+				hName = colName[0].getElementsByTagName('span')[0]
+										.innerHTML.length * 12;
 
 		actual = actual > hName ? actual : hName;
 		if ($(this).css('display') !== 'none') {
@@ -88,7 +89,7 @@ function onAlarmMessage(data, isUpdate) {
 	});
 
 	model.alarm.addRow('<tr style="background-color:' + 
-			data.color + '">' + newColumn + '</tr>')
+			data.color + '">' + newColumn + '</tr>');
 	if (isUpdate == false) {
 	} else {
 		model.alarm.sortTable();
@@ -116,8 +117,8 @@ function showHideColumn(col, isShow) {
 }
 
 function confirmOne() {
-	var isConfirm = true;
-	var cm = {}, par = {};
+	var isConfirm = true,
+			cm = {}, par = {};
 	cm.type = 'CommandMessage';
 	cm.command = 'confimAlarmOne';
 	cm.parameters = [];

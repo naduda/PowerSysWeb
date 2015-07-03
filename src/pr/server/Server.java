@@ -1,12 +1,15 @@
 package pr.server;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -18,6 +21,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import pr.SVGModel;
+import pr.common.Utils;
 import pr.db.ConnectDB;
 import pr.model.Scheme;
 import pr.model.Tscheme;
@@ -27,6 +32,9 @@ import pr.server.messages.CommandMessage;
 import pr.server.messages.Message;
 import pr.server.messages.coders.MessageDecoder;
 import pr.server.messages.coders.MessageEncoder;
+import pr.svgObjects.CP;
+import pr.svgObjects.G;
+import pr.svgObjects.SVG;
 
 @ServerEndpoint(value = "/load", configurator = GetHttpSessionConfigurator.class,
 	encoders = {MessageEncoder.class}, decoders = {MessageDecoder.class})
@@ -37,7 +45,7 @@ public class Server {
 	private static final Map<Integer, Scheme> schemes = Collections.synchronizedMap(new HashMap<>());
 	
 	public Server() throws UnsupportedEncodingException, IOException {
-		System.out.println("==================== new Server ====================");
+		System.out.println("====================< new Server >====================");
 	}
 	
 	@OnOpen
@@ -56,7 +64,7 @@ public class Server {
 	@OnMessage
 	public void handlerMessage(final Session session, Message message) throws IOException, EncodeException {
 		if (message instanceof CommandMessage) {
-			CommandMessage cm = (CommandMessage) message;
+			final CommandMessage cm = (CommandMessage) message;
 			switch (cm.getCommand().toLowerCase()) {
 			case "getscheme":
 				int idScheme = Integer.parseInt(cm.getParameters().get("idNode"));
@@ -70,6 +78,7 @@ public class Server {
 			case "getscripts" :
 				scheme = schemes.get(users.get(session).getIdScheme());
 				Tools.sendScripts(session, scheme);
+				Tools.sendTransparantsList(session);
 				break;
 			case "settu" :
 				scheme = schemes.get(users.get(session).getIdScheme());
@@ -78,7 +87,6 @@ public class Server {
 				ConnectDB.setTU(idSignal, value, 0, (int)users.get(session).getUserId(), scheme.getIdScheme());
 				try {
 					Thread.sleep(3000);
-					cm = new CommandMessage();
 					cm.setCommand("updateTU");
 					Map<String, String> parameters = new HashMap<>();
 					parameters.put("status", "1");
@@ -101,6 +109,54 @@ public class Server {
 			case "setuserid":
 				users.get(session).setUserId(Long.parseLong(cm.getParameters().get("userId")));
 				break;
+			case "updatescheme":
+				scheme = schemes.get(users.get(session).getIdScheme());
+				SVGModel svgModel = SVGModel.getInstance();
+				Tscheme sch = ConnectDB.getNodesMap().get(scheme.getIdScheme());
+				SVG svg = svgModel.getSVG(new ByteArrayInputStream((byte[])sch.getSchemefile()));
+
+				Map<String, G> gMap = svg.getGroupMap();
+				cm.getParameters().keySet().forEach(p -> {
+					G g = gMap.get(p);
+					String propsString = cm.getParameters().get(p);
+					String[] arr = propsString.split(";");
+					for (String prop : arr) {
+						if (prop.startsWith("cp_")) {
+							String pName = prop.substring(3, prop.indexOf(":"));
+							String pValue = prop.substring(prop.indexOf(":") + 1);
+							CP cp = g.getCustProps().getCPbyName(pName);
+							if (cp != null) {
+								cp.setVal(pValue);
+							} else {
+								CP newCP = new CP();
+								newCP.setNameU(pName);
+								newCP.setLbl(pName);
+								newCP.setPrompt("");
+								newCP.setType(0);
+								newCP.setFormat("");
+								newCP.setSortKey("");
+								newCP.setInvis(false);
+								newCP.setAsk(false);
+								newCP.setVal(pValue);
+								g.getCustProps().getCustomProps().add(newCP);
+							}
+						}
+					}
+					List<CP> list4remove = new ArrayList<>();
+					g.getCustProps().getCustomProps().forEach(cp -> {
+						if (propsString.indexOf("cp_" + cp.getNameU()) < 0)
+							list4remove.add(cp);
+					});
+					list4remove.forEach(g.getCustProps().getCustomProps()::remove);
+				});
+				
+				try(ByteArrayOutputStream out = svgModel.getOtputStream(svg);) {
+					if (out != null) {
+						Tools.updateScheme(scheme.getIdScheme(), out.toByteArray());
+					}
+				}
+				svgModel.setObject("c:/1/PowerSys/target/1.svg", svg);
+				break;
 			default:
 				System.err.println(cm.getCommand().toLowerCase());
 				break;
@@ -118,9 +174,14 @@ public class Server {
 				Tscheme sch = ConnectDB.getNodesMap().get(idScheme);
 				scheme = SVGtrans.convert2matrix(new ByteArrayInputStream((byte[])sch.getSchemefile()));
 			} catch (Exception e) {
-				scheme = SVGtrans.convert2matrix("d:/GIT/PowerSysWeb/PowerSysWeb/WebContent/schemes/" + idScheme + ".svg");
+				System.out.println("Try GlassFish dir");
+				scheme = SVGtrans.convert2matrix(Utils.getFullPath("../eclipseApps/PowerSysWeb/schemes/" + idScheme + ".svg"));
+				if (scheme == null) {
+					System.out.println("Try Tomcat dir");
+					scheme = SVGtrans.convert2matrix(Utils.getFullPath("../webapps/PowerSysWeb/schemes/" + idScheme + ".svg"));
+				}
 			}
-			
+			scheme.setIdScheme(idScheme);
 			schemes.put(idScheme, scheme);
 		}
 

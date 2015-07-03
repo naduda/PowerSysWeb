@@ -1,6 +1,3 @@
-// var docURL = document.URL;
-// docURL = docURL.substring(docURL.indexOf('://') + 1, docURL.lastIndexOf("/"));
-
 function initTree() {
 	$('#treeDIV').jstree({
 		'core' : {
@@ -84,7 +81,45 @@ function initTree() {
 			item4: {
 				label: 'Save Scheme',
 				action: function () {
-					alert('Save Scheme is impossible now');
+					var svg = document.getElementById('scheme'),
+							cm = {
+								type: 'CommandMessage', 
+								command: 'updateScheme',
+								parameters: []
+							},
+							groups = svg.getElementsByTagName('g'),
+							count = groups.length;
+
+					Array.prototype.forEach.call(groups, function(g){
+						// if(g.getAttribute('script')) {
+							var param = {};
+							param[g.id] = '';
+							for(atr in g.attributes){
+								if (g.attributes.hasOwnProperty(atr) && 
+										g.attributes[atr].name){
+									var atrName = g.attributes[atr].name,
+											atrValue = g.attributes[atr].value;
+
+									// if (atrValue !== '0') {
+									// 	switch(atrName.toLowerCase()){
+									// 		case 'idsignal':
+									// 		case 'idts':
+									// 		case 'idtu':
+									// 		case 'script':
+									// 			param[g.id] += ';' + atrName + ':' + atrValue;
+									// 			break;
+									// 	}
+									// }
+									if(atrName.slice(0,3) === 'cp_'){
+										param[g.id] += ';' + atrName + ':' + atrValue;
+									}
+								}
+							}
+							param[g.id] = param[g.id].slice(1);
+							if(param[g.id]) cm.parameters.push(param);
+						// }
+					});
+					webSocket.send(JSON.stringify(cm));
 				},
 				icon : 'glyphicon glyphicon-ok',
 			}

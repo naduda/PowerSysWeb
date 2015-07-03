@@ -32,23 +32,21 @@ public class SVGtrans {
 			fill = fill.substring(0, fill.indexOf(";"));
 			fill = fill.substring(fill.indexOf(":") + 1);
 			
-			Map<String, Map<String, String>> custProps = new HashMap<>();
-			Map<Integer, List<String>> signalMap = new HashMap<>();
-			svg.getG().forEach(g -> clean(svg, g, custProps, signalMap));
+			Map<String, Map<String, String>> groupsMap = new HashMap<>();
+			svg.getG().forEach(g -> clean(svg, g, groupsMap));
 			contSVG = svgModel.setObject(svg);
 			
 			result.setBackground(fill);
-			result.setCustProps(custProps);
-			result.setSignalMap(signalMap);
+			result.setGroupsMap(groupsMap);
 		} catch (Exception e) {
-			e.printStackTrace();
+			return null;
 		}
 		
 		int k = 0;
 		while (flag) {
 			String newCont = contSVG.substring(k);
 			int ind = newCont.indexOf("transform=\"t");
-			
+
 			if (ind < 0 ) {
 				flag = false;
 				result.setContent(contSVG);
@@ -68,31 +66,29 @@ public class SVGtrans {
 		String contSVG = "";
 		boolean flag = true;
 		int lastInd = 0;
-		
+
 		try {
 			SVGModel svgModel = SVGModel.getInstance();
 			SVG svg = svgModel.getSVG(is);
 			svg.setTitle(null);
 			svg.setDocumentProperties(null);
-			
+
 			String clazz = svg.getG().get(0).getListG().get(0).getlRect().get(0).getClazz();
 			String fill = svg.getStyleByName(clazz);
 			fill = fill.substring(fill.indexOf("fill"));
 			fill = fill.substring(0, fill.indexOf(";"));
 			fill = fill.substring(fill.indexOf(":") + 1);
 			
-			Map<String, Map<String, String>> custProps = new HashMap<>();
-			Map<Integer, List<String>> signalMap = new HashMap<>();
-			svg.getG().forEach(g -> clean(svg, g, custProps, signalMap));
+			Map<String, Map<String, String>> groupsMap = new HashMap<>();
+			svg.getG().forEach(g -> clean(svg, g, groupsMap));
 			contSVG = svgModel.setObject(svg);
-			
+
 			result.setBackground(fill);
-			result.setCustProps(custProps);
-			result.setSignalMap(signalMap);
+			result.setGroupsMap(groupsMap);
 		} catch (Exception e) {
-			e.printStackTrace();
+			return null;
 		}
-		
+
 		int k = 0;
 		while (flag) {
 			String newCont = contSVG.substring(k);
@@ -168,14 +164,14 @@ public class SVGtrans {
 
 		return "matrix(" + 
 			(Double.valueOf(arr1[0]) * Double.valueOf(arr2[0]) + Double.valueOf(arr1[2]) * Double.valueOf(arr2[1])) + sep +
-		    (Double.valueOf(arr1[1]) * Double.valueOf(arr2[0]) + Double.valueOf(arr1[3]) * Double.valueOf(arr2[1])) + sep +
-		    (Double.valueOf(arr1[0]) * Double.valueOf(arr2[2]) + Double.valueOf(arr1[2]) * Double.valueOf(arr2[3])) + sep +
-		    (Double.valueOf(arr1[1]) * Double.valueOf(arr2[2]) + Double.valueOf(arr1[3]) * Double.valueOf(arr2[3])) + sep +
-		    (Double.valueOf(arr1[0]) * Double.valueOf(arr2[4]) + Double.valueOf(arr1[2]) * Double.valueOf(arr2[5]) + Double.valueOf(arr1[4])) + sep +
-		    (Double.valueOf(arr1[1]) * Double.valueOf(arr2[4]) + Double.valueOf(arr1[3]) * Double.valueOf(arr2[5]) + Double.valueOf(arr1[5])) + ")";
+			(Double.valueOf(arr1[1]) * Double.valueOf(arr2[0]) + Double.valueOf(arr1[3]) * Double.valueOf(arr2[1])) + sep +
+			(Double.valueOf(arr1[0]) * Double.valueOf(arr2[2]) + Double.valueOf(arr1[2]) * Double.valueOf(arr2[3])) + sep +
+			(Double.valueOf(arr1[1]) * Double.valueOf(arr2[2]) + Double.valueOf(arr1[3]) * Double.valueOf(arr2[3])) + sep +
+			(Double.valueOf(arr1[0]) * Double.valueOf(arr2[4]) + Double.valueOf(arr1[2]) * Double.valueOf(arr2[5]) + Double.valueOf(arr1[4])) + sep +
+			(Double.valueOf(arr1[1]) * Double.valueOf(arr2[4]) + Double.valueOf(arr1[3]) * Double.valueOf(arr2[5]) + Double.valueOf(arr1[5])) + ")";
 	}
-	
-	private static void clean(SVG svg, G g, Map<String, Map<String, String>> custProps, Map<Integer, List<String>> signalMap) {
+
+	private static void clean(SVG svg, G g, Map<String, Map<String, String>> custProps) {
 		if (g.getTitle().toLowerCase().contains("lineconn.") || g.getTitle().toLowerCase().contains("line.")) {
 			try {
 				String classes = getInnerClasses(g);
@@ -199,19 +195,9 @@ public class SVGtrans {
 		if (g.getCustProps() != null) {
 			Map<String, String> gData = new HashMap<>();
 			g.getCustProps().getCustomProps().forEach(p -> {
-				String nameCP = p.getNameU();
-				gData.put(nameCP, p.getVal());
-				if (nameCP.toLowerCase().equals("id") || nameCP.toLowerCase().equals("idts2") || nameCP.toLowerCase().equals("idtu2")) {
-					if (p.getVal() != null) {
-						Integer idSignal = Integer.parseInt(p.getVal());
-						if (signalMap.containsKey(idSignal)) {
-							signalMap.get(idSignal).add(g.getId());
-						} else {
-							List<String> groups = new ArrayList<>();
-							groups.add(g.getId());
-							signalMap.put(idSignal, groups);
-						}
-					}
+				if (p.getVal() != null) {
+					String nameCP = p.getNameU();
+					gData.put(nameCP, p.getVal());
 				}
 			});
 
@@ -264,7 +250,7 @@ public class SVGtrans {
 			t.getMixedValue().removeIf(v -> v.toString().indexOf("v:") != -1);
 		});
 
-		if (g.getListG() != null) g.getListG().forEach(gr -> clean(svg, gr, custProps, signalMap));
+		if (g.getListG() != null) g.getListG().forEach(gr -> clean(svg, gr, custProps));
 	}
 	
 	private static String getInnerClasses(G g) {

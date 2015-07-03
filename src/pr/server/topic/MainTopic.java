@@ -6,7 +6,8 @@ public class MainTopic {
 	}
 	
 	public void start() {
-		new Thread(new DvalTItopic(), "Thread_TI").start();
+//		new Thread(new DvalTItopic(), "Thread_TI").start();
 		new Thread(new AlarmsTopic(), "Thread_Alarms").start();
+		new Thread(new NotificationsListener(), "Thread_Notifications").start();
 	}
 }

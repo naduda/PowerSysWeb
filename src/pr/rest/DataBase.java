@@ -30,17 +30,17 @@ public class DataBase {
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
 	
 	@Produces(MediaType.APPLICATION_JSON)
-    @GET
+	@GET
 	public static String getSignalByIdTree(@QueryParam("id") String id) {
 		return ConnectDB.getChildNodes(id);
 	}
 	
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{comand}")
-    @GET
+	@GET
 	public static String getDataById(@PathParam("comand") String comand, 
 			@QueryParam("params") String params) throws ParseException {
-		
+
 		String ret = "";
 		switch (comand.toLowerCase()) {
 		case "getdatabyid":
@@ -88,6 +88,15 @@ public class DataBase {
 			break;
 		case "priority":
 			ret = AlarmTools.getTSysParam("ALARM_PRIORITY");
+			break;
+		case "childsignals":
+			ret = ConnectDB.getChildSignals(params);
+			break;
+		case "childsignalpath":
+			ret = ConnectDB.getChildSignalPath(params);
+			break;
+		case "transparant":
+//			Tools
 			break;
 		default: ret = "Get: > Comand <" + comand + "> not found"; break;
 		}

@@ -17,7 +17,7 @@ public class Journal {
 	private static final int ALARM_JOURNAL = 1;
 
 	@Produces(MediaType.APPLICATION_JSON)
-    @GET
+	@GET
 	public static String getJournalById(@QueryParam("id") String id, @Context HttpServletRequest request) {
 		String[] arr = id.substring(id.indexOf(";") + 1).split("_");
 		String dtBeg = null;

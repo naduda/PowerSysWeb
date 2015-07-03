@@ -1,9 +1,8 @@
 function selectable(svg) {
-	var svgNS = "http://www.w3.org/2000/svg";
 	var rect = createRectangle();
 
 	function createRectangle(){
-		var rectangle = document.createElementNS(svgNS,"rect");
+		var rectangle = document.createElementNS(model.svg.namespace,"rect");
 		if ($('#selectableRectangle')[0] === undefined)
 			rectangle.setAttribute("id","selectableRectangle");
 		else
@@ -24,6 +23,7 @@ function selectable(svg) {
 
 	function clearSelection(obj) {
 		var sels = $('.selectableRectangle');
+		model.autoClose();
 		if (!keysF.ctrl) {
 			sels.each(function(){
 				$(this).remove();
@@ -34,6 +34,7 @@ function selectable(svg) {
 	}
 
 	function onselect(obj) {
+		model.autoClose();
 		if((rect.getAttribute('stroke') !== 'none') && (keysF.ctrl == true)) {
 			var nRect = createRectangle();
 			selectRect(nRect, obj);
@@ -49,14 +50,14 @@ function selectable(svg) {
 		var bbox = obj.getBBox();
 		var transform = obj.getAttribute('transform');
 
-		rect.setAttribute("x",bbox.x);
-		rect.setAttribute("y",bbox.y);
-		rect.setAttribute("width",bbox.width);
-		rect.setAttribute("height",bbox.height);
-		rect.setAttribute("stroke","blue");
-		rect.setAttribute("transform",transform);
+		rect.setAttribute('x',bbox.x);
+		rect.setAttribute('y',bbox.y);
+		rect.setAttribute('width',bbox.width == 0 ? 1 : bbox.width);
+		rect.setAttribute('height',bbox.height == 0 ? 1 : bbox.height);
+		rect.setAttribute('stroke','blue');
+		rect.setAttribute('transform',transform);
 
-		rect.setAttribute("selectedId",obj.getAttribute('id'));
+		rect.setAttribute('selectedId', obj.getAttribute('id'));
 	}
 
 	for(i = 0; i < svg.childNodes.length; i++) {
@@ -70,13 +71,28 @@ function selectable(svg) {
 							runFuncByName(this, 'onclick');
 						};
 						gs[j].ondblclick = function(e){
+							onselect(this);
 							runFuncByName(this, 'ondblclick');
 							e.preventDefault();
-						},
-						gs[j].oncontextmenu = function(){
+						};
+						gs[j].oncontextmenu = function(e){
 							onselect(this);
-							alert('right');
-							//return false;
+							psFunctions.run('./js/pr/forms/ContextG.js', 
+								function(){
+									var func = psFunctions.results['./js/pr/forms/ContextG.js'];
+									if (func){
+										var context, f = func();
+										context = f.Context();
+										document.body.appendChild(context);
+										setPopupWindow('contextG', 'main');
+										context.style.top = 
+											model.currentItem.getBoundingClientRect().top + 'px';
+										context.style.left = 
+											model.currentItem.getBoundingClientRect().left + 'px';
+										f.setWidth(context);
+									} else console.log(scriptName);
+								});
+							e.preventDefault();
 						}
 					}
 				}

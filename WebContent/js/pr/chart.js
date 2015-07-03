@@ -76,7 +76,7 @@ chart.setDataTable = function(){
 		Array.prototype.forEach.call(paras, function(selRect) {
 			var curItem = document.getElementById(selRect.getAttribute('selectedId'));
 			if (curItem != null) {
-				closeId = curItem.getAttribute('idSignal');
+				closeId = curItem.getAttribute('cp_id');
 
 				chart.chart.yAxis[0].setTitle({
 					text: translateValueByKey('key_pValue') + ', ' + curItem.getAttribute('unit')
@@ -156,7 +156,7 @@ chart.afterSetExtremes = function afterSetExtremes(e) {
 
 	Array.prototype.forEach.call(paras, function(selRect) {
 		var curItem = document.getElementById(selRect.getAttribute('selectedId'));
-		idSignal = curItem.getAttribute('idSignal');
+		idSignal = curItem.getAttribute('cp_id');
 
 		url = 'http' + docURL + '/dataServer/db/getDataById?params=' + 
 					idSignal + '_' + dtBeg +'_' + dtEnd + '_' + integr;

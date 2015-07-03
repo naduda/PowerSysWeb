@@ -73,8 +73,7 @@ function initWebSocketFileServer() {
 }
 
 function onCommandMessage(data) {
-	var parName;
-	var parValue;
+	var parName, parValue;
 	if(data.command === 'scheme') {
 		for (i = 0; i < data.parameters.length; i++) {
 			for (var key in data.parameters[i]) {
@@ -93,6 +92,7 @@ function onCommandMessage(data) {
 		}
 
 		var svg = document.getElementsByTagName('svg').item(0);
+		model.setSVG(svg);
 		svg.setAttribute('width', '100%');
 		svg.setAttribute('height', '100%');
 
@@ -150,6 +150,41 @@ function onCommandMessage(data) {
 
 		document.getElementById('connectInfo').innerHTML = '   User - ' +
 				user + '; Server - ' + server + '; DB - ' + dbName + '.';
+	} else if(data.command === 'transparants'){
+		for (i = 0; i < data.parameters.length; i++) {
+			for (var key in data.parameters[i]) {
+				if (data.parameters[i].hasOwnProperty(key)) {
+					var item = {};
+					item.id = key;
+					item.desc = data.parameters[i][key];
+					model.transparants[item.id] = item;
+				}
+			}
+		}
+	} else if(data.command === 'setTratsparant'){
+		var idTr, id, titleText, x, y;
+
+		for (i = 0; i < data.parameters.length; i++) {
+			for (var key in data.parameters[i]) {
+				if (data.parameters[i].hasOwnProperty(key)) {
+					switch(key){
+						case 'idTr': idTr = data.parameters[i][key]; break;
+						case 'id': id = data.parameters[i][key]; break;
+						case 'txt': titleText = data.parameters[i][key]; break;
+						case 'x': x = data.parameters[i][key]; break;
+						case 'y': y = data.parameters[i][key]; break;
+					}
+				}
+			}
+		}
+		model.insertTransparant(id,
+			titleText === '' ? 'empty' : titleText, x, y, idTr);
+	} else if(data.command === 'delTratsparant'){
+		var idTr = data.parameters[0]['idTr'];
+				transp = document.getElementById('transparant_' + idTr);
+		console.log('del = ' + idTr)
+		model.ttt = data.parameters[0];
+		model.removeElement(transp);
 	}
 }
 
@@ -216,25 +251,36 @@ function onArrayMessage(data) {
 		for(var i in arr){
 			var val = arr[i];
 			for(var gName in val){
-				var selectedGroup = document.getElementById(gName);
-				var valArray = val[gName].split(':');
-				var title = document.createElementNS(
-					"http://www.w3.org/2000/svg","title");
-				title.textContent = valArray[7];
-				selectedGroup.appendChild(title);
-				selectedGroup.setAttribute('idSignal', valArray[0]);
-				selectedGroup.setAttribute('TS', valArray[2]);
-				selectedGroup.setAttribute('typeSignal', valArray[1]);
-				selectedGroup.setAttribute('koef', valArray[3]);
-				selectedGroup.setAttribute('precision', valArray[4]);
-				selectedGroup.setAttribute('unit', valArray[5] || '');
-				selectedGroup.setAttribute('script', valArray[6]);
-				selectedGroup.setAttribute('idTS', valArray[8]);
-				selectedGroup.setAttribute('idTU', valArray[9]);
+				var selectedGroup = document.getElementById(gName),
+						valArray = val[gName].
+										slice(0, val[gName].indexOf('[')).split(':'),
+						title = document.createElementNS(model.svg.namespace,'title'),
+						custProps = val[gName].substring(
+														val[gName].indexOf('[') + 1, 
+														val[gName].indexOf(']')),
+						props = custProps.split(';');
+
+				if(valArray.length > 0){
+					title.textContent = valArray[0];
+					selectedGroup.appendChild(title);
+					selectedGroup.setAttribute('typeSignal', valArray[1]);
+					selectedGroup.setAttribute('TS', valArray[2]);
+					selectedGroup.setAttribute('koef', valArray[3]);
+					selectedGroup.setAttribute('precision', valArray[4]);
+					selectedGroup.setAttribute('unit', valArray[5] || '');
+					selectedGroup.setAttribute('script', valArray[6] || '');
+				}
+
+				Array.prototype.forEach.call(props, function(prop){
+					var pName = prop.substring(0, prop.indexOf(':')),
+							pValue = prop.substring(prop.indexOf(':') + 1);
+					selectedGroup.setAttribute(pName, pValue);
+				});
 			}
 		}
+
+		webSocket.send(JSON.stringify({
+			'type' : 'CommandMessage', 'command' : 'getOldValues'
+		}));
 	}
-	webSocket.send(JSON.stringify({
-		'type' : 'CommandMessage', 'command' : 'getOldValues'
-	}));
 }

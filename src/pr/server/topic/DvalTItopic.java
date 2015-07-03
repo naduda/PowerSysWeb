@@ -30,24 +30,9 @@ public class DvalTItopic extends ATopic {
 		try {
 			Timestamp newDT = dt;
 			ls = (List<DvalTI>) new BatisJDBC(s -> s.getMapper(IMapper.class).getLastTI(newDT)).get();
-	
+
 			if (ls != null && ls.size() > 0) {
 				dt = ls.stream().max(comp).get().getServdt();
-//				for (int i = 0; i < ls.size(); i++) {
-//					DvalTI ti = ls.get(i);
-//					if (i == 0) dt = ti.getServdt();
-//					
-//					ti.setVal(ti.getVal() * signals.get(ti.getSignalref()).getKoef());
-//					long diff = Duration.between(ti.getDt().toInstant(), ti.getServdt().toInstant()).toMinutes();
-//					if (diff > 3) {
-//						ti.setActualData(false);
-//						System.err.println("No actual data - " + ti.getSignalref() + 
-//								"   [Diff = " + diff + " min;   servdt: " + 
-//								new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(ti.getServdt()) + "]");
-//					}
-//					msgObject.setObject(ti);
-//					producer.send(topic, msgObject);
-//				}
 				Iterator<Session> iterator = Server.getUsers().keySet().iterator();
 				while (iterator.hasNext()) {
 					Session session = (Session) iterator.next();
