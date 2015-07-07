@@ -77,18 +77,6 @@ public class ConnectDB {
 		}
 		return confTreeMap;
 	}
-	
-	public static Ttransparant getTtransparantById(int idtr) {
-		return (Ttransparant) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTtransparantById(idtr)).get();
-	}
-	
-	public static TtranspLocate getTransparantLocate(int trref) {
-		return (TtranspLocate) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTransparantLocate(trref)).get();
-	}
-	
-	public static TtranspHistory getTtranspHistory(int trref) {
-		return (TtranspHistory) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTtranspHistory(trref)).get();
-	}
 
 	public static void setNodesMap(Map<Integer, Tscheme> nodesMap) {
 		ConnectDB.nodesMap = nodesMap;
@@ -303,6 +291,60 @@ public class ConnectDB {
 			});
 		}
 		return transparants;
+	}
+	
+	public static Ttransparant getTtransparantById(int idtr) {
+		return (Ttransparant) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTtransparantById(idtr)).get();
+	}
+	
+	public static TtranspLocate getTransparantLocate(int trref) {
+		return (TtranspLocate) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTransparantLocate(trref)).get();
+	}
+	
+	public static TtranspHistory getTtranspHistory(int trref) {
+		return (TtranspHistory) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTtranspHistory(trref)).get();
+	}
+	
+	public static int getMaxTranspID() {
+		return (int) new BatisJDBC(s -> s.getMapper(IMapperT.class).getMaxTranspID()).get();
+	}
+	
+	public static void insertTtransparant(int idtr, int signref, String objname, int tp, int schemeref) {
+		new BatisJDBC(s -> {
+			s.getMapper(IMapperAction.class).insertTtransparant(idtr, signref, objname, tp, schemeref);
+			return 0;
+		}).get();
+	}
+	
+	public static void insertTtranspHistory(int trref, int userref, String txt, int trtype) {
+		new BatisJDBC(s -> {
+			s.getMapper(IMapperAction.class).insertTtranspHistory(trref, userref, txt, trtype);
+			return 0;
+		}).get();
+	}
+	
+	public static void deleteTtranspLocate(int trref, int scref) {
+		new BatisJDBC(s -> {s.getMapper(IMapperAction.class).deleteTtranspLocate(trref, scref);return 0;}).get();
+	}
+	
+	public static void insertTtranspLocate(int trref, int scref, int x, int y, int h, int w) {
+		new BatisJDBC(s -> {s.getMapper(IMapperAction.class).insertTtranspLocate(trref, scref, x, y, h, w);return 0;}).get();
+	}
+	
+	public static List<Ttransparant> getTtransparantsActive(int idScheme) {
+		return (List<Ttransparant>) new BatisJDBC(s -> s.getMapper(IMapperT.class).getTtransparantsActive(idScheme)).get();
+	}
+	
+	public static void updateTtransparantLastUpdate(int idtr) {
+		new BatisJDBC(s -> {s.getMapper(IMapperAction.class).updateTtransparantLastUpdate(idtr);return 0;}).get();
+	}
+	
+	public static void updateTtranspHistory(int trref, String txt) {
+		new BatisJDBC(s -> {s.getMapper(IMapperAction.class).updateTtranspHistory(trref, txt);return 0;}).get();
+	}
+	
+	public static void updateTtransparantCloseTime(int idtr) {
+		new BatisJDBC(s -> {s.getMapper(IMapperT.class).updateTtransparantCloseTime(idtr);return 0;}).get();
 	}
 	
 	public static Transparant getTransparantById(int idTransparant) {

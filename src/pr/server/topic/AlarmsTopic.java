@@ -75,4 +75,9 @@ public class AlarmsTopic extends ATopic {
 		return dt;
 	}
 
+	@Override
+	public void onClose() {
+		
+	}
+
 }

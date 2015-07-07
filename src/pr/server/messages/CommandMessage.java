@@ -10,6 +10,11 @@ public class CommandMessage extends Message {
 	public CommandMessage() {
 		setType(this.getClass().getSimpleName());
 	}
+	
+	public CommandMessage(String command) {
+		this();
+		setCommand(command);
+	}
 
 	public String getCommand() {
 		return command;

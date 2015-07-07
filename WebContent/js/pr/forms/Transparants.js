@@ -39,7 +39,7 @@ return {
 					id = it.id.slice(it.id.indexOf('_') + 1),
 					position = model.currentItem.position;
 
-			model.insertTransparant(id,
+			model.addTransparant(id,
 						inReason.value === '' ? 'empty' : inReason.value,
 						position.left, position.top);
 			model.autoClose();

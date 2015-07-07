@@ -5,6 +5,7 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mybatis-3.2.8.jar"/>
 	<classpathentry kind="lib" path="D:/GIT/PowerSys/lib/postgresql-9.3-1102.jdbc41.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/svg.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tomcat-dbcp.jar"/>
 	<classpathentry kind="con" path="oracle.eclipse.tools.glassfish.lib.system">
 		<attributes>
 			<attribute name="owner.project.facets" value="jst.web"/>

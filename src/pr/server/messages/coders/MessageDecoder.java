@@ -48,7 +48,7 @@ public class MessageDecoder implements Decoder.Text<Message> {
 					while (iterator.hasNext()) {
 						String key = iterator.next();
 						String value = param.get(key).toString();
-						
+
 						parameters.put(key, value.substring(1, value.length() - 1));
 					}
 				}

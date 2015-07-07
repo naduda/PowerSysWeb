@@ -162,7 +162,7 @@ function onCommandMessage(data) {
 			}
 		}
 	} else if(data.command === 'setTratsparant'){
-		var idTr, id, titleText, x, y;
+		var idTr, id, titleText, x, y, t;
 
 		for (i = 0; i < data.parameters.length; i++) {
 			for (var key in data.parameters[i]) {
@@ -177,13 +177,16 @@ function onCommandMessage(data) {
 				}
 			}
 		}
-		model.insertTransparant(id,
-			titleText === '' ? 'empty' : titleText, x, y, idTr);
+		t = document.getElementById('transparant_' + idTr);
+		if(t){
+			model.updateTransparant(t, titleText, x, y);
+		} else {
+			model.insertTransparant(id,
+					titleText === '' ? 'empty' : titleText, x, y, idTr);
+		}
 	} else if(data.command === 'delTratsparant'){
 		var idTr = data.parameters[0]['idTr'];
 				transp = document.getElementById('transparant_' + idTr);
-		console.log('del = ' + idTr)
-		model.ttt = data.parameters[0];
 		model.removeElement(transp);
 	}
 }

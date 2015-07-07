@@ -61,7 +61,7 @@ public class Tools {
 
 			if (scheme == null) return;
 			List<String> listGroups = scheme.getSignalMap().get(value.getSignalref());
-			
+
 			if (listGroups == null) return;
 			vm.setGroups(listGroups);
 
@@ -71,18 +71,31 @@ public class Tools {
 		}
 	}
 	
+	public static void sendActiveTransparants(Session session, Scheme scheme) {
+		try {
+			ConnectDB.getTtransparantsActive(scheme.getIdScheme()).forEach(t -> {
+				sendTransparant(t.getIdtr());
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void sendTransparant(int idTr) {
 		CommandMessage cm = new CommandMessage();
 		Ttransparant tt = ConnectDB.getTtransparantById(idTr);
-		System.out.println(idTr);
+		int counter = 0;
 		try {
 			TtranspLocate loc = ConnectDB.getTransparantLocate(idTr);
+			while(loc == null && counter++ < 15) {
+				Thread.sleep(100);
+				loc = ConnectDB.getTransparantLocate(idTr);
+			}
 			if(loc == null) {
 				cm.setCommand("delTratsparant");
 				cm.setParameters("idTr", idTr + "");
 			} else {
 				TtranspHistory h = ConnectDB.getTtranspHistory(idTr);
-				
 				cm.setCommand("setTratsparant");
 				cm.setParameters("idTr", idTr + "");
 				cm.setParameters("id", tt.getTp() + "");
@@ -96,15 +109,51 @@ public class Tools {
 			
 			Optional<Entry<Session, SessionParams>> ls = Server.getUsers().entrySet()
 					.stream().filter(f -> f.getValue().getIdScheme() == tt.getSchemeref()).findFirst();
-			System.out.println("ls = " + ls);
+
 			if (ls.isPresent()) {
 				Session session = ls.get().getKey();
-				System.out.println("send");
 				session.getBasicRemote().sendObject(cm);
 			}
 		} catch (Exception e) {
 			System.err.println("sendTransparant The connection has been closed. " + idTr);
 			System.out.println(e);
+		}
+	}
+	
+	public static void addTransparant(int id, String text, int idScheme, int x, int y, String name, int idSignal){
+		try {
+			int idtr = ConnectDB.getMaxTranspID();
+			int idSignalOnScheme = Integer.parseInt(Server.getSchemes().get(idScheme).getSignalMap()
+					.keySet().stream().findFirst().get().toString());
+			if(idSignal == 0) idSignal = idSignalOnScheme;
+			ConnectDB.insertTtransparant(idtr, idSignal, name, id, idScheme);
+			ConnectDB.insertTtranspHistory(idtr, -1, text, 0);
+			ConnectDB.deleteTtranspLocate(idtr, idScheme);
+			ConnectDB.insertTtranspLocate(idtr, idScheme, x, y, 43, 43);
+			ConnectDB.updateTtransparantLastUpdate(idtr);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void updateTransparant(int idtr, String text, int idScheme, int x, int y){
+		try {
+			ConnectDB.deleteTtranspLocate(idtr, idScheme);
+			ConnectDB.insertTtranspLocate(idtr, idScheme, x, y, 43, 43);
+			ConnectDB.updateTtransparantLastUpdate(idtr);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void deleteTransparant(int idTr, int idScheme){
+		try {
+			ConnectDB.updateTtransparantCloseTime(idTr);
+			ConnectDB.deleteTtranspLocate(idTr, idScheme);
+			TtranspHistory th = ConnectDB.getTtranspHistory(idTr);
+			ConnectDB.insertTtranspHistory(idTr, -1, th.getTxt(), 0);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	

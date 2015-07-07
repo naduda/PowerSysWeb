@@ -91,33 +91,21 @@ function initTree() {
 							count = groups.length;
 
 					Array.prototype.forEach.call(groups, function(g){
-						// if(g.getAttribute('script')) {
-							var param = {};
-							param[g.id] = '';
-							for(atr in g.attributes){
-								if (g.attributes.hasOwnProperty(atr) && 
-										g.attributes[atr].name){
-									var atrName = g.attributes[atr].name,
-											atrValue = g.attributes[atr].value;
+						var param = {};
+						param[g.id] = '';
+						for(atr in g.attributes){
+							if (g.attributes.hasOwnProperty(atr) && 
+									g.attributes[atr].name){
+								var atrName = g.attributes[atr].name,
+										atrValue = g.attributes[atr].value;
 
-									// if (atrValue !== '0') {
-									// 	switch(atrName.toLowerCase()){
-									// 		case 'idsignal':
-									// 		case 'idts':
-									// 		case 'idtu':
-									// 		case 'script':
-									// 			param[g.id] += ';' + atrName + ':' + atrValue;
-									// 			break;
-									// 	}
-									// }
-									if(atrName.slice(0,3) === 'cp_'){
-										param[g.id] += ';' + atrName + ':' + atrValue;
-									}
+								if(atrName.slice(0,3) === 'cp_'){
+									param[g.id] += ';' + atrName + ':' + atrValue;
 								}
 							}
-							param[g.id] = param[g.id].slice(1);
-							if(param[g.id]) cm.parameters.push(param);
-						// }
+						}
+						param[g.id] = param[g.id].slice(1);
+						if(param[g.id]) cm.parameters.push(param);
 					});
 					webSocket.send(JSON.stringify(cm));
 				},

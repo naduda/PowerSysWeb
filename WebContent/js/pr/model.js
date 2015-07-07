@@ -9,7 +9,7 @@ function Model(){
 	model.transparants = [];
 
 	model.removeElement = function(e){
-		e.parentNode.removeChild(e);
+		if(e) e.parentNode.removeChild(e);
 	}
 	model.autoClose = function(){
 		var cls = document.querySelectorAll('.autoClose');
@@ -17,6 +17,26 @@ function Model(){
 			Array.prototype.forEach.call(cls, function(e){
 				model.removeElement(e);
 			});
+	}
+
+	model.addTransparant = function(id, titleText, x, y){
+		var cm = {
+					type: 'CommandMessage', 
+					command: 'addTransparant',
+					parameters: []
+				},
+				name = model.currentItem.getElementsByTagName('title')[0],
+				idSignal = model.currentItem.getAttribute('cp_id');
+
+		name = name ? name.innerHTML : '';
+		idSignal = idSignal ? idSignal : '0';
+		cm.parameters.push({'id': id});
+		cm.parameters.push({'x': x + ''});
+		cm.parameters.push({'y': y + ''});
+		cm.parameters.push({'txt': titleText});
+		cm.parameters.push({'objName': name});
+		cm.parameters.push({'idSignal': idSignal});
+		webSocket.send(JSON.stringify(cm));
 	}
 
 	model.insertTransparant = function(id, titleText, x, y, idTr){
@@ -27,8 +47,6 @@ function Model(){
 				title = document.createElementNS(model.svg.namespace,'title');
 
 		t.innerHTML = g;
-		console.log(idTr)
-		console.log(idTr === undefined)
 		t.setAttribute('id', 'transparant_' + (idTr === undefined ? id : idTr));
 		title.textContent = titleText;
 		t.appendChild(title);
@@ -45,7 +63,23 @@ function Model(){
 			document.body.addEventListener('mousemove', onMoveListener,false);
 		},false);
 		t.addEventListener('mouseup',function(evt){
+			var cm = {
+					type: 'CommandMessage', 
+					command: 'updateTransparant',
+					parameters: []
+				},
+				translate = t.getAttribute('transform'), x, y;
+
+			translate = translate.slice(translate.indexOf('(')+1, translate.length-1);
+			x = translate.slice(0, translate.indexOf(','));
+			y = translate.slice(translate.indexOf(',') + 1);
+
+			cm.parameters.push({'idtr': idTr});
+			cm.parameters.push({'x': x + ''});
+			cm.parameters.push({'y': y + ''});
+			cm.parameters.push({'txt': titleText});
 			document.body.removeEventListener('mousemove',onMoveListener,false);
+			webSocket.send(JSON.stringify(cm));
 		},false);
 		function cursorPoint(evt){
 			model.svg.point.x = evt.clientX;
@@ -74,6 +108,13 @@ function Model(){
 		}
 
 		model.svg.content.appendChild(t);
+	}
+
+	model.updateTransparant = function(t, titleText, x, y){
+		var title = t.getElementsByTagName('title')[0];
+
+		t.setAttribute('transform', 'translate(' + x + ',' + y + ')');
+		title.innerHTML = titleText;
 	}
 
 	model.setSVG = function(content){

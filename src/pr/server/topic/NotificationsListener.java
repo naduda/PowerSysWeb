@@ -1,6 +1,7 @@
 package pr.server.topic;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -12,6 +13,7 @@ import java.util.logging.Level;
 
 import javax.websocket.Session;
 
+import org.apache.tomcat.dbcp.dbcp2.DelegatingConnection;
 import org.postgresql.PGConnection;
 import org.postgresql.PGNotification;
 
@@ -26,32 +28,34 @@ import pr.server.SessionParams;
 public class NotificationsListener extends ATopic {
 	private PGConnection pgconn;
 	private Connection conn;
+	private Statement statement;
 	
+	public NotificationsListener() {
+		setSleepTimeout(250);
+		getPGConnection();
+	}
+	
+	@SuppressWarnings("rawtypes")
 	private PGConnection getPGConnection() {
 		if (pgconn == null) {
 			try {
-				Connection conn = ConnectDB.getDataSource().getConnection();
+				conn = ConnectDB.getDataSource().getConnection();
+				statement = conn.createStatement();
 				if(conn.isWrapperFor(org.postgresql.PGConnection.class)){
 					pgconn = conn.unwrap(org.postgresql.PGConnection.class);
+				} else {
+					pgconn = (PGConnection)((DelegatingConnection)conn).getInnermostDelegate();
 				}
-
-				Statement stmt = conn.createStatement();
-				stmt.execute("LISTEN t_device_au; LISTEN tx_add; LISTEN tr_update; LISTEN t_appstates_ai;");
-				stmt.close();
+				statement.execute("LISTEN t_device_au; LISTEN tx_add; LISTEN tr_update; LISTEN t_appstates_ai;");
 			} catch (Exception e) {
-				LogFiles.log.log(Level.SEVERE, e.getMessage(), e);
+				e.printStackTrace();
 			}
 		}
 		return pgconn;
 	}
 
 	public Timestamp senderMessage(Timestamp dt) {
-		try {
-			if (conn != null && !conn.isValid(10)) {
-				System.out.println("Not valid Connection !!!");
-				pgconn = null;
-			}
-
+		try (ResultSet rs = statement.executeQuery("SELECT 1");) {
 			PGNotification notifications[] = getPGConnection().getNotifications();
 			if (notifications != null) {
 				for (int i = 0; i < notifications.length; i++) {
@@ -74,11 +78,6 @@ public class NotificationsListener extends ATopic {
 //							msgObject.setObject("device;" + parameters);
 							break;
 						case "tr_update":
-							try {
-								Thread.sleep(1500);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
 							Tools.sendTransparant(Integer.parseInt(parameters));
 							break;
 						case "t_appstates_ai":
@@ -96,7 +95,7 @@ public class NotificationsListener extends ATopic {
 			try {
 				Thread.sleep(60000);
 			} catch (InterruptedException e1) {
-				LogFiles.log.log(Level.SEVERE, e1.getMessage(), e1);
+				e1.printStackTrace();
 			}
 		}
 		
@@ -129,8 +128,26 @@ public class NotificationsListener extends ATopic {
 		} catch(Exception e) {
 			LogFiles.log.log(Level.SEVERE, e.getMessage(), e);
 		}
-				
+
 		return dti;
 	}
 
+	@Override
+	public void onClose() {
+		if(statement != null){
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		if(conn != null){
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Close connection " + this.getClass().getName());
+	}
 }

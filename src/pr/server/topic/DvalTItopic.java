@@ -51,5 +51,10 @@ public class DvalTItopic extends ATopic {
 		}
 		return dt;
 	}
+
+	@Override
+	public void onClose() {
+		
+	}
 	
 }

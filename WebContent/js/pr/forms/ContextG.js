@@ -67,8 +67,18 @@ return {
 		});
 
 		dDel.addEventListener('click', function(evt){
-			model.removeElement(document.getElementById("contextT"));
-			model.removeElement(transp);
+			var cm = {
+						type: 'CommandMessage', 
+						command: 'deleteTransparant',
+						parameters: []
+					},
+					id = transp.id;
+
+			cm.parameters.push({'id': id.slice(id.indexOf('_') + 1)});
+			webSocket.send(JSON.stringify(cm));
+			// model.removeElement(document.getElementById("contextT"));
+			// model.removeElement(transp);
+			model.autoClose();
 		});
 
 		return main;

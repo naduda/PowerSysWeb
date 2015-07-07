@@ -74,6 +74,7 @@ public class Server {
 			case "getoldvalues" :
 				Scheme scheme = schemes.get(users.get(session).getIdScheme());
 				Tools.sendValues(session, ConnectDB.getOldValues(scheme.getSignalMap().keySet()), scheme);
+				Tools.sendActiveTransparants(session, scheme);
 				break;
 			case "getscripts" :
 				scheme = schemes.get(users.get(session).getIdScheme());
@@ -156,6 +157,43 @@ public class Server {
 					}
 				}
 				svgModel.setObject("c:/1/PowerSys/target/1.svg", svg);
+				break;
+			case "addtransparant":
+				try {
+					int id = Integer.parseInt(cm.getParameters().get("id"));
+					int idSignalRef = Integer.parseInt(cm.getParameters().get("idSignal"));
+					double x = Double.parseDouble(cm.getParameters().get("x"));
+					double y = Double.parseDouble(cm.getParameters().get("y"));
+					String text = cm.getParameters().get("txt");
+					String name = cm.getParameters().get("objName");
+					Tools.addTransparant(id, text, users.get(session).getIdScheme(), (int)x, (int)y, name, idSignalRef);
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+					System.out.println(cm.getParameters().get("id"));
+					System.out.println(cm.getParameters().get("x"));
+					System.out.println(cm.getParameters().get("y"));
+				}
+				break;
+			case "deletetransparant":
+				try {
+					int id = Integer.parseInt(cm.getParameters().get("id"));
+					Tools.deleteTransparant(id, users.get(session).getIdScheme());
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+					System.out.println(cm.getParameters().get("id"));
+				}
+				break;
+			case "updatetransparant":
+				try {
+					int idtr = Integer.parseInt(cm.getParameters().get("idtr"));
+					double x = Double.parseDouble(cm.getParameters().get("x"));
+					double y = Double.parseDouble(cm.getParameters().get("y"));
+					String text = cm.getParameters().get("txt");
+					Tools.updateTransparant(idtr, text, users.get(session).getIdScheme(), (int)x, (int)y);
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+					System.out.println(cm.getParameters().get("id"));
+				}
 				break;
 			default:
 				System.err.println(cm.getCommand().toLowerCase());

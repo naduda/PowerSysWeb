@@ -25,12 +25,14 @@ public abstract class ATopic implements Runnable {
 				dt = senderMessage(dt);
 				Thread.sleep(sleepTimeout);
 			} catch (Exception e) {
-				e.printStackTrace();
+				onClose();
 			}
 		}
+		onClose();
 	}
 	
 	abstract public Timestamp senderMessage(Timestamp dt);
+	abstract public void onClose();
 	
 	public boolean isRun() {
 		return isRun;
