@@ -44,6 +44,8 @@ Temporary Items
 
 #Eclipse
 .settings/
+.classpath/
+.project/
 bin/
 logs/
 target/
