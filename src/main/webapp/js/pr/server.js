@@ -98,7 +98,7 @@ function onCommandMessage(data) {
 
 		selectable(svg);
 
-		var myScroll = new IScroll('#scheme', {
+		model.myScroll = new IScroll('#scheme', {
 			zoom: true,
 			zoomMax : 10,
 			scrollX: true,

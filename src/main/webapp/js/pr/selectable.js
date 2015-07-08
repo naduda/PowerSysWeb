@@ -21,7 +21,7 @@ function selectable(svg) {
 		return rectangle;
 	}
 
-	function clearSelection(obj) {
+	function clearSelection() {
 		var sels = $('.selectableRectangle');
 		model.autoClose();
 		if (!keysF.ctrl) {

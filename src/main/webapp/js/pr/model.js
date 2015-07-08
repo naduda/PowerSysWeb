@@ -1,7 +1,7 @@
 var model = new Model();
 
 function Model(){
-	var model = {};
+	var model = {}, myScroll, onMoveListener;
 
 	model.noCache = 'no-cache';
 	model.svg = {};
@@ -53,12 +53,19 @@ function Model(){
 		t.setAttribute('transform', 'translate(' + x + ',' + y + ')');
 
 		t.addEventListener('mousedown',function(evt){
+			if(evt.buttons != 1) return;
+			model.myScroll.disable();
 			onMoveListener = function(evt){
-				var	p = cursorPoint(evt), bounds = t.getBBox();
+				var	p = cursorPoint(evt, t), bounds = t.getBBox(),
+						scale = model.svg.content.getAttribute('style'), sc;
+
+				scale = scale.slice(scale.indexOf('scale'));
+				scale = scale.slice(scale.indexOf('(') + 1, scale.indexOf(')'));
+				sc = Number(scale);
 
 				t.setAttribute('transform', 
-					'translate(' + (p.x - 0.5*bounds.width) + ',' + 
-												 (p.y - 0.5*bounds.height) + ')');
+					'translate(' + (p.x/sc - 0.5*bounds.width) + ',' + 
+												 (p.y/sc - 0.5*bounds.height) + ')');
 			}
 			document.body.addEventListener('mousemove', onMoveListener,false);
 		},false);
@@ -80,12 +87,12 @@ function Model(){
 			cm.parameters.push({'txt': titleText});
 			document.body.removeEventListener('mousemove',onMoveListener,false);
 			webSocket.send(JSON.stringify(cm));
+			model.myScroll.enable();
 		},false);
-		function cursorPoint(evt){
-			model.svg.point.x = evt.clientX;
-			model.svg.point.y = evt.clientY;
-			return model.svg.point.matrixTransform(
-							model.svg.content.getScreenCTM().inverse());
+		function cursorPoint(evt, t){
+			var p = model.svg.point;
+			p.x = evt.clientX; p.y = evt.clientY;
+			return p.matrixTransform(model.svg.content.getScreenCTM().inverse());
 		}
 
 		t.oncontextmenu = function(e){
