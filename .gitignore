@@ -45,6 +45,7 @@ Temporary Items
 #Eclipse
 bin/
 logs/
+target/
 *.class
 *.rar
 
