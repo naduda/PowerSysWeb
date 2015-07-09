@@ -51,7 +51,7 @@ public class FileServer {
 				case "idScheme":
 					String idScheme = originalMessage.substring(originalMessage.indexOf(':') + 1, originalMessage.indexOf(";"));
 					int id = Integer.parseInt(idScheme);
-					Tools.updateScheme(id, fos.toByteArray());
+					Tools.updateScheme(session, id, fos.toByteArray());
 					System.out.println("Changed scheme with ID = " + id);
 					break;
 				}

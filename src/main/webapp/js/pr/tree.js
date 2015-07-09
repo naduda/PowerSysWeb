@@ -49,7 +49,7 @@ function initTree() {
 				label: 'Change Scheme',
 				action: function () {
 					// console.log(node.original);
-					var iFile = elt('input', {type: 'file', id: 'fileOpenDialog'});
+					var iFile = elt('input', {type: 'file'});
 					iFile.addEventListener("change", function(event) {
 						var i = 0, file = iFile.files[0], reader = new FileReader();
 
@@ -79,7 +79,7 @@ function initTree() {
 				icon : 'glyphicon glyphicon-remove alarm'
 			},
 			item4: {
-				label: 'Save Scheme',
+				label: 'Save Scheme [DB]',
 				action: function () {
 					var svg = document.getElementById('scheme'),
 							cm = {
@@ -109,7 +109,18 @@ function initTree() {
 					});
 					webSocket.send(JSON.stringify(cm));
 				},
-				icon : 'glyphicon glyphicon-ok',
+				icon : 'fa fa-database',
+			},
+			item5: {
+				label: 'Save Scheme [Disc]',
+				action: function () {
+					var cm = {
+								type: 'CommandMessage', 
+								command: 'saveScheme'
+							};
+					webSocket.send(JSON.stringify(cm));
+				},
+				icon : 'glyphicon glyphicon-hdd',
 			}
 		};
 

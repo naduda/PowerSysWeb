@@ -188,6 +188,8 @@ function onCommandMessage(data) {
 		var idTr = data.parameters[0]['idTr'];
 				transp = document.getElementById('transparant_' + idTr);
 		model.removeElement(transp);
+	} else if(data.command === 'saveScheme'){
+		model.saveTextAsFile(data.parameters[0]['content'], 'svgScheme.svg');
 	}
 }
 

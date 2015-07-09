@@ -35,6 +35,9 @@ import pr.server.messages.AlarmMessage;
 import pr.server.messages.CommandMessage;
 import pr.server.messages.KeyValueArrayMessage;
 import pr.server.messages.ValueMessage;
+import pr.svgObjects.CP;
+import pr.svgObjects.G;
+import pr.svgObjects.SVG;
 
 public class Tools {
 	public static final Map<Integer, VsignalView> VSIGNALS = ConnectDB.getVsignalsMap();
@@ -303,6 +306,43 @@ public class Tools {
 		return null;
 	}
 	
+	public static void updateSVG(SVG svg, CommandMessage cm) {
+		Map<String, G> gMap = svg.getGroupMap();
+		cm.getParameters().keySet().forEach(p -> {
+			G g = gMap.get(p);
+			String propsString = cm.getParameters().get(p);
+			String[] arr = propsString.split(";");
+			for (String prop : arr) {
+				if (prop.startsWith("cp_")) {
+					String pName = prop.substring(3, prop.indexOf(":"));
+					String pValue = prop.substring(prop.indexOf(":") + 1);
+					CP cp = g.getCustProps().getCPbyName(pName);
+					if (cp != null) {
+						cp.setVal(pValue);
+					} else {
+						CP newCP = new CP();
+						newCP.setNameU(pName);
+						newCP.setLbl(pName);
+						newCP.setPrompt("");
+						newCP.setType(0);
+						newCP.setFormat("");
+						newCP.setSortKey("");
+						newCP.setInvis(false);
+						newCP.setAsk(false);
+						newCP.setVal(pValue);
+						g.getCustProps().getCustomProps().add(newCP);
+					}
+				}
+			}
+			List<CP> list4remove = new ArrayList<>();
+			g.getCustProps().getCustomProps().forEach(cp -> {
+				if (propsString.indexOf("cp_" + cp.getNameU()) < 0)
+					list4remove.add(cp);
+			});
+			list4remove.forEach(g.getCustProps().getCustomProps()::remove);
+		});
+	}
+	
 	public static void confirmAlarms(int userId, String text, Map<String, String> parameters) {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 		parameters.keySet().forEach(k -> {
@@ -327,11 +367,12 @@ public class Tools {
 		});
 	}
 	
-	public static void updateScheme(int idScheme, byte[] content) {
+	public static void updateScheme(Session session, int idScheme, byte[] content) {
 		Tscheme nodeScheme = ConnectDB.getNodesMap().get(idScheme);
 		ConnectDB.updateTScheme(idScheme, nodeScheme.getSchemedenom(), nodeScheme.getSchemename(), 
 				nodeScheme.getSchemedescr(), nodeScheme.getParentref(), content, nodeScheme.getUserid());
 		Server.getSchemes().remove(idScheme);
 		ConnectDB.setNodesMap(null);
+		Server.putScheme(session, idScheme);
 	}
 }

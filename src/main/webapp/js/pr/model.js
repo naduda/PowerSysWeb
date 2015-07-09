@@ -1,32 +1,66 @@
 var model = new Model();
 
 function Model(){
-	var model = {}, myScroll, onMoveListener;
+	var _m = Object.create(null), myScroll, onMoveListener;
 
-	model.noCache = 'no-cache';
-	model.svg = {};
-	model.svg.namespace = 'http://www.w3.org/2000/svg';
-	model.transparants = [];
+	_m.noCache = 'no-cache';
+	_m.removeElement = function(e){if(e) e.parentNode.removeChild(e);}
+	_m.autoClose = autoClose;
+	_m.saveTextAsFile = saveTextAsFile;
 
-	model.removeElement = function(e){
-		if(e) e.parentNode.removeChild(e);
+	_m.svg = {};
+	_m.setSVG = setSVG;
+	_m.svg.namespace = 'http://www.w3.org/2000/svg';
+
+	_m.transparants = [];
+	_m.addTransparant = addTransparant;
+	_m.insertTransparant = insertTransparant;
+	_m.updateTransparant = updateTransparant;
+
+	_m.alarm = new Alarms();
+	_m.setCurrentItem = setCurrentItem;
+
+	_m.ObjectProperties = {left: '5px', top: '250px'};
+	_m.ObjectProperties.show = ObjectPropertiesShow;
+	_m.ObjectProperties.hide = ObjectPropertiesHide;
+	_m.updateObjectProperties = updateObjectProperties;
+
+	_m.EditObjectProperties = {left: '5px', top: '250px'};
+	_m.EditObjectProperties.show = EditObjectPropertiesShow;
+	_m.EditObjectProperties.hide = EditObjectPropertiesHide;
+	_m.EditObjectProperties.update = EditObjectPropertiesUpdate;
+
+	_m.SignalsForm = {left: '400px', top: '100px'};
+	_m.SignalsForm.show = SignalsFormShow;
+	_m.SignalsForm.hide = SignalsFormHide;
+
+	return _m;
+//============ Implemantation ============
+	function saveTextAsFile(textToWrite, fileNameToSaveAs){
+		var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'}),
+				downloadLink = document.createElement("a");
+
+		downloadLink.download = fileNameToSaveAs;
+		downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+		downloadLink.click();
 	}
-	model.autoClose = function(){
+
+	function autoClose(){
 		var cls = document.querySelectorAll('.autoClose');
 		if(cls.length > 0)
 			Array.prototype.forEach.call(cls, function(e){
-				model.removeElement(e);
+				_m.removeElement(e);
 			});
 	}
 
-	model.addTransparant = function(id, titleText, x, y){
+	function addTransparant(id, titleText, x, y){
 		var cm = {
 					type: 'CommandMessage', 
 					command: 'addTransparant',
 					parameters: []
 				},
-				name = model.currentItem.getElementsByTagName('title')[0],
-				idSignal = model.currentItem.getAttribute('cp_id');
+				name = _m.currentItem.getElementsByTagName('title')[0],
+				idSignal = _m.currentItem.getAttribute('cp_id');
 
 		name = name ? name.innerHTML : '';
 		idSignal = idSignal ? idSignal : '0';
@@ -39,12 +73,12 @@ function Model(){
 		webSocket.send(JSON.stringify(cm));
 	}
 
-	model.insertTransparant = function(id, titleText, x, y, idTr){
-		var desc = model.transparants[id].desc,
+	function insertTransparant(id, titleText, x, y, idTr){
+		var desc = _m.transparants[id].desc,
 				svg = desc.slice(desc.indexOf(';') + 1),
 				g = svg.slice(svg.indexOf('<g'), svg.indexOf('</svg')),
-				t = document.createElementNS(model.svg.namespace,"g"),
-				title = document.createElementNS(model.svg.namespace,'title');
+				t = document.createElementNS(_m.svg.namespace,"g"),
+				title = document.createElementNS(_m.svg.namespace,'title');
 
 		t.innerHTML = g;
 		t.setAttribute('id', 'transparant_' + (idTr === undefined ? id : idTr));
@@ -54,10 +88,10 @@ function Model(){
 
 		t.addEventListener('mousedown',function(evt){
 			if(evt.buttons != 1) return;
-			model.myScroll.disable();
+			_m.myScroll.disable();
 			onMoveListener = function(evt){
 				var	p = cursorPoint(evt, t), bounds = t.getBBox(),
-						scale = model.svg.content.getAttribute('style'), sc;
+						scale = _m.svg.content.getAttribute('style'), sc;
 
 				scale = scale.slice(scale.indexOf('scale'));
 				scale = scale.slice(scale.indexOf('(') + 1, scale.indexOf(')'));
@@ -87,12 +121,12 @@ function Model(){
 			cm.parameters.push({'txt': titleText});
 			document.body.removeEventListener('mousemove',onMoveListener,false);
 			webSocket.send(JSON.stringify(cm));
-			model.myScroll.enable();
+			_m.myScroll.enable();
 		},false);
 		function cursorPoint(evt, t){
-			var p = model.svg.point;
+			var p = _m.svg.point;
 			p.x = evt.clientX; p.y = evt.clientY;
-			return p.matrixTransform(model.svg.content.getScreenCTM().inverse());
+			return p.matrixTransform(_m.svg.content.getScreenCTM().inverse());
 		}
 
 		t.oncontextmenu = function(e){
@@ -114,62 +148,64 @@ function Model(){
 			e.preventDefault();
 		}
 
-		model.svg.content.appendChild(t);
+		_m.svg.content.appendChild(t);
 	}
 
-	model.updateTransparant = function(t, titleText, x, y){
+	function updateTransparant(t, titleText, x, y){
 		var title = t.getElementsByTagName('title')[0];
 
 		t.setAttribute('transform', 'translate(' + x + ',' + y + ')');
 		title.innerHTML = titleText;
 	}
 
-	model.setSVG = function(content){
-		model.svg.content = content;
-		model.svg.point = content.createSVGPoint();
+	function setSVG(content){
+		_m.svg.content = content;
+		_m.svg.point = content.createSVGPoint();
 		content.addEventListener('click', function(){
-			model.autoClose();
+			_m.autoClose();
 		});
 	}
-	model.alarm = modelAlarms();
-	model.setCurrentItem = function(item) {
-		model.currentItem = item;
-		model.updateObjectProperties();
-		model.currentItem.position = getCurrentItemPosition();
+
+	function setCurrentItem(item){
+		_m.currentItem = item;
+		_m.updateObjectProperties();
+		_m.currentItem.position = getCurrentItemPosition();
 	}
-	model.updateObjectProperties = function(){
-		if (model.currentItem) setObjectProperties(model.currentItem);
+
+	function updateObjectProperties(){
+		if (_m.currentItem) setObjectProperties(_m.currentItem);
 	}
-	model.ObjectProperties = {left: '5px', top: '250px'};
-	model.ObjectProperties.show = function(){
+
+	function ObjectPropertiesShow(){
 		psFunctions.run('./js/pr/forms/ObjectProperties.js', 
 			function(){
 				var func = psFunctions.results['./js/pr/forms/ObjectProperties.js'];
 				if (func){
-					if (document.getElementById('objectProperties')) {
-						model.ObjectProperties.hide();
+					if (document.getElementById('objectProperties')){
+						_m.ObjectProperties.hide();
 					} else {
 						document.body.appendChild(func().ObjectProperties());
 						setPopupWindow('objectProperties', 'main');
-						model.updateObjectProperties();
+						_m.updateObjectProperties();
 					}
 				} else console.log(scriptName);
 			});
 	}
-	model.ObjectProperties.hide = function(){
+
+	function ObjectPropertiesHide(){
 		var elem = document.getElementById("objectProperties");
-		model.ObjectProperties.left = elem.style.left;
-		model.ObjectProperties.top = elem.style.top;
+		_m.ObjectProperties.left = elem.style.left;
+		_m.ObjectProperties.top = elem.style.top;
 		return elem.parentNode.removeChild(elem);
 	}
-	model.EditObjectProperties = {left: '5px', top: '250px'};
-	model.EditObjectProperties.show = function(){
+
+	function EditObjectPropertiesShow(){
 		psFunctions.run('./js/pr/forms/ObjectProperties.js', 
 			function(){
 				var func = psFunctions.results['./js/pr/forms/ObjectProperties.js'];
 				if (func){
-					if (document.getElementById('editObjectProperties')) {
-						model.EditObjectProperties.hide();
+					if (document.getElementById('editObjectProperties')){
+						_m.EditObjectProperties.hide();
 					} else {
 						document.body.appendChild(func().EditObjectProperties());
 						setPopupWindow('editObjectProperties', 'main');
@@ -177,23 +213,25 @@ function Model(){
 				} else console.log(scriptName);
 			});
 	}
-	model.EditObjectProperties.hide = function(){
+
+	function EditObjectPropertiesHide(){
 		var elem = document.getElementById("editObjectProperties");
-		model.EditObjectProperties.left = elem.style.left;
-		model.EditObjectProperties.top = elem.style.top;
+		_m.EditObjectProperties.left = elem.style.left;
+		_m.EditObjectProperties.top = elem.style.top;
 		return elem.parentNode.removeChild(elem);
 	}
-	model.EditObjectProperties.update = function(){
+
+	function EditObjectPropertiesUpdate(){
 		var elem = document.getElementById("editObjectProperties");
 		if(elem && elem.style.display === 'block'){
-			model.EditObjectProperties.hide();
-			model.EditObjectProperties.show();
+			_m.EditObjectProperties.hide();
+			_m.EditObjectProperties.show();
 		}
 	}
-	model.SignalsForm = {left: '400px', top: '100px'};
-	model.SignalsForm.show = function(id, editElem) {
+
+	function SignalsFormShow(id, editElem){
 		if(document.getElementById('signalsForm')){
-			model.SignalsForm.hide();
+			_m.SignalsForm.hide();
 		}
 		psFunctions.run('./js/pr/forms/Signals.js', 
 			function(){
@@ -206,24 +244,24 @@ function Model(){
 				} else console.log(scriptName);
 			});
 	}
-	model.SignalsForm.hide = function() {
+
+	function SignalsFormHide(){
 		var elem = document.getElementById("signalsForm");
-		model.SignalsForm.left = elem.style.left;
-		model.SignalsForm.top = elem.style.top;
+		_m.SignalsForm.left = elem.style.left;
+		_m.SignalsForm.top = elem.style.top;
 		return elem.parentNode.removeChild(elem);
 	}
-	return model;
 
-	function modelAlarms() {
+	function Alarms(){
 		var alarm = {}, alarmTable = {};
 
 		alarm.table = alarmTable;
 		alarm.countElement = document.getElementById('alarmsCount');
 		alarm.count = 0;
-		alarm.IncCount = function() {
+		alarm.IncCount = function(){
 			alarm.countElement.innerHTML = ++alarm.count;
 		}
-		alarm.DecCount = function() {
+		alarm.DecCount = function(){
 			alarm.countElement.innerHTML = --alarm.count;
 		}
 		alarm.addRow = function(text){
@@ -246,9 +284,9 @@ function Model(){
 		return alarm;
 	}
 
-	function setObjectProperties(obj) {
-		if(document.getElementById('objectProperties')) {
-			if (obj.getElementsByTagName('title')[0] !== undefined) {
+	function setObjectProperties(obj){
+		if(document.getElementById('objectProperties')){
+			if (obj.getElementsByTagName('title')[0] !== undefined){
 				document.getElementById('infoName').innerHTML = 
 					obj.getElementsByTagName('title')[0].innerHTML;
 				var code = obj.getAttribute('cp_id');
@@ -256,7 +294,7 @@ function Model(){
 				document.getElementById('infoCode').innerHTML = code;
 				document.getElementById('infoType').innerHTML = obj.getAttribute('typeSignal');
 				document.getElementById('infoMode').innerHTML = obj.getAttribute('infoMode');
-				if (obj.getAttribute('TS') === '1') {
+				if (obj.getAttribute('TS') === '1'){
 					document.getElementById('infoValue').innerHTML = obj.getAttribute('value') + '·\
 						' + obj.getAttribute('koef') + ' = \
 						' +(obj.getAttribute('value') * obj.getAttribute('koef'));
@@ -266,7 +304,7 @@ function Model(){
 				document.getElementById('infoUnit').innerHTML = obj.getAttribute('unit');
 				var quality;
 				var locale = 'Language_' + document.getElementById('lang').value;
-				switch(obj.getAttribute('rcode')) {
+				switch(obj.getAttribute('rcode')){
 					case '0': 
 						quality = '<span id="${keyAuto}"\
 							>' + translateValueByKey('keyAuto') + '</span>';
@@ -292,9 +330,9 @@ function Model(){
 	}
 
 	function getCurrentItemPosition(){
-		var bbox = model.currentItem.getBBox(),
+		var bbox = _m.currentItem.getBBox(),
 				x = bbox.x, y = bbox.y,
-				transform = model.currentItem.getAttribute('transform'),
+				transform = _m.currentItem.getAttribute('transform'),
 				matrix = transform.slice(transform.indexOf('(') + 1, 
 																 transform.length - 1).split(','),
 				a = Number(matrix[0]), b = Number(matrix[1]),

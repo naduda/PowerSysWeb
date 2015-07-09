@@ -4,12 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -32,8 +31,6 @@ import pr.server.messages.CommandMessage;
 import pr.server.messages.Message;
 import pr.server.messages.coders.MessageDecoder;
 import pr.server.messages.coders.MessageEncoder;
-import pr.svgObjects.CP;
-import pr.svgObjects.G;
 import pr.svgObjects.SVG;
 
 @ServerEndpoint(value = "/load", configurator = GetHttpSessionConfigurator.class,
@@ -115,48 +112,22 @@ public class Server {
 				SVGModel svgModel = SVGModel.getInstance();
 				Tscheme sch = ConnectDB.getNodesMap().get(scheme.getIdScheme());
 				SVG svg = svgModel.getSVG(new ByteArrayInputStream((byte[])sch.getSchemefile()));
-
-				Map<String, G> gMap = svg.getGroupMap();
-				cm.getParameters().keySet().forEach(p -> {
-					G g = gMap.get(p);
-					String propsString = cm.getParameters().get(p);
-					String[] arr = propsString.split(";");
-					for (String prop : arr) {
-						if (prop.startsWith("cp_")) {
-							String pName = prop.substring(3, prop.indexOf(":"));
-							String pValue = prop.substring(prop.indexOf(":") + 1);
-							CP cp = g.getCustProps().getCPbyName(pName);
-							if (cp != null) {
-								cp.setVal(pValue);
-							} else {
-								CP newCP = new CP();
-								newCP.setNameU(pName);
-								newCP.setLbl(pName);
-								newCP.setPrompt("");
-								newCP.setType(0);
-								newCP.setFormat("");
-								newCP.setSortKey("");
-								newCP.setInvis(false);
-								newCP.setAsk(false);
-								newCP.setVal(pValue);
-								g.getCustProps().getCustomProps().add(newCP);
-							}
-						}
-					}
-					List<CP> list4remove = new ArrayList<>();
-					g.getCustProps().getCustomProps().forEach(cp -> {
-						if (propsString.indexOf("cp_" + cp.getNameU()) < 0)
-							list4remove.add(cp);
-					});
-					list4remove.forEach(g.getCustProps().getCustomProps()::remove);
-				});
+				Tools.updateSVG(svg, cm);
 				
 				try(ByteArrayOutputStream out = svgModel.getOtputStream(svg);) {
 					if (out != null) {
-						Tools.updateScheme(scheme.getIdScheme(), out.toByteArray());
+						Tools.updateScheme(session, scheme.getIdScheme(), out.toByteArray());
 					}
 				}
-				svgModel.setObject("c:/1/PowerSys/target/1.svg", svg);
+				break;
+			case "savescheme":
+				scheme = schemes.get(users.get(session).getIdScheme());
+				Tscheme tScheme = ConnectDB.getNodesMap().get(scheme.getIdScheme());
+				String content = new String((byte[])tScheme.getSchemefile(), StandardCharsets.UTF_8);
+
+				CommandMessage res = new CommandMessage("saveScheme");
+				res.setParameters("content", content);
+				session.getBasicRemote().sendObject(res);
 				break;
 			case "addtransparant":
 				try {
@@ -196,13 +167,13 @@ public class Server {
 				}
 				break;
 			default:
-				System.err.println(cm.getCommand().toLowerCase());
+				System.err.println("Command message " + cm.getCommand().toLowerCase() + " not implement yet.");
 				break;
 			}
 		}
 	}
 	
-	private void putScheme(Session session, int idScheme) {
+	public static void putScheme(Session session, int idScheme) {
 		if(idScheme == 0) return;
 		Scheme scheme = null; 
 		if (schemes.containsKey(idScheme)) {
