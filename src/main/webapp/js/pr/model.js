@@ -3,10 +3,33 @@ var model = new Model();
 function Model(){
 	var _m = Object.create(null), myScroll, onMoveListener;
 
+	_m.psFunctions = {
+		results: Object.create(null),
+		run: function(name, cb) {
+			if (name in this.results){
+				cb();
+			} else {
+				readScript(name, cb);
+			}
+		}
+	};
+
+	setTranslator();
+	initKeysListeners();
+	_m.tools = new Tools();
 	_m.noCache = 'no-cache';
+	_m.docURL = getDocURL();
+
 	_m.removeElement = function(e){if(e) e.parentNode.removeChild(e);}
 	_m.autoClose = autoClose;
 	_m.saveTextAsFile = saveTextAsFile;
+
+	_m.chart = createChart();
+	_m.alarm = setAlarms(function(){
+		_m.webSocket = initWebSocket();
+		_m.fileWebSocket = initWebSocketFileServer();
+	});
+	_m.setCurrentItem = setCurrentItem;
 
 	_m.svg = {};
 	_m.setSVG = setSVG;
@@ -16,9 +39,6 @@ function Model(){
 	_m.addTransparant = addTransparant;
 	_m.insertTransparant = insertTransparant;
 	_m.updateTransparant = updateTransparant;
-
-	_m.alarm = new Alarms();
-	_m.setCurrentItem = setCurrentItem;
 
 	_m.ObjectProperties = {left: '5px', top: '250px'};
 	_m.ObjectProperties.show = ObjectPropertiesShow;
@@ -36,6 +56,363 @@ function Model(){
 
 	return _m;
 //============ Implemantation ============
+	function readScript(file, cb){
+		var sName = file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
+		if (!sName) return false;
+
+		var rawFile = new XMLHttpRequest();
+		rawFile.open("GET", file, true);
+		if(model && model.noCache)
+			rawFile.setRequestHeader('Cache-Control', model.noCache);
+		// rawFile.onreadystatechange = function () {
+		rawFile.addEventListener("load", function() {
+			if(rawFile.readyState === 4) {
+				if(rawFile.status === 200 || rawFile.status == 0) {
+					var allText = rawFile.responseText,
+							func = new Function('obj', allText);
+					_m.psFunctions.results[file] = func;
+
+					try {
+						cb(func);
+					} catch(e) {
+						console.log(e);
+						console.log(file);
+					}
+				}
+			}
+		});
+		rawFile.send(null);
+	}
+
+	function setTranslator(){
+		_m.psFunctions.run('./js/pr/translate.js', 
+				function(){
+					var func = _m.psFunctions.results['./js/pr/translate.js'];
+					if(func){
+						_m.Translator = func().Translator();
+					} else console.log(scriptName);
+				});
+	}
+
+	function initWebSocketFileServer(){
+		var ws = new WebSocket('ws' + _m.docURL + '/fileserver');
+
+		ws.binaryType = "arraybuffer";
+		ws.onopen = function() {
+				console.log("FileServer Connected.")
+		};
+
+		ws.onmessage = function(evt) {
+				try{
+					var msg = JSON.parse(evt.data);
+					switch(msg.type.toLowerCase()){
+						case 'ok':
+							var selectedNodeId = $('#treeDIV').jstree('get_selected').toString();
+							$("#treeDIV").jstree("deselect_node", "#" + selectedNodeId);
+							$("#treeDIV").jstree("select_node", "#" + selectedNodeId);
+							alert('Done! OK!');
+							break;
+						case 'error':
+							alert('Error! See log file.');
+							break;
+						default:
+							console.log('Message type = ' + msg.type);
+							break;
+					}
+				} catch(e) {
+					console.log('Error: ' + e);
+				}
+		};
+
+		ws.onclose = function() {
+				console.log("Connection is closed...");
+		};
+		ws.onerror = function(e) {
+				console.log(e.msg);
+		}
+		return ws;
+	}
+
+	function initWebSocket(){
+		var ws = new WebSocket('ws' + _m.docURL + '/load');
+		ws.onmessage = function (message) {
+			var jsonData = JSON.parse(message.data);
+			if(jsonData.type === 'CommandMessage') {
+				onCommandMessage(jsonData);
+			} else if (jsonData.type === 'ValueMessage'){
+				onValueMessage(jsonData);
+			} else if (jsonData.type === 'AlarmMessage'){
+				_m.alarm.onAlarmMessage(jsonData);
+			} else if (jsonData.type === 'KeyValueArrayMessage') {
+				onArrayMessage(jsonData);
+			}
+		}
+		ws.onerror = function (e) {
+			console.log(e);
+		}
+		ws.onclose = function () {
+			console.log('session close ' + model.docURL);
+			alert('Session closed! You need update your page.');
+		}
+		ws.onopen = function(){
+			console.log('session open');
+			$.getScript('./js/pr/tree.js');
+		}
+		return ws;
+	}
+
+	function onCommandMessage(data){
+		var parName, parValue;
+		if(data.command === 'scheme'){
+			for (i = 0; i < data.parameters.length; i++) {
+				for (var key in data.parameters[i]) {
+					parName = key;
+					if (data.parameters[i].hasOwnProperty(key)) {
+						parValue = data.parameters[i][key];
+					}
+				}
+
+				if (parName === 'content') {
+					document.getElementById('scheme').innerHTML = parValue;
+				} else if (parName === 'fill') {
+					document.getElementById('scheme').style.background = parValue;
+					document.getElementById('schemeContainer')
+									.style.background = parValue;
+				}
+			}
+
+			var svg = document.getElementsByTagName('svg').item(0);
+			model.setSVG(svg);
+			svg.setAttribute('width', '100%');
+			svg.setAttribute('height', '100%');
+
+			selectable(svg);
+
+			model.myScroll = new IScroll('#scheme', {
+				zoom: true,
+				zoomMax : 10,
+				scrollX: true,
+				scrollY: true,
+				mouseWheel: true,
+				wheelAction: 'zoom'
+			});
+
+			$('#alarmTable thead tr:first').find('th').each(function(){
+				var actual = $(this).find('span:first').html()
+								.length * 10 + 40;
+				if($(this).width() < actual)
+					$(this).width(actual);
+			});
+
+			model.webSocket.send(JSON.stringify({
+				'type' : 'CommandMessage', 'command' : 'getScripts'
+			}));
+		} else if(data.command === 'priority') {
+			var selectPriority = document.getElementById('alarmFilter');
+			for (i = 0; i < data.parameters.length; i++) {
+				for (var key in data.parameters[i]) {
+					parName = key;
+					if (data.parameters[i].hasOwnProperty(key)) {
+						parValue = data.parameters[i][key];
+					}
+				}
+				var option = document.createElement("option");
+				option.value = parName;
+				option.text = parValue;
+				switch(parName) {
+					case '1': option.style.backgroundColor = 'red'; break;
+					case '2': option.style.backgroundColor = 'yellow'; break;
+					case '3': option.style.backgroundColor = 'green'; break;
+					default: option.style.backgroundColor = '#eee'; break;
+				}
+				selectPriority.add(option);
+			}
+		} else if(data.command === 'updateTU'){
+			var param = data.parameters[0];
+			if (param.status === '1')
+				$('.modal.bootstrap-dialog').remove();
+		} else if(data.command === 'connString'){
+			var connStr = data.parameters[0].value,
+				arr = connStr.split('_'), 
+				user = arr[arr.length - 1],
+				server = arr[0],
+				dbName = connStr.substring(server.length + 1, connStr.length - user.length - 1);	
+
+			document.getElementById('connectInfo').innerHTML = '   User - ' +
+					user + '; Server - ' + server + '; DB - ' + dbName + '.';
+		} else if(data.command === 'transparants'){
+			for (i = 0; i < data.parameters.length; i++) {
+				for (var key in data.parameters[i]) {
+					if (data.parameters[i].hasOwnProperty(key)) {
+						var item = {};
+						item.id = key;
+						item.desc = data.parameters[i][key];
+						model.transparants[item.id] = item;
+					}
+				}
+			}
+		} else if(data.command === 'setTratsparant'){
+			var idTr, id, titleText, x, y, t;
+
+			for (i = 0; i < data.parameters.length; i++) {
+				for (var key in data.parameters[i]) {
+					if (data.parameters[i].hasOwnProperty(key)) {
+						switch(key){
+							case 'idTr': idTr = data.parameters[i][key]; break;
+							case 'id': id = data.parameters[i][key]; break;
+							case 'txt': titleText = data.parameters[i][key]; break;
+							case 'x': x = data.parameters[i][key]; break;
+							case 'y': y = data.parameters[i][key]; break;
+						}
+					}
+				}
+			}
+			t = document.getElementById('transparant_' + idTr);
+			if(t){
+				model.updateTransparant(t, titleText, x, y);
+			} else {
+				model.insertTransparant(id,
+						titleText === '' ? 'empty' : titleText, x, y, idTr);
+			}
+		} else if(data.command === 'delTratsparant'){
+			var idTr = data.parameters[0]['idTr'];
+					transp = document.getElementById('transparant_' + idTr);
+			model.removeElement(transp);
+		} else if(data.command === 'saveScheme'){
+			model.saveTextAsFile(data.parameters[0]['content'], 'svgScheme.svg');
+		}
+	}
+
+	function onValueMessage(data) {
+		var dti = {},
+				lastDate = document.getElementById('lastDate'),
+				timestamp = lastDate.getAttribute('timestamp'),
+				dateFormated = model.tools.timestamp2date(Number(timestamp)),
+				lastDateFormated = model.tools.timestamp2date(Number(data.timestamp));
+
+		if(data.timestamp > timestamp) {
+			lastDate.setAttribute('timestamp', data.timestamp);
+			lastDate.innerHTML = lastDateFormated;
+		}
+
+		for (var key in data) {
+			if (data.hasOwnProperty(key)) {
+				if (key !== 'groups') dti[key] = data[key];
+			}
+		}
+
+		for (i = 0; i < data.groups.length; i++) {
+			var group = data.groups[i],
+					activeGroup = model.tools.getGroupByName(group.name);
+
+			activeGroup.element.setAttribute('dateFormated', lastDateFormated);
+			activeGroup.element.setAttribute('rcode', data.rcode);
+			activeGroup.element.setAttribute('infoMode', data.mode);
+			for (var key in group) {
+				if (group.hasOwnProperty(key)) {
+					dti[key] = group[key];
+				}
+			}
+
+			dti.koef = activeGroup.koef;
+			dti.precision = activeGroup.precision;
+			dti.unit = activeGroup.unit;
+
+			var elem = new Elem(activeGroup, dti);
+			_m.psFunctions.run(elem.scriptName, elem.run);
+		}
+		if (model.currentItem != null) {
+			model.updateObjectProperties();
+		}
+	}
+
+	function Elem(activeGroup, dti){
+		var scriptName = './scripts/' + activeGroup.script + '.js',
+				element = activeGroup.element;
+		this.dti = dti;
+		this.scriptName = scriptName;
+		this.run = function() {
+			var func = _m.psFunctions.results[scriptName];
+			if (func){
+				func(element).onChange(dti);
+				element.setAttribute('value', dti.value);
+			} else console.log(scriptName);
+		}
+	}
+
+	function onArrayMessage(data) {
+		if (data.name === 'scripts') {
+			var arr = data.array;
+			for(var i in arr){
+				var val = arr[i];
+				for(var gName in val){
+					var selectedGroup = document.getElementById(gName),
+							valArray = val[gName].
+											slice(0, val[gName].indexOf('[')).split(':'),
+							title = document.createElementNS(model.svg.namespace,'title'),
+							custProps = val[gName].substring(
+															val[gName].indexOf('[') + 1, 
+															val[gName].indexOf(']')),
+							props = custProps.split(';');
+
+					if(valArray.length > 0){
+						title.textContent = valArray[0];
+						selectedGroup.appendChild(title);
+						selectedGroup.setAttribute('typeSignal', valArray[1]);
+						selectedGroup.setAttribute('TS', valArray[2]);
+						selectedGroup.setAttribute('koef', valArray[3]);
+						selectedGroup.setAttribute('precision', valArray[4]);
+						selectedGroup.setAttribute('unit', valArray[5] || '');
+						selectedGroup.setAttribute('script', valArray[6] || '');
+					}
+
+					Array.prototype.forEach.call(props, function(prop){
+						var pName = prop.substring(0, prop.indexOf(':')),
+								pValue = prop.substring(prop.indexOf(':') + 1);
+						selectedGroup.setAttribute(pName, pValue);
+					});
+				}
+			}
+
+			model.webSocket.send(JSON.stringify({
+				'type' : 'CommandMessage', 'command' : 'getOldValues'
+			}));
+		}
+	}
+
+	function getDocURL(){
+		var docURL = document.URL;
+				docURL = docURL.substring(docURL.indexOf('://'), 
+																	docURL.lastIndexOf("/"));
+		return docURL;
+	}
+
+	function initKeysListeners(){
+		if(!_m.keysF) _m.keysF = Object.create(null);
+		window.addEventListener("keydown", function(event){
+			switch(event.keyCode) {
+				case 16: _m.keysF.shift = true; break;
+				case 17: _m.keysF.ctrl = true; break;
+				case 18: _m.keysF.ctrl = true; break;
+				// default: console.log(event.keyCode);break;
+			}
+		}, false);
+		window.addEventListener("keyup", function(event){
+				switch(event.keyCode) {
+					case 16: _m.keysF.shift = false; break;
+					case 17: _m.keysF.ctrl = false; break;
+					case 18: _m.keysF.ctrl = false; break;
+				}
+		}, false);
+	}
+
+	function createChart(){
+		$.getScript("./js/pr/chart.js", function(){
+			_m.chart = new Chart();
+		});
+		return _m.chart;
+	}
+
 	function saveTextAsFile(textToWrite, fileNameToSaveAs){
 		var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'}),
 				downloadLink = document.createElement("a");
@@ -70,7 +447,7 @@ function Model(){
 		cm.parameters.push({'txt': titleText});
 		cm.parameters.push({'objName': name});
 		cm.parameters.push({'idSignal': idSignal});
-		webSocket.send(JSON.stringify(cm));
+		_m.webSocket.send(JSON.stringify(cm));
 	}
 
 	function insertTransparant(id, titleText, x, y, idTr){
@@ -120,7 +497,7 @@ function Model(){
 			cm.parameters.push({'y': y + ''});
 			cm.parameters.push({'txt': titleText});
 			document.body.removeEventListener('mousemove',onMoveListener,false);
-			webSocket.send(JSON.stringify(cm));
+			_m.webSocket.send(JSON.stringify(cm));
 			_m.myScroll.enable();
 		},false);
 		function cursorPoint(evt, t){
@@ -130,14 +507,14 @@ function Model(){
 		}
 
 		t.oncontextmenu = function(e){
-			psFunctions.run('./js/pr/forms/ContextG.js', 
+			_m.psFunctions.run('./js/pr/forms/ContextG.js', 
 				function(){
-					var func = psFunctions.results['./js/pr/forms/ContextG.js'];
+					var func = _m.psFunctions.results['./js/pr/forms/ContextG.js'];
 					if (func){
 						var f = func(), menu = f.ContextTransp(t);
 
 						document.body.appendChild(menu);
-						setPopupWindow('contextT', 'main');
+						_m.tools.setPopupWindow('contextT', 'main');
 						menu.style.top = 
 							t.getBoundingClientRect().top + 'px';
 						menu.style.left = 
@@ -159,11 +536,11 @@ function Model(){
 	}
 
 	function setSVG(content){
+		var alarmTable = document.getElementById('divTableAlarm');
 		_m.svg.content = content;
 		_m.svg.point = content.createSVGPoint();
-		content.addEventListener('click', function(){
-			_m.autoClose();
-		});
+		content.addEventListener('click', function(){_m.autoClose();});
+		alarmTable.addEventListener('click', function(){_m.autoClose();});
 	}
 
 	function setCurrentItem(item){
@@ -177,15 +554,15 @@ function Model(){
 	}
 
 	function ObjectPropertiesShow(){
-		psFunctions.run('./js/pr/forms/ObjectProperties.js', 
+		_m.psFunctions.run('./js/pr/forms/ObjectProperties.js', 
 			function(){
-				var func = psFunctions.results['./js/pr/forms/ObjectProperties.js'];
+				var func = _m.psFunctions.results['./js/pr/forms/ObjectProperties.js'];
 				if (func){
 					if (document.getElementById('objectProperties')){
 						_m.ObjectProperties.hide();
 					} else {
 						document.body.appendChild(func().ObjectProperties());
-						setPopupWindow('objectProperties', 'main');
+						_m.tools.setPopupWindow('objectProperties', 'main');
 						_m.updateObjectProperties();
 					}
 				} else console.log(scriptName);
@@ -200,15 +577,15 @@ function Model(){
 	}
 
 	function EditObjectPropertiesShow(){
-		psFunctions.run('./js/pr/forms/ObjectProperties.js', 
+		_m.psFunctions.run('./js/pr/forms/ObjectProperties.js', 
 			function(){
-				var func = psFunctions.results['./js/pr/forms/ObjectProperties.js'];
+				var func = _m.psFunctions.results['./js/pr/forms/ObjectProperties.js'];
 				if (func){
 					if (document.getElementById('editObjectProperties')){
 						_m.EditObjectProperties.hide();
 					} else {
 						document.body.appendChild(func().EditObjectProperties());
-						setPopupWindow('editObjectProperties', 'main');
+						_m.tools.setPopupWindow('editObjectProperties', 'main');
 					}
 				} else console.log(scriptName);
 			});
@@ -233,13 +610,13 @@ function Model(){
 		if(document.getElementById('signalsForm')){
 			_m.SignalsForm.hide();
 		}
-		psFunctions.run('./js/pr/forms/Signals.js', 
+		_m.psFunctions.run('./js/pr/forms/Signals.js', 
 			function(){
-				var func = psFunctions.results['./js/pr/forms/Signals.js'];
+				var func = _m.psFunctions.results['./js/pr/forms/Signals.js'];
 				if (func){
 					var fObj = func();
 					document.body.appendChild(fObj.SignalsForm(editElem));
-					setPopupWindow('signalsForm', 'main');
+					_m.tools.setPopupWindow('signalsForm', 'main');
 					fObj.initSignalsTree(id);
 				} else console.log(scriptName);
 			});
@@ -252,36 +629,11 @@ function Model(){
 		return elem.parentNode.removeChild(elem);
 	}
 
-	function Alarms(){
-		var alarm = {}, alarmTable = {};
-
-		alarm.table = alarmTable;
-		alarm.countElement = document.getElementById('alarmsCount');
-		alarm.count = 0;
-		alarm.IncCount = function(){
-			alarm.countElement.innerHTML = ++alarm.count;
-		}
-		alarm.DecCount = function(){
-			alarm.countElement.innerHTML = --alarm.count;
-		}
-		alarm.addRow = function(text){
-			alarm.table.body.append(text);
-			alarm.IncCount();
-		}
-		alarm.sortTable = function(){
-			alarm.table.body.trigger("update")
-				.trigger("sorton", [[[7,0],[12,0],[4,1]]]);
-			if($('#alarmTable tbody tr:first').find('td')[7].innerHTML === 1) 
-				alarm.table.body.trigger("sorton", [[[4,1]]]);
-		}
-		alarm.clearTable = function(){
-			$.tablesorter.clearTableBody($('#alarmTable')[0]);
-			alarm.count = 0;
-		}
-		alarmTable.table = document.getElementById('alarmTable');
-		alarmTable.body = $('#alarmTable tbody');
-		alarmTable.headerRowCols = $('#alarmTable thead tr:first').find('th');
-		return alarm;
+	function setAlarms(cb){
+		$.getScript("./js/pr/alarms.js", function(){
+			model.alarm = new Alarms();
+			if(cb) cb();
+		});
 	}
 
 	function setObjectProperties(obj){
@@ -307,11 +659,11 @@ function Model(){
 				switch(obj.getAttribute('rcode')){
 					case '0': 
 						quality = '<span id="${keyAuto}"\
-							>' + translateValueByKey('keyAuto') + '</span>';
+							>' + model.Translator.translateValueByKey('keyAuto') + '</span>';
 						break;
 					case '107': 
 						quality = '<span id="${keyManual}"\
-							>' + translateValueByKey('keyManual') + '</span>';
+							>' + model.Translator.translateValueByKey('keyManual') + '</span>';
 						break;
 				}
 				document.getElementById('infoQuality').innerHTML = quality;

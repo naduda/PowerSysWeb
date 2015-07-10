@@ -54,7 +54,7 @@ public class Server {
 		Tools.sendAlarms(session, ConnectDB.getAlarmsByPeriod(null, null));
 		Tools.sendPriorities(session, ConnectDB.getTSysParam("ALARM_PRIORITY"));
 		Tools.sendConnStr(session);
-		
+
 		System.out.println("Socket connected at " + new Date(System.currentTimeMillis()));
 	}
 	

@@ -1,8 +1,8 @@
-function initTree() {
+(function initTree(){
 	$('#treeDIV').jstree({
 		'core' : {
 			'data' : {
-				'url' : docURL.substring(1) + '/dataServer/db/?',
+				'url' : model.docURL.substring(1) + '/dataServer/db/?',
 				'data' : function (node) {
 					return { "id" : node.id };
 				},
@@ -21,9 +21,9 @@ function initTree() {
 			'items' : customMenu
 		},
 		'plugins' : ['types', 'contextmenu', 'state']
-	}).on('changed.jstree', function (e, data) {
-		if(data.selected.length) {
-			parent.webSocket.send(JSON.stringify({
+	}).on('changed.jstree', function (e, data){
+		if(data.selected.length){
+			model.webSocket.send(JSON.stringify({
 				'type' : 'CommandMessage',
 				'command' : 'getScheme',
 				'parameters' : [{
@@ -34,40 +34,40 @@ function initTree() {
 		}
 	});
 
-	function customMenu(node) {
+	function customMenu(node){
 		var items = {
 			item1: {
 				label: 'Create Scheme',
 				action: function () {
 					alert('Create Scheme is impossible now');
 				},
-				icon : 'glyphicon glyphicon-plus',
+				icon: 'glyphicon glyphicon-plus',
 			},
 			item2: {
-				separator_before : true,
-				separator_after : true,
-				label: 'Change Scheme',
+				separator_before: true,
+				separator_after: true,
+				label: 'Load Scheme',
 				action: function () {
 					// console.log(node.original);
 					var iFile = elt('input', {type: 'file'});
 					iFile.addEventListener("change", function(event) {
 						var i = 0, file = iFile.files[0], reader = new FileReader();
 
-						fileWebSocket.send('idScheme:' + node.id + ';');
+						model.fileWebSocket.send('idScheme:' + node.id + ';');
 
 						var reader = new FileReader();
 						var rawData = new ArrayBuffer();
 						reader.onload = function(e) {
 								rawData = e.target.result;
-								fileWebSocket.send(rawData);
-								fileWebSocket.send('end');
+								model.fileWebSocket.send(rawData);
+								model.fileWebSocket.send('end');
 						}
 						reader.readAsArrayBuffer(file);
 					}, false);
 					performClick(iFile);
 				},
-				icon : 'glyphicon glyphicon-pencil',
-				shortcut : 113,
+				icon: 'fa fa-download',
+				shortcut: 113,
 				shortcut_label : 'F2'
 			},
 			item3: {
@@ -76,7 +76,7 @@ function initTree() {
 					alert('Delete Scheme is impossible now');
 				},
 				_disabled : true,
-				icon : 'glyphicon glyphicon-remove alarm'
+				icon: 'fa fa-trash alarm'
 			},
 			item4: {
 				label: 'Save Scheme [DB]',
@@ -107,7 +107,7 @@ function initTree() {
 						param[g.id] = param[g.id].slice(1);
 						if(param[g.id]) cm.parameters.push(param);
 					});
-					webSocket.send(JSON.stringify(cm));
+					model.webSocket.send(JSON.stringify(cm));
 				},
 				icon : 'fa fa-database',
 			},
@@ -118,7 +118,7 @@ function initTree() {
 								type: 'CommandMessage', 
 								command: 'saveScheme'
 							};
-					webSocket.send(JSON.stringify(cm));
+					model.webSocket.send(JSON.stringify(cm));
 				},
 				icon : 'glyphicon glyphicon-hdd',
 			}
@@ -134,4 +134,4 @@ function initTree() {
 			elem.dispatchEvent(evt);
 		}
 	}
-}
+})();

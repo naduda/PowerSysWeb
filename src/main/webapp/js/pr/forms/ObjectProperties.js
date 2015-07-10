@@ -1,7 +1,7 @@
 return {
 	ObjectProperties: function(){
 		var headerText = elt('span', {id:'${keyTooltip_info}'}, 
-											translateValueByKey('keyTooltip_info')),
+											model.Translator.translateValueByKey('keyTooltip_info')),
 				closeButton = elt('i', {class:'fa fa-times closeButton'}),
 				header = elt('DIV', {class:'popupHeader'},
 										headerText, closeButton),
@@ -33,7 +33,7 @@ return {
 					cell2 = row.insertCell(1),
 					key = arguments[2],
 					label = elt('span', {id:'${' + key + '}'}, 
-						translateValueByKey(key));
+						model.Translator.translateValueByKey(key));
 
 			cell1.appendChild(label);
 			cell1.appendChild(document.createTextNode(':'));
@@ -42,7 +42,7 @@ return {
 	},
 	EditObjectProperties: function(){
 		var headerText = elt('span', {id:'${keyTooltip_info}'}, 
-											translateValueByKey('keyTooltip_info')),
+											model.Translator.translateValueByKey('keyTooltip_info')),
 				closeButton = elt('i', {class:'fa fa-times closeButton'}),
 				header = elt('DIV', {class:'popupHeader'},
 										headerText,
@@ -51,7 +51,7 @@ return {
 				iName = elt('input', {id:'propKey', type:'text', size:'10'}),
 				iValue = elt('input', {id:'propValue',type:'text', size:'10'}),
 				spanOK = elt('span', {id:'${keyApply}'}, 
-											translateValueByKey('keyApply')),
+											model.Translator.translateValueByKey('keyApply')),
 				btnApply = elt('button', {type:'button'}, spanOK),
 				top = elt('DIV', null, 
 								'Name: ', iName, ' value: ', iValue, btnApply),
@@ -104,11 +104,11 @@ return {
 					key = arguments[2],
 					value = arguments[3],
 					spanEdit = elt('span', {id:'${keyEdit}'}, 
-											translateValueByKey('keyEdit')),
+											model.Translator.translateValueByKey('keyEdit')),
 					button = elt('button', {type:'button', 
 										id:'btn_' + key}, spanEdit),
 					spanDelete = elt('span', {id:'${keyDelete}'}, 
-											translateValueByKey('keyDelete')),
+											model.Translator.translateValueByKey('keyDelete')),
 					buttonDel = elt('button', {type:'button', 
 										id:'btn_del_' + key}, spanDelete);
 

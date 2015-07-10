@@ -1,17 +1,17 @@
 return {
 	SignalsForm: function(editElem){
 		var headerText = elt('span', {id:'${keySignalTreeTitle}'}, 
-											translateValueByKey('keySignalTreeTitle')),
+											model.Translator.translateValueByKey('keySignalTreeTitle')),
 				closeButton = elt('i', {class:'fa fa-times closeButton'}),
 				header = elt('DIV', {class:'popupHeader'},
 										headerText, closeButton),
 				content = elt('DIV', {id:'treeSignals', class:'popupContent'}),
 				spanOK = elt('span', {id:'${keyApply}'}, 
-											translateValueByKey('keyApply')),
+											model.Translator.translateValueByKey('keyApply')),
 				btnOK = elt('button', {type:'button', id:'btnOK',
 										style: 'margin: 0 10px 0 10px'}, spanOK),
 				spanCancel = elt('span', {id:'${keyClose}'}, 
-											translateValueByKey('keyClose')),
+											model.Translator.translateValueByKey('keyClose')),
 				btnCancel = elt('button', {type:'button', id:'btnCancel',
 										style: 'margin: 0 10px 0 10px'}, spanCancel),
 				footer = elt('DIV', {style: 'text-align: center; margin: 5px'}, 
@@ -50,7 +50,7 @@ return {
 		$('#treeSignals').jstree({
 			'core' : {
 				'data' : {
-					'url' : docURL.slice(1) + '/dataServer/db/childSignals?',
+					'url' : model.docURL.slice(1) + '/dataServer/db/childSignals?',
 					'data' : function (node) {
 						return { "params" : node.id };
 					},
@@ -68,7 +68,7 @@ return {
 			'plugins' : ['types']
 		});
 
-		var url = docURL.slice(1) + '/dataServer/db/childSignalPath?params=' + id;
+		var url = model.docURL.slice(1) + '/dataServer/db/childSignalPath?params=' + id;
 		$.getJSON(url, function(data){
 			if (data.path){
 				openNode(data.path.slice(data.path.indexOf('/') + 1));

@@ -63,7 +63,7 @@
 				</div>
 			</div>
 			<div id="langSelector" class="pull-right">
-				<select id="lang" class="btn-sm menubutton" onchange="translateARM();">
+				<select id="lang" class="btn-sm menubutton" onchange="model.Translator.translateARM();">
 					<option value="en">English</option>
 					<option value="uk">Українська</option>
 					<option value="ru">Русский</option>
@@ -101,7 +101,7 @@
 					<span id="tFull" class="toolbarItem fa statusbar-toggler menubar-toggler fa-arrows-alt"></span>
 					<span class="toolbarItem fa fa-info-circle" title="" id="${keyTooltip_info}" onclick="model.ObjectProperties.show();"></span>
 					<a class="toolbarItem" href="#"><i class="fa fa-warning"></i></a>
-					<span class="toolbarItem fa fa-bar-chart" title="" id="${keyTooltip_showChart}" onclick="showChartPowerSys();"></span>
+					<span class="toolbarItem fa fa-bar-chart" title="" id="${keyTooltip_showChart}" onclick="model.chart.showChartPowerSys();"></span>
 					<span class="devider">.</span>
 					<a class="toolbarItem" href="#"><i class="glyphicon glyphicon-search"></i></a>
 					<a class="toolbarItem" href="#"><i class="glyphicon glyphicon-repeat"></i></a>
@@ -119,9 +119,9 @@
 			<div id="southPane" class="ui-layout-south">
 				<div id='toolbarDIV' class="toolbar">
 					<b><ins>#{keyAlarms}</ins></b>
-					<span onclick="confirmOne();" class="toolbarItem fa fa-check"></span>
+					<span onclick="model.alarm.confirmOne();" class="toolbarItem fa fa-check"></span>
 					<span id="confirmSS" class="toolbarItem fa fa-check-square-o"></span>
-					<span onclick="confirmAll();" class="toolbarItem fa fa-check-square"></span>
+					<span onclick="model.alarm.confirmAll();" class="toolbarItem fa fa-check-square"></span>
 					<span class="devider">.</span>
 					<div class="fa fa-filter">
 						<select id="alarmFilter" class="menubutton">
@@ -130,7 +130,7 @@
 					</div>
 
 					<button type="button" class="menubutton" onclick="model.alarm.sortTable();">#{keyTooltip_btnSorting}</button>
-					<button id="btnAlarmColumns" type="button" class="menubutton" onclick="setAlarmColumns();">Columns</button>
+					<button id="btnAlarmColumns" type="button" class="menubutton" onclick="model.tools.setAlarmColumns();">Columns</button>
 
 					<div class="pull-right">
 						<span id='alarmsCount' class="badge">0</span>
@@ -171,7 +171,7 @@
 		<div id="chartsPowerSys" class="popupW">
 			<div class="popupHeader">
 				#{keyTooltip_showChart}
-				<i class="fa fa-times closeButton" onclick="showChartPowerSys();"></i>
+				<i class="fa fa-times closeButton" onclick="model.chart.showChartPowerSys();"></i>
 			</div>
 			<div class="popupToolbar">
 				<select id="sInstantaneous" class="menubutton">
@@ -207,14 +207,12 @@
 		</div>
 
 		<script src="./js/pr/tools.js"></script>
-		<script src="./js/pr/translate.js"></script>
-		<script src="./js/pr/alarms.js"></script>
-		<script src="./js/pr/chart.js"></script>
+		
 
 		<script src="./js/pr/selectable.js"></script>
 		<script src="./js/iscroll-zoom.min.js"></script>
 		<script src="./js/pr/load.js"></script>
 		<script src="./js/pr/model.js"></script>
-		<script src="./js/pr/server.js"></script>
+		<!--script src="./js/pr/translate.js"></script-->
 	</body>
 </html>

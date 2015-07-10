@@ -1,4 +1,4 @@
-function selectable(svg) {
+function selectable(svg){
 	var rect = createRectangle();
 
 	function createRectangle(){
@@ -24,7 +24,7 @@ function selectable(svg) {
 	function clearSelection() {
 		var sels = $('.selectableRectangle');
 		model.autoClose();
-		if (!keysF.ctrl) {
+		if (!model.keysF.ctrl) {
 			sels.each(function(){
 				$(this).remove();
 			});
@@ -35,7 +35,7 @@ function selectable(svg) {
 
 	function onselect(obj) {
 		model.autoClose();
-		if((rect.getAttribute('stroke') !== 'none') && (keysF.ctrl == true)) {
+		if((rect.getAttribute('stroke') !== 'none') && (model.keysF.ctrl == true)){
 			var nRect = createRectangle();
 			selectRect(nRect, obj);
 		} else {
@@ -77,14 +77,14 @@ function selectable(svg) {
 						};
 						gs[j].oncontextmenu = function(e){
 							onselect(this);
-							psFunctions.run('./js/pr/forms/ContextG.js', 
+							model.psFunctions.run('./js/pr/forms/ContextG.js', 
 								function(){
-									var func = psFunctions.results['./js/pr/forms/ContextG.js'];
+									var func = model.psFunctions.results['./js/pr/forms/ContextG.js'];
 									if (func){
 										var context, f = func();
 										context = f.Context();
 										document.body.appendChild(context);
-										setPopupWindow('contextG', 'main');
+										model.tools.setPopupWindow('contextG', 'main');
 										context.style.top = 
 											model.currentItem.getBoundingClientRect().top + 'px';
 										context.style.left = 
@@ -106,11 +106,11 @@ function selectable(svg) {
 	}
 
 	function runFuncByName(target, name) {
-		var activeGroup = getGroupByName(target.id);
+		var activeGroup = model.tools.getGroupByName(target.id);
 		var scriptName = './scripts/' + activeGroup.script + '.js';
 
-		psFunctions.run(scriptName, function() {
-			var func = psFunctions.results[scriptName];
+		model.psFunctions.run(scriptName, function() {
+			var func = model.psFunctions.results[scriptName];
 			if (!func) return false;
 			switch(name) {
 				case 'ondblclick':

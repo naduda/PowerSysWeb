@@ -1,10 +1,8 @@
 //http://layout.jquery-dev.net/demos/simple.html
 //http://layout.jquery-dev.com/index.cfm
-var myLayout;
-var myLayoutInner;
-
-$(document).ready(function () {
-	myLayout = $('body').layout({
+$(document).ready(function (){
+	replace4Translator();
+	var myLayout = $('body').layout({
 		closable:									true
 	,	resizable:								true
 	,	slidable:									true
@@ -25,7 +23,7 @@ $(document).ready(function () {
 		.bindButton('.statusbar-toggler', 'toggle', 'south')
 	;
 
-	myLayoutInner = $('#main').layout({
+	var myLayoutInner = $('#main').layout({
 		closable:									true
 	,	resizable:								true
 	,	slidable:									true
@@ -56,46 +54,69 @@ $(document).ready(function () {
 		.bindButton('.alarm-toggler', 'toggle', 'south')
 		.bindButton('.north-toggler', 'toggle', 'north')
 	;
-});
 
-var psFunctions = {
-	results: {},
-	run: function(name, cb) {
-		if (name in this.results) {
-			cb();
-		} else {
-			readScript(name, cb);
-		}
-	}
-};
+	function onHideShow(paneName, pane, state){
+		var button, oldValue, newValue;
 
-function readScript(file, cb) {
-	var sName = file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
-	if (!sName) return false;
-
-	var rawFile = new XMLHttpRequest();
-	rawFile.open("GET", file, true);
-	if(model.noCache)
-		rawFile.setRequestHeader('Cache-Control', model.noCache);
-	// rawFile.onreadystatechange = function () {
-	rawFile.addEventListener("load", function() {
-		if(rawFile.readyState === 4) {
-			if(rawFile.status === 200 || rawFile.status == 0) {
-				var allText = rawFile.responseText,
-						func = new Function('obj', allText);
-				psFunctions.results[file] = func;
-
+		if (pane.prop('id') === 'southPane') {
+			button = document.getElementById('tAlarms');
+			var bText;
+			if (state.isClosed == true) {
+				oldValue = /\bfa-angle-double-down\b/;
+				newValue = 'fa-angle-double-up';
 				try {
-						cb(func);
-				} catch(e) {
-					console.log(e);
-					console.log(file);
+					bText = document.getElementById('${keyHideAlarms}');
+					bText.id = '${keyShowAlarms}';
+					bText.innerHTML = model.Translator.translateValueByKey('keyShowAlarms');
+				} catch(e){
+					console.log('load.js onHideShow...');
+				}
+			} else {
+				oldValue = /\bfa-angle-double-up\b/;
+				newValue = 'fa-angle-double-down';
+				try {
+					bText = document.getElementById('${keyShowAlarms}');
+					bText.id = '${keyHideAlarms}';
+					bText.innerHTML = model.Translator.translateValueByKey('keyHideAlarms');
+				} catch(e){
+					console.log('load.js onHideShow...');
 				}
 			}
+		} else if (pane.prop('id') === 'treeContainer') {
+			button = document.getElementById('tTree');
+			if (state.isClosed == true) {
+				oldValue = /\bfa-angle-double-left\b/;
+				newValue = 'fa-angle-double-right';
+			} else {
+				oldValue = /\bfa-angle-double-right\b/;
+				newValue = 'fa-angle-double-left';
+			}
 		}
-	});
-	rawFile.send(null);
-}
+		button.className = button.className.replace(oldValue,newValue);
+	}
+
+	function resizePane(paneName, pane, state) {
+		if (pane.prop('id') === 'southPane') {
+			$('#divTableAlarm').height(state.size - $('#toolbarDIV').height() - 6);
+		}
+	}
+
+	function replace4Translator(){
+		var all = document.body.getElementsByTagName("*");
+
+		for (var i = 0; i < all.length; i++) {
+			var el = all[i], begInd = el.innerHTML.indexOf("#{");
+
+			if (begInd > -1) {
+				var key = el.innerHTML.substring(begInd + 2);
+				key = key.substring(0, key.indexOf('}'));
+
+				el.innerHTML = el.innerHTML.replace('#{' + key + '}',
+					'<span id="${' + key + '}"></span>');
+			}
+		}
+	}
+});
 
 $('#scheme').on('scroll', function (e) {
 	scheme.scrollTop = 0;
@@ -103,53 +124,6 @@ $('#scheme').on('scroll', function (e) {
 });
 
 $('#divTableAlarm').height(200 - $('#toolbarDIV').height() - 6);
-
-function resizePane(paneName, pane, state) {
-	if (pane.prop('id') === 'southPane') {
-		$('#divTableAlarm').height(state.size - $('#toolbarDIV').height() - 6);
-	}
-}
-
-function onHideShow(paneName, pane, state) {
-	var button;
-	var oldValue;
-	var newValue;
-	if (pane.prop('id') === 'southPane') {
-		button = document.getElementById('tAlarms');
-		var bText;
-		if (state.isClosed == true) {
-			oldValue = /\bfa-angle-double-down\b/;
-			newValue = 'fa-angle-double-up';
-			try {
-				bText = document.getElementById('${keyHideAlarms}');
-				bText.id = '${keyShowAlarms}';
-				bText.innerHTML = translateValueByKey('keyShowAlarms');
-			} catch(e){
-				console.log('load.js onHideShow...');
-			}
-		} else {
-			oldValue = /\bfa-angle-double-up\b/;
-			newValue = 'fa-angle-double-down';
-			try {
-				bText = document.getElementById('${keyShowAlarms}');
-				bText.id = '${keyHideAlarms}';
-				bText.innerHTML = translateValueByKey('keyHideAlarms');
-			} catch(e){
-				console.log('load.js onHideShow...');
-			}
-		}
-	} else if (pane.prop('id') === 'treeContainer') {
-		button = document.getElementById('tTree');
-		if (state.isClosed == true) {
-			oldValue = /\bfa-angle-double-left\b/;
-			newValue = 'fa-angle-double-right';
-		} else {
-			oldValue = /\bfa-angle-double-right\b/;
-			newValue = 'fa-angle-double-left';
-		}
-	}
-	button.className = button.className.replace(oldValue,newValue);
-}
 
 $('#schemeContainer').on('scroll', function (e) {
 	schemeContainer.scrollTop = 0;

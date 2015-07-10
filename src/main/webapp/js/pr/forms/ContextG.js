@@ -1,10 +1,10 @@
 return {
 	Context: function(){
 		var mode = elt('span', {id:'${keyOperationMode}'}, 
-										translateValueByKey('keyOperationMode')),
+										model.Translator.translateValueByKey('keyOperationMode')),
 				dMode = elt('DIV', {class:'context'}, mode),
 				transp = elt('span', {id:'${keyAddTransparant}'}, 
-										translateValueByKey('keyAddTransparant')),
+										model.Translator.translateValueByKey('keyAddTransparant')),
 				dTransp = elt('DIV', {class:'context'}, transp),
 				main = elt('DIV', {id:'contextG', class:'autoClose'}, dMode, dTransp);
 
@@ -13,14 +13,14 @@ return {
 			var elem = document.getElementById("contextG");
 
 			elem.parentNode.removeChild(elem);
-			psFunctions.run('./js/pr/forms/Transparants.js', 
+			model.psFunctions.run('./js/pr/forms/Transparants.js', 
 				function(){
-					var func = psFunctions.results['./js/pr/forms/Transparants.js'];
+					var func = model.psFunctions.results['./js/pr/forms/Transparants.js'];
 					if (func){
 						var transps, f = func();
 						transps = f.Transpatants();
 						document.body.appendChild(transps);
-						setPopupWindow('transparants', 'main');
+						model.tools.setPopupWindow('transparants', 'main');
 						transps.style.top = 
 							model.currentItem.getBoundingClientRect().top + 'px';
 						transps.style.left = 
@@ -41,23 +41,23 @@ return {
 
 	ContextTransp: function(transp){
 		var edit = elt('span', {id:'${keyEdit}'}, 
-										translateValueByKey('keyEdit')),
+										model.Translator.translateValueByKey('keyEdit')),
 				dEdit = elt('DIV', {class:'context'}, edit),
 				del = elt('span', {id:'${keyDelete}'}, 
-										translateValueByKey('keyDelete')),
+										model.Translator.translateValueByKey('keyDelete')),
 				dDel = elt('DIV', {class:'context'}, del),
 				main = elt('DIV', {id:'contextT', class:'autoClose'}, dEdit, dDel);
 
 		main.style.backgroundColor = 'silver';
 
 		dEdit.addEventListener('click', function(evt){
-			psFunctions.run('./js/pr/forms/Transparants.js', 
+			model.psFunctions.run('./js/pr/forms/Transparants.js', 
 				function(){
-					var func = psFunctions.results['./js/pr/forms/Transparants.js'];
+					var func = model.psFunctions.results['./js/pr/forms/Transparants.js'];
 					if (func){
 						var f = func(), transps = f.TranspatantEdit(transp);
 						document.body.appendChild(transps);
-						setPopupWindow('transparantEdit', 'main');
+						model.tools.setPopupWindow('transparantEdit', 'main');
 						transps.style.top = 
 							model.currentItem.getBoundingClientRect().top + 'px';
 						transps.style.left = 
@@ -75,7 +75,7 @@ return {
 					id = transp.id;
 
 			cm.parameters.push({'id': id.slice(id.indexOf('_') + 1)});
-			webSocket.send(JSON.stringify(cm));
+			model.webSocket.send(JSON.stringify(cm));
 			// model.removeElement(document.getElementById("contextT"));
 			// model.removeElement(transp);
 			model.autoClose();
